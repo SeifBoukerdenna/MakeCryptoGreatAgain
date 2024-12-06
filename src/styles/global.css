@@ -1,0 +1,423 @@
+body,
+html {
+    margin: 0;
+    padding: 0;
+    font-family: 'Nunito Sans', sans-serif;
+    height: 100%;
+    background: #000;
+    color: #fff;
+}
+
+/* Patriotic crypto background */
+body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at center, #0a0c10 0%, #000000 100%);
+    /* Subtle pattern of flags & crypto: a semi-transparent png repeating */
+    background-image: url('/src/assets/pattern-crypto-flag.png');
+    /* Create a pattern of small flags and coins */
+    background-size: 150px 150px;
+    background-repeat: repeat;
+    opacity: 0.1;
+    z-index: -1;
+}
+
+/* NAV BAR */
+.nav-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    background: linear-gradient(to right, #0a0e20, #1b1e26);
+    border-bottom: 2px solid #2c2f36;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+}
+
+.logo {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #ffffff;
+    text-shadow: 0 0 5px #ff0000, 0 0 8px #0000ff;
+    /* Add a subtle American crypto icon next to it */
+    background: url('/src/assets/eagle-bitcoin.png') no-repeat right center;
+    background-size: 40px;
+    padding-right: 50px;
+}
+
+.wallet-button {
+    background: linear-gradient(to right, #ff0000, #0000ff);
+    color: #fff;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 25px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: opacity 0.3s;
+}
+
+.wallet-button:hover {
+    opacity: 0.9;
+}
+
+/* HEADER */
+.header {
+    text-align: center;
+    padding: 1.5rem 1rem;
+    background: linear-gradient(135deg, rgba(0, 0, 50, 0.7), rgba(10, 10, 20, 0.7));
+    position: relative;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+}
+
+.header::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: url('/src/assets/american-eagle-silhouette.png') no-repeat center;
+    background-size: contain;
+    opacity: 0.05;
+    z-index: 0;
+}
+
+.title {
+    font-size: 2.7rem;
+    margin: 0;
+    color: #fff;
+    text-shadow: 0 0 7px #ff0000, 0 0 7px #0000ff;
+    z-index: 1;
+    position: relative;
+}
+
+.subtitle {
+    font-size: 1.2rem;
+    font-weight: 300;
+    margin: 0.5rem 0 0 0;
+    color: #ddd;
+    opacity: 0.95;
+    z-index: 1;
+    position: relative;
+}
+
+/* MAIN CONTENT */
+.main-content {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+/* SIDEBAR */
+.sidebar {
+    width: 300px;
+    background: rgba(0, 0, 0, 0.4);
+    border-right: 1px solid #2c2f36;
+    padding: 1rem;
+}
+
+.buy-coin-card {
+    background: linear-gradient(135deg, #1f2128, #14171c);
+    border-radius: 15px;
+    padding: 1.5rem 1rem;
+    text-align: center;
+    border: 2px solid #2c2f36;
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+    animation: fadeIn 0.5s ease;
+    position: relative;
+}
+
+.buy-coin-card::before {
+    content: "";
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    bottom: -10px;
+    left: -10px;
+    border: 2px dashed rgba(255, 255, 255, 0.3);
+    border-radius: 20px;
+    animation: glowBorder 2s infinite alternate;
+}
+
+@keyframes glowBorder {
+    from {
+        opacity: 0.5;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.buy-coin-card h2 {
+    margin-bottom: 1rem;
+    font-size: 1.6rem;
+    color: #fff;
+    text-shadow: 0 0 5px #00ffea;
+}
+
+.connect-reminder {
+    font-size: 1rem;
+    color: #bbb;
+}
+
+.coin-input {
+    width: 80%;
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+    border: none;
+    border-radius: 5px;
+    outline: none;
+    background: #2c2f36;
+    color: #fff;
+    text-align: center;
+}
+
+.buy-button {
+    background: linear-gradient(to right, #ff0000, #0000ff);
+    border: none;
+    padding: 0.7rem 1rem;
+    color: #fff;
+    font-weight: bold;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.buy-button:hover {
+    opacity: 0.9;
+}
+
+/* CHAT AREA */
+.chat-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    /* Ensure input sticks to the bottom */
+    padding: 1rem;
+    overflow: hidden;
+    position: relative;
+}
+
+.chat-header {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1rem;
+    position: relative;
+}
+
+.trump-avatar-container {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    background: radial-gradient(circle at center, rgba(255, 255, 255, 0.1), transparent);
+    padding: 1rem;
+    border-radius: 50%;
+    position: relative;
+}
+
+.trump-avatar {
+    width: 100px;
+    height: auto;
+    border-radius: 50%;
+    border: 3px solid #fff;
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+    animation: fadeInDown 0.5s ease;
+}
+
+/* Add a subtle eagle watermark behind messages */
+.chat-area::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: url('/src/assets/eagle-bitcoin-large.png') no-repeat center;
+    background-size: 200px;
+    opacity: 0.05;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.messages {
+    flex: 1;
+    /* Take up remaining space */
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    overflow-y: auto;
+    margin-bottom: 1rem;
+    padding-right: 0.5rem;
+    min-height: 100px;
+    /* Ensures some space even if empty */
+    z-index: 1;
+    position: relative;
+}
+
+.messages::-webkit-scrollbar {
+    width: 6px;
+}
+
+.messages::-webkit-scrollbar-thumb {
+    background: #333;
+    border-radius: 3px;
+}
+
+.message {
+    max-width: 75%;
+    padding: 0.8rem 1rem;
+    border-radius: 10px;
+    font-size: 1rem;
+    line-height: 1.4;
+    box-shadow: 0 0 5px rgba(255, 255, 255, 0.1);
+    animation: fadeInUp 0.3s ease;
+}
+
+.message.user {
+    align-self: flex-end;
+    background: #2c2f36;
+    color: #fff;
+}
+
+.message.trump {
+    align-self: flex-start;
+    background: linear-gradient(to right, #ff0000, #0000ff);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.message.trump.loading {
+    background: linear-gradient(90deg, #333, #555);
+}
+
+/* MESSAGE INPUT */
+.message-input-container {
+    display: flex;
+    padding: 0.5rem;
+    background: rgba(0, 0, 0, 0.6);
+    border-top: 1px solid #2c2f36;
+    backdrop-filter: blur(5px);
+    position: relative;
+}
+
+.message-input-container::before {
+    content: "";
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: url('/src/assets/mini-eagle-coin.png') no-repeat center;
+    background-size: 20px;
+    width: 20px;
+    height: 20px;
+    opacity: 0.8;
+    pointer-events: none;
+}
+
+.message-input {
+    flex: 1;
+    padding: 0.5rem 1rem 0.5rem 2.5rem;
+    /* Add left padding for the icon */
+    border: none;
+    border-radius: 25px;
+    background: #2c2f36;
+    color: #fff;
+    outline: none;
+    font-size: 1rem;
+    transition: box-shadow 0.3s;
+}
+
+.message-input::placeholder {
+    color: #aaa;
+    font-style: italic;
+}
+
+.message-input:focus {
+    box-shadow: 0 0 10px #ff0000, 0 0 10px #0000ff;
+}
+
+.send-button {
+    margin-left: 0.5rem;
+    background: linear-gradient(to right, #ff0000, #0000ff);
+    color: #fff;
+    padding: 0.5rem 1.2rem;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 25px;
+    transition: opacity 0.3s;
+}
+
+.send-button:hover {
+    opacity: 0.9;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+    .main-content {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        width: 100%;
+        order: 2;
+        margin-top: 1rem;
+    }
+
+    .chat-area {
+        order: 1;
+    }
+
+    .message {
+        max-width: 90%;
+    }
+}
+
+@media (max-width: 480px) {
+    .title {
+        font-size: 1.8rem;
+    }
+
+    .subtitle {
+        font-size: 1rem;
+    }
+
+    .trump-avatar {
+        width: 60px;
+    }
+}
