@@ -13,7 +13,7 @@ export async function getTrumpResponseFromOpenAI(
   const response = await axios.post(
     OPENAI_API_URL,
     {
-      model: "gpt-3.5-turbo", // or gpt-4 if you have access
+      model: "gpt-4", // or gpt-4 if you have access
       messages: [
         { role: "system", content: systemPrompt },
         { role: "user", content: userMessage },
