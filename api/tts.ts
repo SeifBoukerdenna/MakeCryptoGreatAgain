@@ -2,10 +2,14 @@
 
 import { VercelRequest, VercelResponse } from "@vercel/node";
 
-// Utility function to handle CORS preflight requests
-function handleOptions(req: VercelRequest, res: VercelResponse): boolean {
+// Handle CORS preflight requests
+function handleOptions(
+  req: VercelRequest,
+  res: VercelResponse,
+  allowedOrigin: string
+): boolean {
   if (req.method === "OPTIONS") {
-    res.setHeader("Access-Control-Allow-Origin", "*"); // 🔒 In production, replace "*" with your frontend URL for better security
+    res.setHeader("Access-Control-Allow-Origin", allowedOrigin);
     res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
     res.setHeader("Access-Control-Allow-Headers", "Content-Type");
     res.status(200).end();
@@ -14,10 +18,14 @@ function handleOptions(req: VercelRequest, res: VercelResponse): boolean {
   return false;
 }
 
-// Utility function to ensure the request method is POST
-function ensurePostMethod(req: VercelRequest, res: VercelResponse): boolean {
+// Ensure the request method is POST
+function ensurePostMethod(
+  req: VercelRequest,
+  res: VercelResponse,
+  allowedOrigin: string
+): boolean {
   if (req.method !== "POST") {
-    res.setHeader("Access-Control-Allow-Origin", "*"); // 🔒 In production, replace "*" with your frontend URL for better security
+    res.setHeader("Access-Control-Allow-Origin", allowedOrigin);
     res.status(405).json({ error: "Method not allowed" });
     return false;
   }
@@ -25,32 +33,37 @@ function ensurePostMethod(req: VercelRequest, res: VercelResponse): boolean {
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+  // Retrieve ALLOWED_ORIGIN or set to "*" for development
+  const allowedOrigin = process.env.ALLOWED_ORIGIN || "*";
+
   // Handle CORS preflight
-  if (handleOptions(req, res)) return;
+  if (handleOptions(req, res, allowedOrigin)) return;
 
   // Ensure the request method is POST
-  if (!ensurePostMethod(req, res)) return;
+  if (!ensurePostMethod(req, res, allowedOrigin)) return;
 
   const { text, voice } = req.body || {};
 
   // Validate the 'text' parameter
   if (!text || typeof text !== "string") {
-    res.setHeader("Access-Control-Allow-Origin", "*"); // 🔒 In production, replace "*" with your frontend URL for better security
+    res.setHeader("Access-Control-Allow-Origin", allowedOrigin);
     return res.status(400).json({ error: "Missing or invalid text parameter" });
   }
 
-  // Retrieve API credentials from environment variables
-  // const authToken = process.env.PLAY_SECRET_KEY; // Correct variable name
-  // const userId = process.env.PLAY_USER_ID;
+  // **Temporarily Hardcode API Credentials for Testing**
+  const authToken = "198f8a8d41b641848ba289bee9418a2d"; // Replace with your Play.ht secret key
+  const userId = "PLBxqtHtEvhmn4gSNdzcUX35yZu1"; // Replace with your Play.ht user ID
+
+  // **End of Hardcoding**
 
   // Validate API credentials
-  // if (!authToken || !userId) {
-  //   console.error(
-  //     `Missing API credentials: authToken=${authToken}, userId=${userId}`
-  //   );
-  //   // res.setHeader("Access-Control-Allow-Origin", "*"); // 🔒 In production, replace "*" with your frontend URL for better security
-  //   return res.status(200).json({ error: "Server configuration error" });
-  // }
+  if (!authToken || !userId) {
+    console.error(
+      `Missing API credentials: authToken=${authToken}, userId=${userId}`
+    );
+    res.setHeader("Access-Control-Allow-Origin", allowedOrigin);
+    return res.status(500).json({ error: "Server configuration error" });
+  }
 
   // Set a default voice if none is provided
   const chosenVoice =
@@ -65,8 +78,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       headers: {
         Accept: "audio/mpeg",
         "Content-Type": "application/json",
-        AUTHORIZATION: "198f8a8d41b641848ba289bee9418a2d",
-        "X-USER-ID": "PLBxqtHtEvhmn4gSNdzcUX35yZu1",
+        Authorization: authToken, // Correct casing
+        "X-User-ID": userId,
       },
       body: JSON.stringify({
         text: text.trim(),
@@ -79,7 +92,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // Handle non-OK responses
     if (!playResponse.ok) {
       const errorText = await playResponse.text();
-      res.setHeader("Access-Control-Allow-Origin", "*"); // 🔒 In production, replace "*" with your frontend URL for better security
+      res.setHeader("Access-Control-Allow-Origin", allowedOrigin);
       return res
         .status(playResponse.status)
         .json({ error: errorText || "Failed to generate TTS" });
@@ -92,7 +105,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const base64Data = Buffer.from(buffer).toString("base64");
 
     // Set CORS headers
-    res.setHeader("Access-Control-Allow-Origin", "*"); // 🔒 In production, replace "*" with your frontend URL for better security
+    res.setHeader("Access-Control-Allow-Origin", allowedOrigin);
     res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
     res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
@@ -100,7 +113,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(200).json({ audioBase64: base64Data });
   } catch (error) {
     console.error("Error calling Play.ht API:", error);
-    res.setHeader("Access-Control-Allow-Origin", "*"); // 🔒 In production, replace "*" with your frontend URL for better security
+    res.setHeader("Access-Control-Allow-Origin", allowedOrigin);
     return res.status(500).json({ error: "Internal server error" });
   }
 }
