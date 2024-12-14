@@ -2,86 +2,36 @@ import React, { useState, useRef } from 'react';
 
 const PlayTTSComponent: React.FC = () => {
     const [text, setText] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
-    const [audioSrc, setAudioSrc] = useState('');
+    const [isLoading,] = useState(false);
+    const [audioSrc,] = useState('');
     const audioRef = useRef<HTMLAudioElement>(null);
 
-    const userId = import.meta.env.VITE_Play_UserId;
-    const secretKey = import.meta.env.VITE_Play_Secret_Key;
-    const voiceId = 'en-US-AshleyNeural'; // Default voice
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setText(e.target.value);
     };
 
     const handleGenerateAudio = async () => {
-        if (!text.trim()) return;
-
-        setIsLoading(true);
-        setAudioSrc('');
-
         try {
-            // STEP 1: Request TTS generation
-            const response = await fetch('https://play.ht/api/v2/tts', {
+            const response = await fetch('/api/tts', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-User-ID': userId,
-                    'X-User-Secret': secretKey
-                },
-                body: JSON.stringify({
-                    text: text.trim(),
-                    voice: voiceId
-                })
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text: "Hello sir" }) // if you use text from state
             });
 
             if (!response.ok) {
                 throw new Error(`API request failed with status ${response.status}`);
             }
 
-            const data = await response.json();
-            const jobId = data.transcriptionId;
+            const { audioBase64 } = await response.json();
 
-            // STEP 2: Poll until the audio is ready
-            const audioUrl = await pollForAudio(jobId);
-
-            // STEP 3: Play the audio
-            setAudioSrc(audioUrl);
-            setIsLoading(false);
-
-            if (audioRef.current) {
-                audioRef.current.src = audioUrl;
-                await audioRef.current.play();
-            }
+            // Create a blob URL from the base64 data
+            const audioUrl = `data:audio/mpeg;base64,${audioBase64}`;
+            const audio = new Audio(audioUrl);
+            await audio.play();
 
         } catch (error) {
             console.error('Error generating audio:', error);
-            setIsLoading(false);
-        }
-    };
-
-    const pollForAudio = async (jobId: string): Promise<string> => {
-        const statusUrl = `https://play.ht/api/v2/tts/${jobId}`;
-
-        // Keep polling until status is 'converted'
-        while (true) {
-            await new Promise(r => setTimeout(r, 3000)); // wait 3 seconds between checks
-            const statusRes = await fetch(statusUrl, {
-                headers: {
-                    'X-User-ID': userId,
-                    'X-User-Secret': secretKey
-                }
-            });
-
-            const statusData = await statusRes.json();
-
-            if (statusData.status === 'converted' && statusData.audioUrl) {
-                return statusData.audioUrl;
-            }
-
-            if (statusData.status === 'failed') {
-                throw new Error('Audio generation failed.');
-            }
         }
     };
 
