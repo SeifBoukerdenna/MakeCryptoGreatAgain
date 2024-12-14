@@ -48,3 +48,15 @@ export default tseslint.config({
   },
 })
 ```
+
+## Testing the Voice App
+
+To test the voice app, you need to run the following command instead of `npm run dev`:
+
+```sh
+vercel dev
+```
+
+This will start the development server with Vercel's configuration.
+
+
