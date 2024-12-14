@@ -1,37 +1,39 @@
 import React, { useState } from 'react';
 import TrumpAvatar from '../components/TrumpAvatar';
-import MessageInput from '../components/MessageInput';
+// import MessageInput from '../components/MessageInput';
 import ConnectWallet from '../components/ConnectWallet';
 import BuyTrumpTalkCoin from '../components/BuyTrumpTalkCoin';
-import { getTrumpResponseFromOpenAI } from '../utils/openai';
+// import { getTrumpResponseFromOpenAI } from '../utils/openai';
+// import TrumpChat from '../components/TrumpChat';
+import PlayTTSComponent from '../components/PlayTTSComponent';
 
-interface Message {
-    sender: 'user' | 'trump';
-    text: string;
-}
+// interface Message {
+//     sender: 'user' | 'trump';
+//     text: string;
+// }
 
 const Home: React.FC = () => {
-    const [messages, setMessages] = useState<Message[]>([]);
+    // const [messages, setMessages] = useState<Message[]>([]);
     const [walletAddress, setWalletAddress] = useState<string | null>(null);
-    const [loadingTrumpResponse, setLoadingTrumpResponse] = useState(false);
+    // const [loadingTrumpResponse, setLoadingTrumpResponse] = useState(false);
 
-    const handleSend = async (userText: string) => {
-        const userMessage: Message = { sender: 'user', text: userText };
-        setMessages(prev => [...prev, userMessage]);
-        setLoadingTrumpResponse(true);
+    // const handleSend = async (userText: string) => {
+    //     const userMessage: Message = { sender: 'user', text: userText };
+    //     setMessages(prev => [...prev, userMessage]);
+    //     setLoadingTrumpResponse(true);
 
-        try {
-            const trumpReplyText = await getTrumpResponseFromOpenAI(userText);
-            const trumpReply: Message = { sender: 'trump', text: trumpReplyText.trim() };
-            setMessages(prev => [...prev, trumpReply]);
-        } catch (error) {
-            console.error("Error fetching Trump response:", error);
-            const errorMessage: Message = { sender: 'trump', text: "Sorry, something went wrong. Huge problems!" };
-            setMessages(prev => [...prev, errorMessage]);
-        } finally {
-            setLoadingTrumpResponse(false);
-        }
-    };
+    //     try {
+    //         const trumpReplyText = await getTrumpResponseFromOpenAI(userText);
+    //         const trumpReply: Message = { sender: 'trump', text: trumpReplyText.trim() };
+    //         setMessages(prev => [...prev, trumpReply]);
+    //     } catch (error) {
+    //         console.error("Error fetching Trump response:", error);
+    //         const errorMessage: Message = { sender: 'trump', text: "Sorry, something went wrong. Huge problems!" };
+    //         setMessages(prev => [...prev, errorMessage]);
+    //     } finally {
+    //         setLoadingTrumpResponse(false);
+    //     }
+    // };
 
     return (
         <div className="home-container">
@@ -55,7 +57,7 @@ const Home: React.FC = () => {
                     <div className="chat-header">
                         <TrumpAvatar />
                     </div>
-                    <div className="messages">
+                    {/* <div className="messages">
                         {messages.map((m, i) => (
                             <div key={i} className={`message ${m.sender}`}>
                                 <p>{m.text}</p>
@@ -66,8 +68,10 @@ const Home: React.FC = () => {
                                 <p>Thinking... (in a very big way!)</p>
                             </div>
                         )}
-                    </div>
-                    <MessageInput onSend={handleSend} />
+                    </div> */}
+                    {/* <MessageInput onSend={handleSend} /> */}
+                    {/* <TrumpChat /> */}
+                    <PlayTTSComponent />
                 </div>
             </div>
         </div>
