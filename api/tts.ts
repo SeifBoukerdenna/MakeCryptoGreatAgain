@@ -85,7 +85,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         text: text.trim(),
         voice: chosenVoice,
         output_format: "mp3",
-        voice_engine: "PlayDialog",
+        voice_engine: "Play3.0-mini",
       }),
     });
 
