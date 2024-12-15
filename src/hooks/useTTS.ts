@@ -1,6 +1,6 @@
-// src/hooks/useTTS.ts
-
 import { useState, useCallback } from "react";
+import routes from "../configs/routes.json";
+import voices from "../configs/voices.json";
 
 interface UseTTSResult {
   isLoading: boolean;
@@ -19,13 +19,12 @@ export function useTTS(): UseTTSResult {
     setError(null);
 
     try {
-      const response = await fetch("/api/tts", {
+      const response = await fetch(routes.api.tts, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           text,
-          voice:
-            "s3://voice-cloning-zero-shot/9f6080a2-c6c6-4a5a-a101-17b354087b68/original/manifest.json",
+          voice: voices.trump.voice,
         }),
       });
 

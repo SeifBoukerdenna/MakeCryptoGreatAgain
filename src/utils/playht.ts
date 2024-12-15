@@ -1,6 +1,6 @@
 import axios from "axios";
+import routes from "../configs/routes.json";
 
-const PLAYHT_API_URL = "https://play.ht/api/v1/convert";
 const PLAYHT_USER_ID = import.meta.env.VITE_Play_UserId;
 const PLAYHT_SECRET_KEY = import.meta.env.VITE_Play_Secret_Key;
 
@@ -16,7 +16,7 @@ export async function convertTextToSpeech(text: string): Promise<string> {
 
   try {
     const response = await axios.post(
-      PLAYHT_API_URL,
+      routes.playHT.convert,
       {
         content: [text],
         // voice: "donald_trump_gwsyn",

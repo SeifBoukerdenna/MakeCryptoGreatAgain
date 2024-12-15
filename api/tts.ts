@@ -1,7 +1,8 @@
 // api/tts.ts
 
 import { VercelRequest, VercelResponse } from "@vercel/node";
-
+import voices from "../src/configs/voices.json";
+import routes from "../src/configs/routes.json";
 // Handle CORS preflight requests
 function handleOptions(
   req: VercelRequest,
@@ -50,11 +51,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(400).json({ error: "Missing or invalid text parameter" });
   }
 
+  // going to replace this with the actual API credentials
   // **Temporarily Hardcode API Credentials for Testing**
   const authToken = "198f8a8d41b641848ba289bee9418a2d"; // Replace with your Play.ht secret key
   const userId = "PLBxqtHtEvhmn4gSNdzcUX35yZu1"; // Replace with your Play.ht user ID
-
-  // **End of Hardcoding**
 
   // Validate API credentials
   if (!authToken || !userId) {
@@ -69,11 +69,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const chosenVoice =
     typeof voice === "string" && voice.trim()
       ? voice.trim()
-      : "s3://voice-cloning-zero-shot/9f6080a2-c6c6-4a5a-a101-17b354087b68/original/manifest.json";
+      : voices.trump.voice;
 
   try {
     // Make the TTS request to Play.ht
-    const playResponse = await fetch("https://play.ht/api/v2/tts/stream", {
+    const playResponse = await fetch(routes.playHT.stream, {
       method: "POST",
       headers: {
         Accept: "audio/mpeg",

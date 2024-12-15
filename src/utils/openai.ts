@@ -1,15 +1,15 @@
 // src/utils/openai.ts
 import axios from "axios";
+import prompt from "../configs/prompt.json";
+import routes from "../configs/routes.json";
 
-const OPENAI_API_URL = "https://api.openai.com/v1/chat/completions";
+const OPENAI_API_URL = routes.openAI.completion;
 const OPENAI_API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
 
 export async function getTrumpResponseFromOpenAI(
   userMessage: string
 ): Promise<string> {
-  const systemPrompt =
-    "You are Donald Trump. Respond to the user as if you are Donald Trump, with a confident, boastful tone and referencing American greatness. for debugging purposes keep your answers short (1 sentence)";
-  console.log(`OPENAI_API_KEY: ${OPENAI_API_KEY}`);
+  const systemPrompt = prompt.systemPrompt.trump.prompt;
   const response = await axios.post(
     OPENAI_API_URL,
     {
