@@ -38,7 +38,7 @@ const Home: React.FC = () => {
             <nav className="nav-bar">
                 <div className="logo">TrumpTalk</div>
                 <div className="nav-right">
-                    <ConnectWallet walletAddress={walletAddress} setWalletAddress={setWalletAddress} />
+                    <ConnectWallet />
                 </div>
             </nav>
 

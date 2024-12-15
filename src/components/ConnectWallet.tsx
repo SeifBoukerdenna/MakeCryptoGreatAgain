@@ -1,28 +1,39 @@
-import React from 'react';
+import { useWallet } from '@solana/wallet-adapter-react';
+import { PhantomWalletName } from '@solana/wallet-adapter-phantom';
+import { useCallback } from 'react';
 
-interface ConnectWalletProps {
-    walletAddress: string | null;
-    setWalletAddress: React.Dispatch<React.SetStateAction<string | null>>;
-}
+const ConnectWallet: React.FC = () => {
+    const { connected, connect, disconnect, select, publicKey } = useWallet();
 
-const ConnectWallet: React.FC<ConnectWalletProps> = ({ walletAddress, setWalletAddress }) => {
-    const connect = () => {
-        // Simulate a wallet address
-        setWalletAddress('SOLANA_WALLET_ADDRESS_EXAMPLE');
-    };
+    const handleConnect = useCallback(async () => {
+        try {
+            // Use the exported PhantomWalletName rather than a string literal
+            select(PhantomWalletName);
+            await connect();
+        } catch (error) {
+            console.error("Error connecting wallet:", error);
+        }
+    }, [connect, select]);
 
-    const disconnect = () => {
-        setWalletAddress(null);
-    };
+    const handleDisconnect = useCallback(async () => {
+        try {
+            await disconnect();
+        } catch (error) {
+            console.error("Error disconnecting wallet:", error);
+        }
+    }, [disconnect]);
 
     return (
         <div className="connect-wallet">
-            {walletAddress ? (
-                <button className="wallet-button" onClick={disconnect}>
-                    Disconnect
-                </button>
+            {connected && publicKey ? (
+                <div className="wallet-connected">
+                    <p>Wallet: {publicKey.toBase58()}</p>
+                    <button className="wallet-button" onClick={handleDisconnect}>
+                        Disconnect
+                    </button>
+                </div>
             ) : (
-                <button className="wallet-button" onClick={connect}>
+                <button className="wallet-button" onClick={handleConnect}>
                     Connect Wallet
                 </button>
             )}
