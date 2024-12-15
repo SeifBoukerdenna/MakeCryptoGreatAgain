@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import TrumpAvatar from '../components/TrumpAvatar';
 import MessageInput from '../components/MessageInput';
-import ConnectWallet from '../components/ConnectWallet';
-import BuyTrumpTalkCoin from '../components/BuyTrumpTalkCoin';
 import { getTrumpResponseFromOpenAI } from '../utils/openai';
 
 interface Message {
@@ -12,7 +10,6 @@ interface Message {
 
 const Home: React.FC = () => {
     const [messages, setMessages] = useState<Message[]>([]);
-    const [walletAddress, setWalletAddress] = useState<string | null>(null);
     const [loadingTrumpResponse, setLoadingTrumpResponse] = useState(false);
 
     const handleSend = async (userText: string) => {
@@ -35,22 +32,8 @@ const Home: React.FC = () => {
 
     return (
         <div className="home-container">
-            <nav className="nav-bar">
-                <div className="logo">TrumpTalk</div>
-                <div className="nav-right">
-                    <ConnectWallet walletAddress={walletAddress} setWalletAddress={setWalletAddress} />
-                </div>
-            </nav>
-
-            <header className="header">
-                <h1 className="title">Talk With "Trump"</h1>
-                <p className="subtitle">The Ultimate American Crypto Chat</p>
-            </header>
 
             <div className="main-content">
-                <div className="sidebar">
-                    <BuyTrumpTalkCoin walletAddress={walletAddress} />
-                </div>
                 <div className="chat-area">
                     <div className="chat-header">
                         <TrumpAvatar />

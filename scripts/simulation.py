@@ -11,7 +11,7 @@ TOTAL_SUPPLY = 1_000_000_000
 USER_TOKENS = 15_000_000.0
 
 # Initial Liquidity
-usd_reserve = 10_000.0
+usd_reserve = 15_000.0
 token_reserve = 985_000_000.0
 
 # Entities

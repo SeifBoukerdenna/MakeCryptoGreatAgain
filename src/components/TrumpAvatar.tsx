@@ -1,5 +1,5 @@
 import React from 'react';
-import trumpImage from '../assets/trump-cartoon.jpg';
+import trumpImage from '../assets/trump-memoji.jpg';
 
 const TrumpAvatar: React.FC = () => {
     return (
