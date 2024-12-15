@@ -8,8 +8,8 @@ export async function getTrumpResponseFromOpenAI(
   userMessage: string
 ): Promise<string> {
   const systemPrompt =
-    "You are Donald Trump. Respond to the user as if you are Donald Trump, with a confident, boastful tone and referencing American greatness.";
-
+    "You are Donald Trump. Respond to the user as if you are Donald Trump, with a confident, boastful tone and referencing American greatness. for debugging purposes keep your answers short (1 sentence)";
+  console.log(`OPENAI_API_KEY: ${OPENAI_API_KEY}`);
   const response = await axios.post(
     OPENAI_API_URL,
     {
