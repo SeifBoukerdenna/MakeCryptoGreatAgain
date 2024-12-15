@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import TrumpAvatar from '../components/TrumpAvatar';
 import MessageInput from '../components/MessageInput';
 import { getTrumpResponseFromOpenAI } from '../utils/openai';
+import MuskAvatar from '../components/MuskAvatar';
+import TateAvatar from '../components/TateAvatar';
 
 interface Message {
     sender: 'user' | 'trump';
@@ -34,6 +36,10 @@ const Home: React.FC = () => {
         <div className="home-container">
 
             <div className="main-content">
+                <div className='character-carousel'>
+                <MuskAvatar></MuskAvatar>
+                <TateAvatar></TateAvatar>
+                </div>
                 <div className="chat-area">
                     <div className="chat-header">
                         <TrumpAvatar />

@@ -7,7 +7,7 @@ html {
     background: #000;
     color: #fff;
 }
-
+/* 
 h1{
     display: flex;
     align-items: center;
@@ -19,6 +19,51 @@ h1{
     box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
     text-shadow: 0 0 5px #ff0000, 0 0 8px #0000ff;
     height: 100px;
+} */
+
+.musk-avatar {
+    display: flex;
+    width: 75px;
+    height: auto;
+    border-radius: 50%;
+    border: 3px solid #fff;
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+    animation: fadeInDown 0.5s ease;
+    justify-content: space-around;
+}
+
+.musk-avatar:hover{
+    cursor: pointer;
+    transform: scale(1.1);
+    transition: transform 330ms ease-in-out;
+}
+
+.tate-avatar{
+    display: flex;
+    width: 75px;
+    height: auto;
+    border-radius: 50%;
+    border: 3px solid #fff;
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+    animation: fadeInDown 0.5s ease;
+    justify-content: space-between;
+}
+
+.tate-avatar:hover{
+    cursor: pointer;
+    transform: scale(1.1);
+    transition: transform 330ms ease-in-out;
+}
+
+.character-carousel{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(to right, #0a0e20, #1b1e26);
+    border-bottom: 2px solid #2c2f36;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+    height: 100px;
+    margin: 10px;
 }
 
 
@@ -53,6 +98,7 @@ h1{
     box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
     animation: fadeInDown 0.5s ease;
 }
+
 
 /* Add a subtle eagle watermark behind messages */
 
