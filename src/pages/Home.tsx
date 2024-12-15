@@ -7,7 +7,6 @@ import BuyTrumpTalkCoin from '../components/BuyTrumpTalkCoin';
 import PromptInput from '../components/PromptInput';
 import { getTrumpResponseFromOpenAI } from '../utils/openai';
 import { useTTS } from '../hooks/useTTS';
-// import './Home.css'; // Ensure you have appropriate styling
 
 interface Message {
     sender: 'user' | 'trump';
