@@ -56,14 +56,17 @@ const Home: React.FC = () => {
             });
 
             // Check if we ended a sentence
-            if (accumulatedTextRef.current.endsWith('.') ||
+            if (
+                accumulatedTextRef.current.endsWith('.') ||
                 accumulatedTextRef.current.endsWith('!') ||
-                accumulatedTextRef.current.endsWith('?')) {
-                // Send the sentence so far to TTS immediately
-                console.log("Sending TTS request with text:", accumulatedTextRef.current);
+                accumulatedTextRef.current.endsWith('?')
+            ) {
+                // We have a full sentence, send it to TTS now
+                console.log("Sending TTS request with sentence:", accumulatedTextRef.current);
                 sendTTSRequest(accumulatedTextRef.current);
-                // If you want to do even more "live" feeling, you could send partial phrases
-                // every few tokens, but that can get messy. Stick to sentence boundaries for clarity.
+
+                // Reset the accumulation to start fresh for the next sentence
+                // accumulatedTextRef.current = "";
             }
         };
 
