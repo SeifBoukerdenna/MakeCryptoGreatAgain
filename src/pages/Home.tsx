@@ -18,7 +18,6 @@ const DEFAULT_VOICE = "s3://voice..."; // your chosen voice
 
 const Home: React.FC = () => {
     const [messages, setMessages] = useState<Message[]>([]);
-    const [walletAddress, setWalletAddress] = useState<string | null>(null);
     const [loadingTrumpResponse, setLoadingTrumpResponse] = useState(false);
 
     // Using the new useTTS hook
@@ -92,7 +91,7 @@ const Home: React.FC = () => {
             <nav className="nav-bar">
                 <div className="logo">TrumpTalk</div>
                 <div className="nav-right">
-                    <ConnectWallet walletAddress={walletAddress} setWalletAddress={setWalletAddress} />
+                    <ConnectWallet />
                 </div>
             </nav>
 
@@ -103,7 +102,7 @@ const Home: React.FC = () => {
 
             <div className="main-content">
                 <div className="sidebar">
-                    <BuyTrumpTalkCoin walletAddress={walletAddress} />
+                    <BuyTrumpTalkCoin />
                 </div>
                 <div className="chat-area">
                     <div className="chat-header">
