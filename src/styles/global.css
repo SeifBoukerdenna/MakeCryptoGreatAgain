@@ -7,19 +7,7 @@ html {
     background: #000;
     color: #fff;
 }
-/* 
-h1{
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 1.5rem 1rem;
-    padding: 0.5rem 1rem;
-    background: linear-gradient(to right, #0a0e20, #1b1e26);
-    border-bottom: 2px solid #2c2f36;
-    box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
-    text-shadow: 0 0 5px #ff0000, 0 0 8px #0000ff;
-    height: 100px;
-} */
+
 
 .musk-avatar {
     display: flex;
@@ -63,13 +51,9 @@ h1{
     border-bottom: 2px solid #2c2f36;
     box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
     height: 100px;
-    margin: 10px;
+    margin: 0px;
+    gap: 40px;
 }
-
-
-
-
-/* CHAT AREA */
 
 
 .chat-header {
@@ -91,7 +75,7 @@ h1{
 }
 
 .trump-avatar {
-    width: 400px;
+    width: 300px;
     height: auto;
     border-radius: 50%;
     border: 3px solid #fff;
@@ -99,8 +83,44 @@ h1{
     animation: fadeInDown 0.5s ease;
 }
 
+.waveform-wrapper {
+    display: flex;
+    align-items: center; 
+    width: 90%;
+    margin: 20px auto;
+    background: #111;
+    padding: 10px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+}
 
-/* Add a subtle eagle watermark behind messages */
+.play-button {
+    background: linear-gradient(to right, #ff0000, #0000ff);
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 15px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-right: 15px; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    transition: opacity 0.3s ease;
+}
+
+.play-button:hover {
+    opacity: 0.9;
+}
+
+.waveform-container {
+    flex: 1;
+    text-align: left;
+}
+
+
+
 
 
 .messages {
@@ -156,7 +176,7 @@ h1{
 
 .message-input-container {
     display: flex;
-    height: 80px;
+    height: 50px;
     padding: 0.5rem;
     background: rgba(0, 0, 0, 0.6);
     border-top: 1px solid #2c2f36;
@@ -171,7 +191,7 @@ h1{
     flex: 1;
     padding: 0.5rem 1rem 0.5rem 2.5rem;
     width : 50px;
-    height:auto;    /* Add left padding for the icon */
+    height:auto;  
     border: none;
     border-radius: 25px;
     background: #2c2f36;
@@ -193,7 +213,7 @@ h1{
 
 .send-button {
     margin-left: 0.5rem;
-    font-size: 36px;
+    font-size: 24px;
     background: linear-gradient(to right, #ff0000, #0000ff);
     color: #fff;
     padding: 0.5rem 1.2rem;
@@ -207,6 +227,9 @@ h1{
 .send-button:hover {
     opacity: 0.9;
 }
+
+
+
 
 /* Animations */
 @keyframes fadeIn {
