@@ -1,3 +1,4 @@
+// src/pages/Home.tsx
 import React, { useState } from 'react';
 import TrumpAvatar from '../components/TrumpAvatar';
 import MessageInput from '../components/MessageInput';
@@ -12,7 +13,6 @@ interface Message {
 
 const Home: React.FC = () => {
     const [messages, setMessages] = useState<Message[]>([]);
-    const [walletAddress, setWalletAddress] = useState<string | null>(null);
     const [loadingTrumpResponse, setLoadingTrumpResponse] = useState(false);
 
     const handleSend = async (userText: string) => {
@@ -38,7 +38,7 @@ const Home: React.FC = () => {
             <nav className="nav-bar">
                 <div className="logo">TrumpTalk</div>
                 <div className="nav-right">
-                    <ConnectWallet walletAddress={walletAddress} setWalletAddress={setWalletAddress} />
+                    <ConnectWallet />
                 </div>
             </nav>
 
@@ -49,7 +49,7 @@ const Home: React.FC = () => {
 
             <div className="main-content">
                 <div className="sidebar">
-                    <BuyTrumpTalkCoin walletAddress={walletAddress} />
+                    <BuyTrumpTalkCoin />
                 </div>
                 <div className="chat-area">
                     <div className="chat-header">
