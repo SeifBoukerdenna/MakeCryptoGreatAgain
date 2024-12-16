@@ -1,48 +1,44 @@
-import React, { useState } from 'react'
+import { useState } from 'react';
 
-interface PromptInputProps {
-    onSubmit: (prompt: string) => void
-}
+type PromptInputProps = {
+    onSubmit: (prompt: string) => void;
+};
 
-const PromptInput: React.FC<PromptInputProps> = ({ onSubmit }) => {
-    const [value, setValue] = useState('')
+const PromptInput = ({ onSubmit }: PromptInputProps) => {
+    const [value, setValue] = useState('');
 
     const handleSubmit = () => {
         if (value.trim()) {
-            onSubmit(value.trim())
-            setValue('')
+            onSubmit(value.trim());
+            setValue('');
         }
-    }
+    };
 
     return (
-        <div style={{ marginBottom: '2rem' }}>
+        <div className="flex w-full">
             <input
                 type="text"
                 placeholder="Ask your question..."
                 value={value}
                 onChange={(e) => setValue(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
+                className="flex-1 p-2 pl-8 bg-[#2c2f36] text-white rounded-full focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-blue-600"
                 style={{
-                    width: '100%', maxWidth: '400px', padding: '0.75rem',
-                    fontSize: '1rem', borderRadius: '5px', border: '1px solid #ccc',
-                    outline: 'none', marginBottom: '1rem'
+                    backgroundImage: 'url(/src/assets/mini-eagle-coin.png)',
+                    backgroundRepeat: 'no-repeat',
+                    backgroundPosition: 'left center',
+                    backgroundSize: '20px',
                 }}
             />
-            <br />
             <button
                 onClick={handleSubmit}
-                style={{
-                    padding: '0.5rem 1rem', fontSize: '1rem', borderRadius: '5px',
-                    border: '1px solid #b22234', background: '#b22234', color: '#fff', cursor: 'pointer',
-                    fontWeight: 'bold', letterSpacing: '0.5px', transition: 'background 0.2s ease'
-                }}
-                onMouseOver={(e) => e.currentTarget.style.background = '#a22234'}
-                onMouseOut={(e) => e.currentTarget.style.background = '#b22234'}
+                disabled={!value.trim()}
+                className="ml-2 bg-gradient-to-r from-red-600 to-blue-600 text-white px-4 py-2 rounded-full font-bold cursor-pointer disabled:opacity-50 transition-opacity"
             >
                 Submit
             </button>
         </div>
-    )
-}
+    );
+};
 
-export default PromptInput
+export default PromptInput;

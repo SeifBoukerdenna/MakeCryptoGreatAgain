@@ -1,0 +1,12 @@
+{
+    "openAI": {
+        "completion": "https://api.openai.com/v1/chat/completions"
+    },
+    "api": {
+        "tts": "/api/tts"
+    },
+    "playHT": {
+        "stream": "https://play.ht/api/v2/tts/stream",
+        "convert": "https://play.ht/api/v1/convert"
+    }
+}

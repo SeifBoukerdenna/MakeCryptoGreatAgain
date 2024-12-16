@@ -1,0 +1,5 @@
+{
+    "trump": {
+        "voice": "s3://voice-cloning-zero-shot/d8aa429b-f3a2-4447-81f4-476d2483d15a/original/manifest.json"
+    }
+}
