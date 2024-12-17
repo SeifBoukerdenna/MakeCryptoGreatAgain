@@ -155,7 +155,10 @@ const Home: React.FC = () => {
               slidesPerView={3}
               centeredSlides={true} // Centered slides
               navigation
-              pagination={{ clickable: true }}
+              pagination={{
+                clickable: true,
+                bulletClass: 'swiper-pagination-bullet', bulletActiveClass: 'swiper-pagination-bullet-active'
+              }}
               loop={true}
               breakpoints={{
                 320: {

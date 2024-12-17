@@ -34,8 +34,8 @@ html {
 
 /* Swiper Slide Centering */
 .mySwiper .swiper-slide {
-    margin-top: 20px;
-    margin-bottom: 20px;
+    margin-top: 15px;
+    margin-bottom: 3rem;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -57,14 +57,16 @@ html {
 
 /* Swiper Pagination Bullets */
 .swiper-pagination-bullet {
-    background: #444;
-    /* Darker bullets */
+    background-color: white !important;
     opacity: 1;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    transition: background-color 0.3s ease;
 }
 
 .swiper-pagination-bullet-active {
-    background: #ff4d4d;
-    /* Active bullet color */
+    background-color: rebeccapurple !important;
 }
 
 /* Individual Character Cards */
@@ -74,9 +76,7 @@ html {
     align-items: center;
     justify-content: space-between;
     background-color: rgba(27, 30, 38, 0.9);
-    /* Slight transparency */
     border: 1px solid #333;
-    /* Darker border */
     border-radius: 10px;
     padding: 15px;
     width: 180px;
