@@ -136,7 +136,7 @@ const Home: React.FC = () => {
   };
 
   return (
-    <div className="home-container bg-gradient-to-r from-gray-800 via-gray-900 to-black text-gray-100 min-h-screen flex flex-col">
+    <div className="home-container bg-gradient-to-r from-gray-700 via-gray-900 to-black text-gray-100 min-h-screen flex flex-col">
       {/* Top Navbar */}
       <nav className="navbar flex justify-between items-center p-4 bg-transparent shadow-md">
         <h1 className="text-2xl font-bold">Make Crypto Great Again</h1>
@@ -146,8 +146,8 @@ const Home: React.FC = () => {
       {/* Main Content */}
       <div className="container mx-auto flex-1 p-6 space-y-16"> {/* Added space-y-16 for spacing between sections */}
         {/* Character Selection */}
-        <section className="px-4"> {/* Removed mb-12 as space-y handles spacing */}
-          <h2 className="text-center text-3xl font-bold mb-4">Choose Your Character</h2>
+        <section className="px-4 mb-8 mt-8">{/* Removed mb-12 as space-y handles spacing */}
+          {/* <h2 className="text-center text-3xl font-bold mb-4">Choose Your Character</h2> */}
           <div className="flex justify-center items-center"> {/* Ensured flex items are centered vertically */}
             <Swiper
               modules={[Navigation, Pagination]}
@@ -190,7 +190,7 @@ const Home: React.FC = () => {
         </section>
 
         {/* Chat Area */}
-        <section className="chat-area bg-gray-800 p-6 rounded-lg shadow-lg flex flex-col h-96">
+        <section className="chat-area p-6 rounded-lg shadow-lg flex flex-col h-96 pt-6 mt-4 mb-4">
           {/* Selected Character Icon */}
           {getSelectedCharacter() && (
             <div className="selected-character-icon flex justify-center mb-4">
