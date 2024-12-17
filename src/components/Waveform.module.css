@@ -1,4 +1,5 @@
-/* components/Waveform.module.css */
+/* /src/components/Waveform.module.css */
+
 .waveformContainer {
     display: flex;
     align-items: flex-end;
@@ -13,7 +14,6 @@
     animation: waveAnimation 1s infinite ease-in-out;
     transform-origin: bottom;
     height: 20%;
-    /* Initial height */
 }
 
 .bar:nth-child(1) {

@@ -1,4 +1,5 @@
-// components/Waveform.tsx
+// /src/components/Waveform.tsx
+
 import React from 'react';
 import styles from './Waveform.module.css';
 

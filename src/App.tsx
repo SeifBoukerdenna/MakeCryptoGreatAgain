@@ -3,6 +3,9 @@ import Home from './pages/Home';
 import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react';
 import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
 import { PhantomWalletAdapter } from '@solana/wallet-adapter-phantom';
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
 
 // Default RPC endpoint (you can use a mainnet, devnet, testnet, or local RPC URL)
 // const endpoint = 'https://api.mainnet-beta.solana.com';
@@ -21,7 +24,7 @@ const App = () => {
     <ConnectionProvider endpoint={endpoint}>
       <WalletProvider wallets={wallets} autoConnect>
         <WalletModalProvider>
-          <Home />;
+          <Home />
         </WalletModalProvider>
       </WalletProvider>
     </ConnectionProvider>

@@ -85,18 +85,6 @@ const ConnectWallet: React.FC = () => {
                     <button className="wallet-button" onClick={handleDisconnect}>
                         Disconnect
                     </button>
-
-                    {/* Display Tokens */}
-                    <div className="token-list" style={{ marginTop: '1rem' }}>
-                        <h3>Your Tokens:</h3>
-                        {tokens.length === 0 && <p>No tokens found.</p>}
-                        {tokens.map((token, i) => (
-                            <div key={i} className="token-item" style={{ marginBottom: '0.5rem' }}>
-                                <p><strong>Mint:</strong> {token.mint}</p>
-                                <p><strong>Balance:</strong> {token.amount.toLocaleString()} (Decimals: {token.decimals})</p>
-                            </div>
-                        ))}
-                    </div>
                 </div>
             ) : (
                 <button className="wallet-button" onClick={handleConnect}>
