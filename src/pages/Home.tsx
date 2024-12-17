@@ -20,54 +20,72 @@ const Home: React.FC = () => {
   const [loadingTrumpResponse, setLoadingTrumpResponse] = useState(false);
   const { isLoading: isTTSLoading, isPlaying, error: ttsError, sendTTSRequest } = useTTS();
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const accumulatedTextRef = useRef<string>('');
+  const fullResponseRef = useRef<string>('');
+  const currentSentenceRef = useRef<string>('');
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  const processSentence = (text: string) => {
+    if (text.trim()) {
+      console.log("Sending TTS request with sentence:", text.trim());
+      sendTTSRequest(text.trim());
+    }
+  };
+
   const handleSend = async (userText: string) => {
+    // Add user message
     const userMessage: Message = { sender: 'user', text: userText };
     setMessages(prev => [...prev, userMessage]);
 
     setLoadingTrumpResponse(true);
-    accumulatedTextRef.current = '';
+    fullResponseRef.current = '';
+    currentSentenceRef.current = '';
 
     const handleToken = (token: string) => {
-      accumulatedTextRef.current += token;
+      // Add proper spacing between tokens
+      const spaceIfNeeded = currentSentenceRef.current && !currentSentenceRef.current.endsWith(' ') ? ' ' : '';
+      currentSentenceRef.current += spaceIfNeeded + token;
+      fullResponseRef.current += spaceIfNeeded + token;
+
+      // Update the message with the full accumulated response
       setMessages(prev => {
-        const lastMessage = prev[prev.length - 1];
+        const updatedMessages = [...prev];
+        const lastMessage = updatedMessages[updatedMessages.length - 1];
+
         if (!lastMessage || lastMessage.sender !== 'trump') {
-          return [...prev, { sender: 'trump', text: token }];
+          return [...prev, { sender: 'trump', text: fullResponseRef.current.trim() }];
         } else {
-          const updatedMessages = [...prev];
           updatedMessages[updatedMessages.length - 1] = {
             ...lastMessage,
-            text: accumulatedTextRef.current,
+            text: fullResponseRef.current.trim()
           };
           return updatedMessages;
         }
       });
 
-      // Check for sentence completion
-      if (/[.!?]$/.test(accumulatedTextRef.current)) {
-        sendTTSRequest(accumulatedTextRef.current);
-        // Optionally reset the accumulated text here if needed
+      // Check for sentence endings and process for TTS
+      if (token.match(/[.!?]\s*$/)) {
+        processSentence(currentSentenceRef.current);
+        currentSentenceRef.current = '';
       }
     };
 
     try {
       await streamGPTResponse(userText, handleToken);
-      // After streaming ends, send any remaining text to TTS
-      if (!/[.!?]$/.test(accumulatedTextRef.current) && accumulatedTextRef.current.trim()) {
-        sendTTSRequest(accumulatedTextRef.current);
+
+      // Handle any remaining text that didn't end with punctuation
+      if (currentSentenceRef.current.trim()) {
+        processSentence(currentSentenceRef.current);
       }
     } catch (error) {
-      console.error('Error fetching Trump response:', error);
-      const errorMessage: Message = { sender: 'trump', text: 'Sorry, something went wrong. Huge problems!' };
+      console.error("Error fetching Trump response:", error);
+      const errorMessage: Message = { sender: 'trump', text: "Sorry, something went wrong. Huge problems!" };
       setMessages(prev => [...prev, errorMessage]);
     } finally {
       setLoadingTrumpResponse(false);
+      currentSentenceRef.current = '';
     }
   };
 
@@ -94,14 +112,14 @@ const Home: React.FC = () => {
                 <p>Thinking... (in a very big way!)</p>
               </div>
             )}
-            {isTTSLoading && (
-              <div className="waveform-wrapper">
-                <Waveform />
-              </div>
-            )}
           </div>
+          {/* Only show waveform when audio is actually playing */}
+          {isPlaying && (
+            <div className="waveform-wrapper">
+              <Waveform />
+            </div>
+          )}
           <PromptInput onSubmit={handleSend} />
-          {isTTSLoading && <p className="tts-status">Reading out the response...</p>}
           {ttsError && <p className="tts-error">{ttsError}</p>}
           <div ref={messagesEndRef} />
         </div>

@@ -1,6 +1,7 @@
 // /src/hooks/useTTS.ts
 
 import { useState, useRef } from "react";
+import voices from "../configs/voices.json";
 
 interface UseTTSResult {
   isLoading: boolean;
@@ -13,17 +14,50 @@ export function useTTS(): UseTTSResult {
   const [isLoading, setIsLoading] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const audioQueueRef = useRef<HTMLAudioElement[]>([]);
+  const isProcessingRef = useRef(false);
+
+  const playNextInQueue = () => {
+    if (audioQueueRef.current.length === 0) {
+      setIsPlaying(false);
+      isProcessingRef.current = false;
+      return;
+    }
+
+    const audio = audioQueueRef.current.shift()!;
+    setIsPlaying(true);
+
+    audio.onended = () => {
+      URL.revokeObjectURL(audio.src);
+      playNextInQueue();
+    };
+
+    audio.onerror = () => {
+      setError("Audio playback error");
+      setIsPlaying(false);
+      URL.revokeObjectURL(audio.src);
+      playNextInQueue();
+    };
+
+    audio.play().catch((err) => {
+      console.error("Playback error:", err);
+      setError("Failed to play audio");
+      setIsPlaying(false);
+      playNextInQueue();
+    });
+  };
 
   const sendTTSRequest = async (text: string) => {
+    if (!text.trim()) return;
+
     setIsLoading(true);
     setError(null);
 
     try {
-      const response = await fetch("/api/stream-tts", {
+      const response = await fetch("/api/tts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text, voice: "en_us_michael" }), // Replace with desired voice
+        body: JSON.stringify({ text, voice: voices.trump.voice }),
       });
 
       if (!response.ok) {
@@ -32,21 +66,14 @@ export function useTTS(): UseTTSResult {
       }
 
       const audioBlob = await response.blob();
-      const audioUrl = URL.createObjectURL(audioBlob);
-      const audio = new Audio(audioUrl);
-      audioRef.current = audio;
+      const audio = new Audio(URL.createObjectURL(audioBlob));
 
-      audio.onplay = () => setIsPlaying(true);
-      audio.onended = () => {
-        setIsPlaying(false);
-        URL.revokeObjectURL(audioUrl);
-      };
-      audio.onerror = () => {
-        setIsPlaying(false);
-        setError("Audio playback error");
-      };
+      audioQueueRef.current.push(audio);
 
-      audio.play();
+      if (!isProcessingRef.current) {
+        isProcessingRef.current = true;
+        playNextInQueue();
+      }
     } catch (err: any) {
       console.error("TTS Error:", err.message);
       setError(err.message);

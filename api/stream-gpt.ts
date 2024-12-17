@@ -1,13 +1,12 @@
 // /api/stream-gpt.ts
 
 import { VercelRequest, VercelResponse } from "@vercel/node";
-import { Readable } from "stream";
 import OpenAI from "openai";
 
-// Initialize OpenAI SDK
+// Initialize OpenAI SDK with Environment Variable
 const openai = new OpenAI({
   apiKey:
-    "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",
+    "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", // Ensure this is set in your environment variables
 });
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -25,7 +24,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
     const stream = await openai.chat.completions.create({
       model: "gpt-3.5-turbo",
-      messages: [{ role: "user", content: prompt }],
+      messages: [
+        { role: "system", content: "You are ChatGPT, a helpful assistant." },
+        { role: "user", content: prompt },
+      ],
       stream: true,
     });
 
