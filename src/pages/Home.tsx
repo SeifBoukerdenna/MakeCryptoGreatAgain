@@ -19,7 +19,7 @@ interface Message {
 const Home: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [loadingTrumpResponse, setLoadingTrumpResponse] = useState(false);
-  const { isLoading: isTTSLoading, isPlaying, error: ttsError, sendTTSRequest } = useTTS();
+  const { isPlaying, error: ttsError, sendTTSRequest } = useTTS();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fullResponseRef = useRef<string>('');
   const responseBuffer = useRef<string>('');
