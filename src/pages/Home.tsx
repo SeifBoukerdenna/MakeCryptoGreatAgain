@@ -13,6 +13,7 @@ import Waveform from '../components/WaveForm';
 interface Message {
   sender: 'user' | 'trump';
   text: string;
+  status: 'loading' | 'playing' | 'complete';
 }
 
 const Home: React.FC = () => {
@@ -29,10 +30,8 @@ const Home: React.FC = () => {
   }, [messages]);
 
   const processSentences = (text: string) => {
-    // Split text into sentences using regex that preserves punctuation and spacing
     const sentences = text.match(/[^.!?]+[.!?]+/g) || [];
 
-    // Process complete sentences
     sentences.forEach(sentence => {
       const trimmedSentence = sentence.trim();
       if (trimmedSentence) {
@@ -40,9 +39,7 @@ const Home: React.FC = () => {
       }
     });
 
-    // Return any remaining text that doesn't end in punctuation
-    const lastPart = text.replace(sentences.join(''), '').trim();
-    return lastPart;
+    return text.replace(sentences.join(''), '').trim();
   };
 
   const processQueue = async () => {
@@ -50,14 +47,27 @@ const Home: React.FC = () => {
       const sentence = sentencesQueue.current.shift();
       if (sentence) {
         console.log("Sending TTS request with sentence:", sentence);
-        await sendTTSRequest(sentence);
+        await sendTTSRequest(sentence, () => {
+          // Update message status to playing when audio starts
+          setMessages(prev => {
+            const lastIndex = prev.length - 1;
+            if (lastIndex >= 0 && prev[lastIndex].sender === 'trump') {
+              const updatedMessages = [...prev];
+              updatedMessages[lastIndex] = {
+                ...updatedMessages[lastIndex],
+                status: 'playing'
+              };
+              return updatedMessages;
+            }
+            return prev;
+          });
+        });
       }
     }
   };
 
   const handleSend = async (userText: string) => {
-    // Add user message
-    const userMessage: Message = { sender: 'user', text: userText };
+    const userMessage: Message = { sender: 'user', text: userText, status: 'complete' };
     setMessages(prev => [...prev, userMessage]);
 
     setLoadingTrumpResponse(true);
@@ -66,18 +76,21 @@ const Home: React.FC = () => {
     sentencesQueue.current = [];
 
     const handleToken = (token: string) => {
-      // Add proper spacing between tokens
       const spaceIfNeeded = fullResponseRef.current && !fullResponseRef.current.endsWith(' ') ? ' ' : '';
       fullResponseRef.current += spaceIfNeeded + token;
       responseBuffer.current += spaceIfNeeded + token;
 
-      // Update the message with the full accumulated response
+      // Update or create trump message with loading status
       setMessages(prev => {
         const updatedMessages = [...prev];
         const lastMessage = updatedMessages[updatedMessages.length - 1];
 
         if (!lastMessage || lastMessage.sender !== 'trump') {
-          return [...prev, { sender: 'trump', text: fullResponseRef.current.trim() }];
+          return [...prev, {
+            sender: 'trump',
+            text: fullResponseRef.current.trim(),
+            status: 'loading'
+          }];
         } else {
           updatedMessages[updatedMessages.length - 1] = {
             ...lastMessage,
@@ -87,11 +100,9 @@ const Home: React.FC = () => {
         }
       });
 
-      // Process complete sentences if we have enough text
       const remainingText = processSentences(responseBuffer.current);
       responseBuffer.current = remainingText || '';
 
-      // Start processing the queue if we have sentences
       if (sentencesQueue.current.length > 0) {
         processQueue();
       }
@@ -100,14 +111,17 @@ const Home: React.FC = () => {
     try {
       await streamGPTResponse(userText, handleToken);
 
-      // Handle any remaining text that didn't end with punctuation
       if (responseBuffer.current.trim()) {
         sentencesQueue.current.push(responseBuffer.current.trim());
         processQueue();
       }
     } catch (error) {
       console.error("Error fetching Trump response:", error);
-      const errorMessage: Message = { sender: 'trump', text: "Sorry, something went wrong. Huge problems!" };
+      const errorMessage: Message = {
+        sender: 'trump',
+        text: "Sorry, something went wrong. Huge problems!",
+        status: 'complete'
+      };
       setMessages(prev => [...prev, errorMessage]);
     } finally {
       setLoadingTrumpResponse(false);
@@ -129,8 +143,12 @@ const Home: React.FC = () => {
           </div>
           <div className="messages">
             {messages.map((m, i) => (
-              <div key={i} className={`message ${m.sender}`}>
-                <p>{m.text}</p>
+              <div key={i} className={`message ${m.sender} ${m.status}`}>
+                {m.status === 'loading' ? (
+                  <p>Preparing response...</p>
+                ) : (
+                  <p>{m.text}</p>
+                )}
               </div>
             ))}
             {loadingTrumpResponse && (

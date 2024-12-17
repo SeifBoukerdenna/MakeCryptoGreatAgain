@@ -7,14 +7,16 @@ interface UseTTSResult {
   isLoading: boolean;
   isPlaying: boolean;
   error: string | null;
-  sendTTSRequest: (text: string) => void;
+  sendTTSRequest: (text: string, onStart?: () => void) => void;
 }
 
 export function useTTS(): UseTTSResult {
   const [isLoading, setIsLoading] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const audioQueueRef = useRef<HTMLAudioElement[]>([]);
+  const audioQueueRef = useRef<
+    { audio: HTMLAudioElement; onStart?: () => void }[]
+  >([]);
   const isProcessingRef = useRef(false);
 
   const playNextInQueue = () => {
@@ -24,8 +26,13 @@ export function useTTS(): UseTTSResult {
       return;
     }
 
-    const audio = audioQueueRef.current.shift()!;
+    const { audio, onStart } = audioQueueRef.current.shift()!;
     setIsPlaying(true);
+
+    // Call onStart callback when audio begins playing
+    audio.onplay = () => {
+      onStart?.();
+    };
 
     audio.onended = () => {
       URL.revokeObjectURL(audio.src);
@@ -47,7 +54,7 @@ export function useTTS(): UseTTSResult {
     });
   };
 
-  const sendTTSRequest = async (text: string) => {
+  const sendTTSRequest = async (text: string, onStart?: () => void) => {
     if (!text.trim()) return;
 
     setIsLoading(true);
@@ -68,7 +75,7 @@ export function useTTS(): UseTTSResult {
       const audioBlob = await response.blob();
       const audio = new Audio(URL.createObjectURL(audioBlob));
 
-      audioQueueRef.current.push(audio);
+      audioQueueRef.current.push({ audio, onStart });
 
       if (!isProcessingRef.current) {
         isProcessingRef.current = true;
