@@ -1,5 +1,3 @@
-// /src/pages/Home.tsx
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination } from 'swiper/modules'; // Import Swiper modules
@@ -138,7 +136,7 @@ const Home: React.FC = () => {
   };
 
   return (
-    <div className="home-container bg-gradient-to-b from-gray-900 to-black text-gray-100 min-h-screen flex flex-col">
+    <div className="home-container bg-gradient-to-r from-gray-800 via-gray-900 to-black text-gray-100 min-h-screen flex flex-col">
       {/* Top Navbar */}
       <nav className="navbar flex justify-between items-center p-4 bg-transparent shadow-md">
         <h1 className="text-2xl font-bold">Make Crypto Great Again</h1>
@@ -146,28 +144,30 @@ const Home: React.FC = () => {
       </nav>
 
       {/* Main Content */}
-      <div className="flex-1 p-6">
+      <div className="container mx-auto flex-1 p-6 space-y-16"> {/* Added space-y-16 for spacing between sections */}
         {/* Character Selection */}
-        <section className="mb-8 px-4"> {/* Added px-4 for horizontal padding */}
+        <section className="px-4"> {/* Removed mb-12 as space-y handles spacing */}
           <h2 className="text-center text-3xl font-bold mb-4">Choose Your Character</h2>
-          <div className="relative">
+          <div className="flex justify-center items-center"> {/* Ensured flex items are centered vertically */}
             <Swiper
               modules={[Navigation, Pagination]}
-              spaceBetween={30}
+              spaceBetween={15}
               slidesPerView={3}
+              centeredSlides={true} // Centered slides
               navigation
               pagination={{ clickable: true }}
+              loop={true}
               breakpoints={{
                 320: {
-                  slidesPerView: 1.2, // Slightly more than 1 to show partial next slide
+                  slidesPerView: 1.2,
                   spaceBetween: 10,
                 },
                 640: {
-                  slidesPerView: 2.2, // Slightly more than 2
+                  slidesPerView: 2.2,
                   spaceBetween: 20,
                 },
                 1024: {
-                  slidesPerView: 3.2, // Slightly more than 3
+                  slidesPerView: 3.2,
                   spaceBetween: 30,
                 },
               }}
