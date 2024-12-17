@@ -1,0 +1,9 @@
+[
+    {
+        "id": "s3://voice-cloning-zero-shot/9f6080a2-c6c6-4a5a-a101-17b354087b68/original/manifest.json",
+        "name": "trump",
+        "type": "instant",
+        "gender": "male",
+        "voice_engine": "PlayHT2.0"
+    }
+]
