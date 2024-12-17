@@ -28,7 +28,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ onSend }) => {
                 onKeyDown={handleKeyDown}
                 className="message-input"
             />
-            <button onClick={handleSendClick} className="send-button">Send</button>
+            <button onClick={handleSendClick} className="send-button">{'↑'}</button>
         </div>
     );
 };
