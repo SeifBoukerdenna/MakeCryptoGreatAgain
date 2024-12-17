@@ -1,90 +1,131 @@
+// /src/pages/Home.tsx
+
 import React, { useState, useEffect, useRef } from 'react';
 import TrumpAvatar from '../components/TrumpAvatar';
 import ConnectWallet from '../components/ConnectWallet';
-import { streamTrumpResponseFromOpenAI } from '../utils/openai';
+import { streamGPTResponse } from '../utils/openai';
 import { useTTS } from '../hooks/useTTS';
-import Waveform from '../components/WaveForm';
-import audioFile from '../assets/trump-speech.m4a';
 import MuskAvatar from '../components/MuskAvatar';
 import TateAvatar from '../components/TateAvatar';
 import PromptInput from '../components/PromptInput';
+import Waveform from '../components/WaveForm';
 
 interface Message {
   sender: 'user' | 'trump';
   text: string;
+  status: 'loading' | 'playing' | 'complete';
 }
-
-const AUTH_TOKEN = "YOUR_PLAYHT_API_KEY";
-const USER_ID = "YOUR_PLAYHT_USER_ID";
-const DEFAULT_VOICE = "s3://voice..."; // your chosen voice
 
 const Home: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [loadingTrumpResponse, setLoadingTrumpResponse] = useState(false);
-
-  // Using the new useTTS hook
-  const { isLoading: isTTSLoading, error: ttsError, sendTTSRequest } = useTTS(AUTH_TOKEN, USER_ID, DEFAULT_VOICE);
-
+  const { isPlaying, error: ttsError, sendTTSRequest } = useTTS();
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const accumulatedTextRef = useRef<string>("");
+  const fullResponseRef = useRef<string>('');
+  const responseBuffer = useRef<string>('');
+  const sentencesQueue = useRef<string[]>([]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  const processSentences = (text: string) => {
+    const sentences = text.match(/[^.!?]+[.!?]+/g) || [];
+
+    sentences.forEach(sentence => {
+      const trimmedSentence = sentence.trim();
+      if (trimmedSentence) {
+        sentencesQueue.current.push(trimmedSentence);
+      }
+    });
+
+    return text.replace(sentences.join(''), '').trim();
+  };
+
+  const processQueue = async () => {
+    while (sentencesQueue.current.length > 0) {
+      const sentence = sentencesQueue.current.shift();
+      if (sentence) {
+        console.log("Sending TTS request with sentence:", sentence);
+        await sendTTSRequest(sentence, () => {
+          // Update message status to playing when audio starts
+          setMessages(prev => {
+            const lastIndex = prev.length - 1;
+            if (lastIndex >= 0 && prev[lastIndex].sender === 'trump') {
+              const updatedMessages = [...prev];
+              updatedMessages[lastIndex] = {
+                ...updatedMessages[lastIndex],
+                status: 'playing'
+              };
+              return updatedMessages;
+            }
+            return prev;
+          });
+        });
+      }
+    }
+  };
+
   const handleSend = async (userText: string) => {
-    // Add user message
-    const userMessage: Message = { sender: 'user', text: userText };
+    const userMessage: Message = { sender: 'user', text: userText, status: 'complete' };
     setMessages(prev => [...prev, userMessage]);
 
     setLoadingTrumpResponse(true);
-    accumulatedTextRef.current = ""; // Reset accumulated text for this response
+    fullResponseRef.current = '';
+    responseBuffer.current = '';
+    sentencesQueue.current = [];
 
     const handleToken = (token: string) => {
-      accumulatedTextRef.current += token;
-      setMessages((prev) => {
-        const lastMessage = prev[prev.length - 1];
+      const spaceIfNeeded = fullResponseRef.current && !fullResponseRef.current.endsWith(' ') ? ' ' : '';
+      fullResponseRef.current += spaceIfNeeded + token;
+      responseBuffer.current += spaceIfNeeded + token;
+
+      // Update or create trump message with loading status
+      setMessages(prev => {
+        const updatedMessages = [...prev];
+        const lastMessage = updatedMessages[updatedMessages.length - 1];
+
         if (!lastMessage || lastMessage.sender !== 'trump') {
-          return [...prev, { sender: 'trump', text: token }];
+          return [...prev, {
+            sender: 'trump',
+            text: fullResponseRef.current.trim(),
+            status: 'loading'
+          }];
         } else {
-          const updatedMessages = [...prev];
           updatedMessages[updatedMessages.length - 1] = {
             ...lastMessage,
-            text: accumulatedTextRef.current,
+            text: fullResponseRef.current.trim()
           };
           return updatedMessages;
         }
       });
 
-      // Check if we ended a sentence
-      if (
-        accumulatedTextRef.current.endsWith('.') ||
-        accumulatedTextRef.current.endsWith('!') ||
-        accumulatedTextRef.current.endsWith('?')
-      ) {
-        // We have a full sentence, send it to TTS now
-        console.log("Sending TTS request with sentence:", accumulatedTextRef.current);
-        sendTTSRequest(accumulatedTextRef.current);
+      const remainingText = processSentences(responseBuffer.current);
+      responseBuffer.current = remainingText || '';
 
-        // Reset the accumulation to start fresh for the next sentence
-        // accumulatedTextRef.current = "";
+      if (sentencesQueue.current.length > 0) {
+        processQueue();
       }
     };
 
     try {
-      await streamTrumpResponseFromOpenAI(userText, handleToken);
-      // After finalizing, if we never hit a period, just send whatever we have
-      if (!accumulatedTextRef.current.match(/[.!?]$/)) {
-        console.log("Sending TTS request with text:", accumulatedTextRef.current);
-        sendTTSRequest(accumulatedTextRef.current);
-      }
+      await streamGPTResponse(userText, handleToken);
 
+      if (responseBuffer.current.trim()) {
+        sentencesQueue.current.push(responseBuffer.current.trim());
+        processQueue();
+      }
     } catch (error) {
       console.error("Error fetching Trump response:", error);
-      const errorMessage: Message = { sender: 'trump', text: "Sorry, something went wrong. Huge problems!" };
+      const errorMessage: Message = {
+        sender: 'trump',
+        text: "Sorry, something went wrong. Huge problems!",
+        status: 'complete'
+      };
       setMessages(prev => [...prev, errorMessage]);
     } finally {
       setLoadingTrumpResponse(false);
+      responseBuffer.current = '';
     }
   };
 
@@ -100,11 +141,14 @@ const Home: React.FC = () => {
           <div className="chat-header">
             <TrumpAvatar />
           </div>
-          <Waveform audioFile={audioFile} />
           <div className="messages">
             {messages.map((m, i) => (
-              <div key={i} className={`message ${m.sender}`}>
-                <p>{m.text}</p>
+              <div key={i} className={`message ${m.sender} ${m.status}`}>
+                {m.status === 'loading' ? (
+                  <p>Preparing response...</p>
+                ) : (
+                  <p>{m.text}</p>
+                )}
               </div>
             ))}
             {loadingTrumpResponse && (
@@ -113,9 +157,14 @@ const Home: React.FC = () => {
               </div>
             )}
           </div>
+          {isPlaying && (
+            <div className="waveform-wrapper">
+              <Waveform />
+            </div>
+          )}
           <PromptInput onSubmit={handleSend} />
-          {isTTSLoading && <p className="tts-status">Reading out the response...</p>}
           {ttsError && <p className="tts-error">{ttsError}</p>}
+          <div ref={messagesEndRef} />
         </div>
       </div>
     </div>

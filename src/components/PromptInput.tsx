@@ -1,10 +1,12 @@
-import { useState } from 'react';
+// /src/components/PromptInput.tsx
 
-type PromptInputProps = {
+import React, { useState } from 'react';
+
+interface PromptInputProps {
     onSubmit: (prompt: string) => void;
-};
+}
 
-const PromptInput = ({ onSubmit }: PromptInputProps) => {
+const PromptInput: React.FC<PromptInputProps> = ({ onSubmit }) => {
     const [value, setValue] = useState('');
 
     const handleSubmit = () => {
