@@ -1,0 +1,71 @@
+/* components/Waveform.module.css */
+.waveformContainer {
+    display: flex;
+    align-items: flex-end;
+    height: 50px;
+    gap: 4px;
+    padding: 10px;
+}
+
+.bar {
+    width: 4px;
+    background-color: #4a90e2;
+    animation: waveAnimation 1s infinite ease-in-out;
+    transform-origin: bottom;
+    height: 20%;
+    /* Initial height */
+}
+
+.bar:nth-child(1) {
+    animation-delay: -0.9s;
+}
+
+.bar:nth-child(2) {
+    animation-delay: -0.8s;
+}
+
+.bar:nth-child(3) {
+    animation-delay: -0.7s;
+}
+
+.bar:nth-child(4) {
+    animation-delay: -0.6s;
+}
+
+.bar:nth-child(5) {
+    animation-delay: -0.5s;
+}
+
+.bar:nth-child(6) {
+    animation-delay: -0.4s;
+}
+
+.bar:nth-child(7) {
+    animation-delay: -0.3s;
+}
+
+.bar:nth-child(8) {
+    animation-delay: -0.2s;
+}
+
+.bar:nth-child(9) {
+    animation-delay: -0.1s;
+}
+
+.bar:nth-child(10) {
+    animation-delay: 0s;
+}
+
+@keyframes waveAnimation {
+
+    0%,
+    100% {
+        transform: scaleY(0.4);
+        opacity: 0.4;
+    }
+
+    50% {
+        transform: scaleY(1);
+        opacity: 1;
+    }
+}

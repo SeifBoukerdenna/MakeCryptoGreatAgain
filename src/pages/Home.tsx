@@ -1,48 +1,41 @@
+// /src/pages/Home.tsx
+
 import React, { useState, useEffect, useRef } from 'react';
 import TrumpAvatar from '../components/TrumpAvatar';
 import ConnectWallet from '../components/ConnectWallet';
-import { streamTrumpResponseFromOpenAI } from '../utils/openai';
+import { streamGPTResponse } from '../utils/openai';
 import { useTTS } from '../hooks/useTTS';
-import Waveform from '../components/WaveForm';
-import audioFile from '../assets/trump-speech.m4a';
 import MuskAvatar from '../components/MuskAvatar';
 import TateAvatar from '../components/TateAvatar';
 import PromptInput from '../components/PromptInput';
+import Waveform from '../components/WaveForm';
 
 interface Message {
   sender: 'user' | 'trump';
   text: string;
 }
 
-const AUTH_TOKEN = "YOUR_PLAYHT_API_KEY";
-const USER_ID = "YOUR_PLAYHT_USER_ID";
-const DEFAULT_VOICE = "s3://voice..."; // your chosen voice
-
 const Home: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [loadingTrumpResponse, setLoadingTrumpResponse] = useState(false);
-
-  // Using the new useTTS hook
-  const { isLoading: isTTSLoading, error: ttsError, sendTTSRequest } = useTTS(AUTH_TOKEN, USER_ID, DEFAULT_VOICE);
-
+  const { isLoading: isTTSLoading, isPlaying, error: ttsError, sendTTSRequest } = useTTS();
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const accumulatedTextRef = useRef<string>("");
+  const accumulatedTextRef = useRef<string>('');
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
   const handleSend = async (userText: string) => {
-    // Add user message
     const userMessage: Message = { sender: 'user', text: userText };
     setMessages(prev => [...prev, userMessage]);
 
     setLoadingTrumpResponse(true);
-    accumulatedTextRef.current = ""; // Reset accumulated text for this response
+    accumulatedTextRef.current = '';
 
     const handleToken = (token: string) => {
       accumulatedTextRef.current += token;
-      setMessages((prev) => {
+      setMessages(prev => {
         const lastMessage = prev[prev.length - 1];
         if (!lastMessage || lastMessage.sender !== 'trump') {
           return [...prev, { sender: 'trump', text: token }];
@@ -56,32 +49,22 @@ const Home: React.FC = () => {
         }
       });
 
-      // Check if we ended a sentence
-      if (
-        accumulatedTextRef.current.endsWith('.') ||
-        accumulatedTextRef.current.endsWith('!') ||
-        accumulatedTextRef.current.endsWith('?')
-      ) {
-        // We have a full sentence, send it to TTS now
-        console.log("Sending TTS request with sentence:", accumulatedTextRef.current);
+      // Check for sentence completion
+      if (/[.!?]$/.test(accumulatedTextRef.current)) {
         sendTTSRequest(accumulatedTextRef.current);
-
-        // Reset the accumulation to start fresh for the next sentence
-        // accumulatedTextRef.current = "";
+        // Optionally reset the accumulated text here if needed
       }
     };
 
     try {
-      await streamTrumpResponseFromOpenAI(userText, handleToken);
-      // After finalizing, if we never hit a period, just send whatever we have
-      if (!accumulatedTextRef.current.match(/[.!?]$/)) {
-        console.log("Sending TTS request with text:", accumulatedTextRef.current);
+      await streamGPTResponse(userText, handleToken);
+      // After streaming ends, send any remaining text to TTS
+      if (!/[.!?]$/.test(accumulatedTextRef.current) && accumulatedTextRef.current.trim()) {
         sendTTSRequest(accumulatedTextRef.current);
       }
-
     } catch (error) {
-      console.error("Error fetching Trump response:", error);
-      const errorMessage: Message = { sender: 'trump', text: "Sorry, something went wrong. Huge problems!" };
+      console.error('Error fetching Trump response:', error);
+      const errorMessage: Message = { sender: 'trump', text: 'Sorry, something went wrong. Huge problems!' };
       setMessages(prev => [...prev, errorMessage]);
     } finally {
       setLoadingTrumpResponse(false);
@@ -100,7 +83,6 @@ const Home: React.FC = () => {
           <div className="chat-header">
             <TrumpAvatar />
           </div>
-          <Waveform audioFile={audioFile} />
           <div className="messages">
             {messages.map((m, i) => (
               <div key={i} className={`message ${m.sender}`}>
@@ -112,10 +94,16 @@ const Home: React.FC = () => {
                 <p>Thinking... (in a very big way!)</p>
               </div>
             )}
+            {isTTSLoading && (
+              <div className="waveform-wrapper">
+                <Waveform />
+              </div>
+            )}
           </div>
           <PromptInput onSubmit={handleSend} />
           {isTTSLoading && <p className="tts-status">Reading out the response...</p>}
           {ttsError && <p className="tts-error">{ttsError}</p>}
+          <div ref={messagesEndRef} />
         </div>
       </div>
     </div>
