@@ -21,16 +21,37 @@ const Home: React.FC = () => {
   const { isLoading: isTTSLoading, isPlaying, error: ttsError, sendTTSRequest } = useTTS();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fullResponseRef = useRef<string>('');
-  const currentSentenceRef = useRef<string>('');
+  const responseBuffer = useRef<string>('');
+  const sentencesQueue = useRef<string[]>([]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  const processSentence = (text: string) => {
-    if (text.trim()) {
-      console.log("Sending TTS request with sentence:", text.trim());
-      sendTTSRequest(text.trim());
+  const processSentences = (text: string) => {
+    // Split text into sentences using regex that preserves punctuation and spacing
+    const sentences = text.match(/[^.!?]+[.!?]+/g) || [];
+
+    // Process complete sentences
+    sentences.forEach(sentence => {
+      const trimmedSentence = sentence.trim();
+      if (trimmedSentence) {
+        sentencesQueue.current.push(trimmedSentence);
+      }
+    });
+
+    // Return any remaining text that doesn't end in punctuation
+    const lastPart = text.replace(sentences.join(''), '').trim();
+    return lastPart;
+  };
+
+  const processQueue = async () => {
+    while (sentencesQueue.current.length > 0) {
+      const sentence = sentencesQueue.current.shift();
+      if (sentence) {
+        console.log("Sending TTS request with sentence:", sentence);
+        await sendTTSRequest(sentence);
+      }
     }
   };
 
@@ -41,13 +62,14 @@ const Home: React.FC = () => {
 
     setLoadingTrumpResponse(true);
     fullResponseRef.current = '';
-    currentSentenceRef.current = '';
+    responseBuffer.current = '';
+    sentencesQueue.current = [];
 
     const handleToken = (token: string) => {
       // Add proper spacing between tokens
-      const spaceIfNeeded = currentSentenceRef.current && !currentSentenceRef.current.endsWith(' ') ? ' ' : '';
-      currentSentenceRef.current += spaceIfNeeded + token;
+      const spaceIfNeeded = fullResponseRef.current && !fullResponseRef.current.endsWith(' ') ? ' ' : '';
       fullResponseRef.current += spaceIfNeeded + token;
+      responseBuffer.current += spaceIfNeeded + token;
 
       // Update the message with the full accumulated response
       setMessages(prev => {
@@ -65,10 +87,13 @@ const Home: React.FC = () => {
         }
       });
 
-      // Check for sentence endings and process for TTS
-      if (token.match(/[.!?]\s*$/)) {
-        processSentence(currentSentenceRef.current);
-        currentSentenceRef.current = '';
+      // Process complete sentences if we have enough text
+      const remainingText = processSentences(responseBuffer.current);
+      responseBuffer.current = remainingText || '';
+
+      // Start processing the queue if we have sentences
+      if (sentencesQueue.current.length > 0) {
+        processQueue();
       }
     };
 
@@ -76,8 +101,9 @@ const Home: React.FC = () => {
       await streamGPTResponse(userText, handleToken);
 
       // Handle any remaining text that didn't end with punctuation
-      if (currentSentenceRef.current.trim()) {
-        processSentence(currentSentenceRef.current);
+      if (responseBuffer.current.trim()) {
+        sentencesQueue.current.push(responseBuffer.current.trim());
+        processQueue();
       }
     } catch (error) {
       console.error("Error fetching Trump response:", error);
@@ -85,7 +111,7 @@ const Home: React.FC = () => {
       setMessages(prev => [...prev, errorMessage]);
     } finally {
       setLoadingTrumpResponse(false);
-      currentSentenceRef.current = '';
+      responseBuffer.current = '';
     }
   };
 
@@ -113,7 +139,6 @@ const Home: React.FC = () => {
               </div>
             )}
           </div>
-          {/* Only show waveform when audio is actually playing */}
           {isPlaying && (
             <div className="waveform-wrapper">
               <Waveform />
