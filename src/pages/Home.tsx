@@ -6,14 +6,12 @@ import { Navigation, Pagination } from 'swiper/modules'; // Import Swiper module
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
-import ConnectWallet from '../components/ConnectWallet';
 import CharacterCard from '../components/CharacterCard';
 import PromptInput from '../components/PromptInput';
 import { streamGPTResponse } from '../utils/openai';
 import { useTTS } from '../hooks/useTTS';
 import Waveform from '../components/WaveForm';
 import { characters } from '../characters';
-import ThemeToggle from '../components/ThemeToggle'; // Import the new ThemeToggle component
 
 interface Message {
   sender: 'user' | 'character';
@@ -21,12 +19,7 @@ interface Message {
   status: 'loading' | 'playing' | 'complete';
 }
 
-interface HomeProps {
-  toggleTheme: () => void;
-  theme: 'light' | 'dark';
-}
-
-const Home: React.FC<HomeProps> = ({ toggleTheme, theme }) => {
+const Home: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [selectedCharacter, setSelectedCharacter] = useState<string>(characters[0].name);
   const [loadingResponse, setLoadingResponse] = useState(false);
@@ -122,18 +115,6 @@ const Home: React.FC<HomeProps> = ({ toggleTheme, theme }) => {
 
   return (
     <div className="home-container min-h-screen flex flex-col">
-      {/* Top Navbar */}
-      <nav className="navbar flex justify-between items-center p-4 bg-transparent shadow-md">
-        <div className="flex items-center">
-          <h1 className="text-2xl font-bold">Make Crypto Great Again</h1>
-        </div>
-        <div className="flex items-center">
-          {/* Theme Toggle Switch */}
-          <ThemeToggle toggleTheme={toggleTheme} theme={theme} />
-          <ConnectWallet />
-        </div>
-      </nav>
-
       {/* Main Content */}
       <div className="container mx-auto flex-1 p-6 space-y-16">
         {/* Character Selection */}

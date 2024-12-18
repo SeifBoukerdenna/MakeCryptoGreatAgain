@@ -1,7 +1,7 @@
 /* src/styles/global.css */
 
-/* Import Roboto Font */
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+/* Import Poppins Font */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
 /* Tailwind CSS Directives */
 @tailwind base;
@@ -12,48 +12,42 @@
 :root {
     /* Light Theme Colors */
     --bg-color: #f5f5f5;
-    /* Light grey instead of pure white */
     --text-color: #333333;
-    /* Dark grey instead of pure black */
     --navbar-bg: linear-gradient(90deg, #ffffff, #f0f0f0);
     --navbar-text: #333333;
     --card-bg-color: #ffffff;
-    /* Off-white for cards */
     --card-border: #dddddd;
-    /* Light grey border */
     --button-bg: #800080;
-    /* Purple */
     --button-hover-bg: #9932CC;
-    /* Darker purple */
     --input-bg: #eaeaea;
-    /* Light grey for inputs */
     --input-text: #333333;
     --input-placeholder: #999999;
     --message-user-bg: #ffffff;
     --message-user-text: #333333;
     --message-character-bg: #f0f0f0;
-    /* Light grey for character messages in light mode */
     --message-character-text: #333333;
     --message-loading-bg: #cccccc;
-    /* Swiper Specific Variables */
     --swiper-nav-color: #800080;
-    /* Purple */
     --swiper-pagination-color: #800080;
-    /* Purple */
     --swiper-pagination-active-color: #9932CC;
-    /* Darker purple */
     --swiper-bullet-color: #333333;
-    /* White bullets */
     --swiper-bullet-active-color: #800080;
-    /* Purple active bullet */
+
+    /* Theme Toggle Specific Variables */
+    --toggle-bg-light: #e2e8f0;
+    /* Light grey for toggle background in light mode */
+    --toggle-bg-dark: #4a5568;
+    /* Dark grey for toggle background in dark mode */
+    --toggle-handle-light: #ffffff;
+    /* White handle in light mode */
+    --toggle-handle-dark: #2d3748;
+    /* Dark handle in dark mode */
 }
 
 .dark {
     /* Dark Theme Colors */
     --bg-color: #121212;
-    /* Dark background */
     --text-color: #e0e0e0;
-    /* Light grey text */
     --navbar-bg: rgba(0, 0, 0, 0.9);
     --navbar-text: #e0e0e0;
     --card-bg-color: #1A1A1A;
@@ -68,17 +62,16 @@
     --message-character-bg: #1A1A1A;
     --message-character-text: #e0e0e0;
     --message-loading-bg: #555555;
-    /* Swiper Specific Variables */
     --swiper-nav-color: #ffffff;
-    /* White */
     --swiper-pagination-color: #ffffff;
-    /* White */
     --swiper-pagination-active-color: #9932CC;
-    /* Darker purple */
     --swiper-bullet-color: #ffffff;
-    /* White bullets */
     --swiper-bullet-active-color: #800080;
-    /* Purple active bullet */
+
+    --toggle-bg-light: #2d3748;
+    --toggle-bg-dark: #e2e8f0;
+    --toggle-handle-light: #ffffff;
+    --toggle-handle-dark: #2d3748;
 }
 
 /* Reset and Base Styles */
@@ -86,7 +79,7 @@ body,
 html {
     margin: 0;
     padding: 0;
-    font-family: 'Roboto', sans-serif;
+    font-family: 'Poppins', sans-serif;
     background: var(--bg-color);
     color: var(--text-color);
     height: 100%;
@@ -99,26 +92,24 @@ html {
     justify-content: space-between;
     align-items: center;
     background: var(--navbar-bg);
-    /* Use CSS variable */
     padding: 1rem 2rem;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     border-bottom: 1px solid var(--card-border);
+    flex-wrap: wrap;
 }
 
 /* Logo Styles */
 .navbar img {
-    height: 40px;
-    width: 40px;
+    height: 50px;
+    width: 50px;
     object-fit: contain;
 }
 
 /* Navbar Title */
 .navbar h1 {
-    font-size: 1.5rem;
+    font-size: 1.75rem;
     font-weight: 700;
-    /* Bolder for prominence */
     color: var(--navbar-text);
-    /* Use CSS variable */
 }
 
 /* Swiper Slide Centering */
@@ -134,19 +125,16 @@ html {
 .swiper-button-prev,
 .swiper-button-next {
     color: var(--swiper-nav-color) !important;
-    /* Use CSS variable */
 }
 
 .swiper-button-prev:hover,
 .swiper-button-next:hover {
     color: var(--swiper-pagination-active-color) !important;
-    /* Darker purple on hover */
 }
 
 /* Swiper Pagination Bullets */
 .swiper-pagination-bullet {
     background-color: var(--swiper-bullet-color) !important;
-    /* Use CSS variable */
     opacity: 0.8;
     width: 12px;
     height: 12px;
@@ -156,7 +144,6 @@ html {
 
 .swiper-pagination-bullet-active {
     background-color: var(--swiper-pagination-active-color) !important;
-    /* Use CSS variable */
     transform: scale(1.2);
 }
 
@@ -167,14 +154,11 @@ html {
     align-items: center;
     justify-content: space-between;
     background-color: var(--card-bg-color);
-    /* Use CSS variable */
     border: 1px solid var(--card-border);
-    /* Use CSS variable */
     border-radius: 12px;
-    /* Slightly more rounded */
     padding: 20px;
-    width: 200px;
-    height: 240px;
+    width: 220px;
+    height: 260px;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     opacity: 1;
     pointer-events: auto;
@@ -182,7 +166,6 @@ html {
 
 .character-card.selected-card {
     background-color: #d5d3d5;
-    /* Purple highlight for selected */
     border-color: #d5d3d5;
     opacity: 0.9;
     pointer-events: none;
@@ -191,16 +174,14 @@ html {
 .character-card:hover {
     transform: scale(1.05);
     box-shadow: 0 4px 20px rgba(128, 0, 128, 0.4);
-    /* Purple shadow on hover */
 }
 
 /* Avatar Circle */
 .character-card .avatar {
-    width: 80px;
-    height: 80px;
+    width: 90px;
+    height: 90px;
     border-radius: 50%;
     border: 3px solid #D3D3D3;
-    /* Light gray border */
     margin-bottom: 15px;
     object-fit: cover;
 }
@@ -212,36 +193,30 @@ html {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    /* Center text */
 }
 
 .character-name {
-    font-size: 1.2rem;
+    font-size: 1.3rem;
     font-weight: 700;
     margin-bottom: 8px;
     color: var(--text-color);
-    /* Use CSS variable */
 }
 
 .character-description {
-    font-size: 0.9rem;
+    font-size: 1rem;
     color: #666666;
-    /* Dark grey for better readability in light mode */
-    /* Light grey for description */
     text-align: center;
-    /* Centered text */
-    line-height: 1.4;
+    line-height: 1.6;
 }
 
 /* Select Button */
 .select-button {
     background: var(--button-bg);
-    /* Use CSS variable */
     color: #FFFFFF;
     border: none;
     border-radius: 25px;
-    padding: 10px 16px;
-    font-size: 0.95rem;
+    padding: 10px 20px;
+    font-size: 1rem;
     font-weight: 700;
     cursor: pointer;
     transition: background 0.3s ease, opacity 0.3s ease;
@@ -253,8 +228,8 @@ html {
     opacity: 0.5;
     border: none;
     border-radius: 25px;
-    padding: 10px 16px;
-    font-size: 0.95rem;
+    padding: 10px 20px;
+    font-size: 1rem;
     font-weight: 700;
     cursor: pointer;
     transition: background 0.3s ease, opacity 0.3s ease;
@@ -262,7 +237,6 @@ html {
 
 .select-button:hover {
     background: var(--button-hover-bg);
-    /* Use CSS variable */
 }
 
 .select-button:disabled {
@@ -273,7 +247,6 @@ html {
 /* Chat Area */
 .chat-area {
     background-color: var(--card-bg-color);
-    /* Use CSS variable */
     padding: 30px;
     margin: 20px;
     border-radius: 12px;
@@ -295,10 +268,8 @@ html {
     height: 120px;
     border-radius: 50%;
     border: 4px solid #D3D3D3;
-    /* Light gray border */
     object-fit: cover;
     box-shadow: 0 0 20px rgba(128, 0, 128, 0.5);
-    /* Purple glow */
 }
 
 .isSelected-avatar {
@@ -322,7 +293,6 @@ html {
     z-index: 1;
     position: relative;
     scroll-behavior: smooth;
-    /* Smooth scrolling */
 }
 
 .messages::-webkit-scrollbar {
@@ -331,7 +301,6 @@ html {
 
 .messages::-webkit-scrollbar-thumb {
     background: #333333;
-    /* Dark scrollbar thumb */
     border-radius: 4px;
 }
 
@@ -348,24 +317,18 @@ html {
 .message.user {
     align-self: flex-end;
     background: var(--message-user-bg);
-    /* Use CSS variable */
     color: var(--message-user-text);
-    /* Use CSS variable */
 }
 
 .message.character {
     align-self: flex-start;
     background: var(--message-character-bg);
-    /* Use CSS variable */
     color: var(--message-character-text);
-    /* Use CSS variable */
     border: 1px solid #555555;
-    /* Subtle border */
 }
 
 .message.loading {
     background: var(--message-loading-bg);
-    /* Use CSS variable */
 }
 
 /* Prompt Input */
@@ -380,9 +343,7 @@ html {
     border: none;
     border-radius: 30px;
     background: var(--input-bg);
-    /* Use CSS variable */
     color: var(--input-text);
-    /* Use CSS variable */
     outline: none;
     font-size: 1rem;
     transition: box-shadow 0.3s ease;
@@ -390,21 +351,18 @@ html {
 
 .message-input::placeholder {
     color: var(--input-placeholder);
-    /* Use CSS variable */
     font-style: italic;
     font-size: 1rem;
 }
 
 .message-input:focus {
     box-shadow: 0 0 15px #800080;
-    /* Purple glow */
 }
 
 .send-button {
     margin-left: 0.75rem;
     font-size: 1rem;
     background: var(--button-bg);
-    /* Use CSS variable */
     color: #FFFFFF;
     padding: 0.75rem 1.5rem;
     border: none;
@@ -416,7 +374,6 @@ html {
 
 .send-button:hover {
     background: var(--button-hover-bg);
-    /* Use CSS variable */
 }
 
 .send-button:disabled {
@@ -501,22 +458,26 @@ html {
 }
 
 @media (max-width: 480px) {
-    .navbar h1 {
-        font-size: 1.4rem;
-    }
-
-    .chat-area {
-        padding: 15px;
-        margin: 10px;
-    }
-
-    .message-input {
-        font-size: 0.9rem;
-    }
-
-    .send-button {
-        font-size: 0.9rem;
+    .navbar {
         padding: 0.5rem 1rem;
+    }
+
+    .logo h1 {
+        font-size: 1.25rem;
+    }
+
+    .navigation-links {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .action-buttons {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .button-wrapper {
+        margin: 0.25rem 0;
     }
 
     .character-card {
@@ -564,4 +525,79 @@ button,
 .message-input,
 .send-button {
     transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.navigation-links {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-grow: 1;
+    flex-wrap: wrap;
+}
+
+/* Base Button-like Link Styles */
+.nav-link {
+    padding: 10px 20px;
+    font-size: 1rem;
+    font-weight: 600;
+    text-decoration: none;
+    border-radius: 8px;
+    border: 2px solid transparent;
+    color: #555;
+    background-color: #f0f0f0;
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+    display: inline-block;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Hover State */
+.nav-link:hover {
+    background-color: #6b46c1;
+    color: #fff;
+}
+
+/* Active State */
+.nav-link.active {
+    background-color: #5a3ea6;
+    color: #fff;
+    border-color: #5a3ea6;
+    box-shadow: 0 6px 10px rgba(90, 62, 166, 0.3);
+}
+
+/* Focus State for Accessibility */
+.nav-link:focus {
+    outline: 3px solid #6b46c1;
+    outline-offset: 2px;
+}
+
+.action-buttons {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-top: 1rem;
+}
+
+.button-wrapper {
+    margin: 0.5rem 0;
+}
+
+.navbar>.navigation-links {
+    margin: 0 auto;
+}
+
+.wallet-button {
+    background: var(--button-bg);
+    color: #FFFFFF;
+    border: none;
+    border-radius: 25px;
+    padding: 10px 16px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.3s ease, opacity 0.3s ease;
+}
+
+.wallet-button:hover {
+    background: var(--button-hover-bg);
 }

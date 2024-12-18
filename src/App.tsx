@@ -1,14 +1,19 @@
+// src/App.tsx
+
 import { useState, useEffect } from 'react';
 import './styles/global.css';
 import Home from './pages/Home';
+import About from './pages/About';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react';
 import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
 import { PhantomWalletAdapter } from '@solana/wallet-adapter-phantom';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
+import Layout from './components/Layout'; // Import the Layout component
 
-// Default RPC endpoint (you can use a mainnet, devnet, testnet, or local RPC URL)
+// Default RPC endpoint
 const endpoint = 'https://api.devnet.solana.com';
 
 // Choose your wallets (Phantom in this example)
@@ -45,8 +50,14 @@ const App = () => {
     <ConnectionProvider endpoint={endpoint}>
       <WalletProvider wallets={wallets} autoConnect>
         <WalletModalProvider>
-          {/* Pass toggleTheme and theme to Home via props */}
-          <Home toggleTheme={toggleTheme} theme={theme} />
+          <Router>
+            <Routes>
+              <Route path="/" element={<Layout toggleTheme={toggleTheme} theme={theme} />}>
+                <Route index element={<Home />} />
+                <Route path="about" element={<About />} />
+              </Route>
+            </Routes>
+          </Router>
         </WalletModalProvider>
       </WalletProvider>
     </ConnectionProvider>
