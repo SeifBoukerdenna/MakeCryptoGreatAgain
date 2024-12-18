@@ -1,4 +1,4 @@
-// /src/components/PromptInput.tsx
+// src/components/PromptInput.tsx
 
 import React, { useState } from 'react';
 

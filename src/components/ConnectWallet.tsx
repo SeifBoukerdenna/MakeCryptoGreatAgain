@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { useWallet, useConnection } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
 import { PhantomWalletName } from '@solana/wallet-adapter-wallets';
@@ -15,7 +15,6 @@ interface TokenInfo {
 const ConnectWallet: React.FC = () => {
     const { connected, publicKey, connect, disconnect, select } = useWallet();
     const { connection } = useConnection();
-    const [tokens, setTokens] = useState<TokenInfo[]>([]);
 
     const handleConnect = useCallback(async () => {
         try {
@@ -29,7 +28,6 @@ const ConnectWallet: React.FC = () => {
     const handleDisconnect = useCallback(async () => {
         try {
             await disconnect();
-            setTokens([]);
         } catch (error) {
             console.error("Error disconnecting wallet:", error);
         }
@@ -62,8 +60,6 @@ const ConnectWallet: React.FC = () => {
                             });
                         }
                     }
-
-                    setTokens(fetchedTokens);
                 } catch (error) {
                     console.error("Error fetching tokens:", error);
                 }

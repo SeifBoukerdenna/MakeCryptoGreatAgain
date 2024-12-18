@@ -1,45 +1,25 @@
+// src/pages/Home.tsx
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination } from 'swiper/modules'; // Import Swiper modules
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
-import TrumpAvatar from '../assets/trump-memoji.jpg';
-import MuskAvatar from '../assets/musk-memoji.png';
-import TateAvatar from '../assets/tate-memoji.png';
 import ConnectWallet from '../components/ConnectWallet';
 import CharacterCard from '../components/CharacterCard';
 import PromptInput from '../components/PromptInput';
 import { streamGPTResponse } from '../utils/openai';
 import { useTTS } from '../hooks/useTTS';
 import Waveform from '../components/WaveForm';
+import { characters } from '../characters';
+
 
 interface Message {
   sender: 'user' | 'character';
   text: string;
   status: 'loading' | 'playing' | 'complete';
 }
-
-interface Character {
-  id: string; // Unique identifier
-  name: string;
-  avatar: string;
-  description: string;
-}
-
-const characters: Character[] = [
-  { id: '1', name: 'Donald Trump', avatar: TrumpAvatar, description: 'Make chats great again!' },
-  { id: '2', name: 'Donald Trump 2', avatar: TrumpAvatar, description: 'Make chats great again!' },
-  { id: '3', name: 'Donald Trump 3', avatar: TrumpAvatar, description: 'Make chats great again!' },
-  { id: '4', name: 'Donald Trump 4', avatar: TrumpAvatar, description: 'Make chats great again!' },
-  { id: '5', name: 'Elon Musk', avatar: MuskAvatar, description: 'Let’s innovate together.' },
-  { id: '6', name: 'Andrew Tate', avatar: TateAvatar, description: 'Top G is ready.' },
-  { id: '7', name: 'Satoshi Nakamoto', avatar: 'path/to/avatar7.png', description: 'Creator of Bitcoin.' },
-  { id: '8', name: 'Ada Lovelace', avatar: 'path/to/avatar8.png', description: 'Pioneer of Computing.' },
-  { id: '9', name: 'Alan Turing', avatar: 'path/to/avatar9.png', description: 'Father of AI.' },
-  { id: '10', name: 'Grace Hopper', avatar: 'path/to/avatar10.png', description: 'Queen of Code.' },
-  // Add more characters as needed
-];
 
 const Home: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -136,7 +116,7 @@ const Home: React.FC = () => {
   };
 
   return (
-    <div className="home-container bg-gradient-to-r from-gray-700 via-gray-900 to-black text-gray-100 min-h-screen flex flex-col">
+    <div className="home-container bg-black text-white min-h-screen flex flex-col">
       {/* Top Navbar */}
       <nav className="navbar flex justify-between items-center p-4 bg-transparent shadow-md">
         <h1 className="text-2xl font-bold">Make Crypto Great Again</h1>
@@ -144,36 +124,22 @@ const Home: React.FC = () => {
       </nav>
 
       {/* Main Content */}
-      <div className="container mx-auto flex-1 p-6 space-y-16"> {/* Added space-y-16 for spacing between sections */}
+      <div className="container mx-auto flex-1 p-6 space-y-16">
         {/* Character Selection */}
-        <section className="px-4 mb-8 mt-8">{/* Removed mb-12 as space-y handles spacing */}
-          {/* <h2 className="text-center text-3xl font-bold mb-4">Choose Your Character</h2> */}
-          <div className="flex justify-center items-center"> {/* Ensured flex items are centered vertically */}
+        <section className="px-4 mb-8 mt-8">
+          <div className="flex justify-center items-center">
             <Swiper
               modules={[Navigation, Pagination]}
-              spaceBetween={15}
-              slidesPerView={3}
-              centeredSlides={true} // Centered slides
+              spaceBetween={20}
+              slidesPerView={4}
+              centeredSlides={false} // Disable centered slides for fixed view
               navigation
               pagination={{
                 clickable: true,
-                bulletClass: 'swiper-pagination-bullet', bulletActiveClass: 'swiper-pagination-bullet-active'
+                bulletClass: 'swiper-pagination-bullet',
+                bulletActiveClass: 'swiper-pagination-bullet-active',
               }}
               loop={true}
-              breakpoints={{
-                320: {
-                  slidesPerView: 1.2,
-                  spaceBetween: 10,
-                },
-                640: {
-                  slidesPerView: 2.2,
-                  spaceBetween: 20,
-                },
-                1024: {
-                  slidesPerView: 3.2,
-                  spaceBetween: 30,
-                },
-              }}
               className="mySwiper"
             >
               {characters.map((char) => (

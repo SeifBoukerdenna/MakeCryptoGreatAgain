@@ -1,4 +1,4 @@
-// /src/components/CharacterCard.tsx
+// src/components/CharacterCard.tsx
 
 import React from 'react';
 
@@ -20,17 +20,17 @@ const CharacterCard: React.FC<CharacterCardProps> = ({
     isSelected,
 }) => {
     return (
-        <div
+        <div key={id}
             className={`character-card ${isSelected ? 'selected-card' : ''}`}
             aria-disabled={isSelected}
         >
-            <img src={avatar} alt={`${name} Avatar`} className="avatar" />
+            <img src={avatar} alt={`${name} Avatar`} className={isSelected ? `isSelected-avatar` : `avatar`} />
             <div className="character-details">
                 <div className="character-name">{name}</div>
                 <div className="character-description">{description}</div>
             </div>
             <button
-                className="select-button"
+                className={isSelected ? "selected-select-button" : "select-button"}
                 onClick={onSelect}
                 disabled={isSelected}
                 aria-disabled={isSelected}
