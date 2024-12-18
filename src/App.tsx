@@ -1,6 +1,4 @@
-// src/App.tsx
-
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import './styles/global.css';
 import Home from './pages/Home';
 import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react';

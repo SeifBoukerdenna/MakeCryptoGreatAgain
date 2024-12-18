@@ -11,44 +11,74 @@
 /* CSS Variables for Light and Dark Themes */
 :root {
     /* Light Theme Colors */
-    --bg-color: #FFFFFF;
-    --text-color: #000000;
-    --navbar-bg: rgba(255, 255, 255, 0.9);
-    --navbar-text: #000000;
-    --card-bg-color: #f0f0f0;
-    --card-border: #cccccc;
+    --bg-color: #f5f5f5;
+    /* Light grey instead of pure white */
+    --text-color: #333333;
+    /* Dark grey instead of pure black */
+    --navbar-bg: linear-gradient(90deg, #ffffff, #f0f0f0);
+    --navbar-text: #333333;
+    --card-bg-color: #ffffff;
+    /* Off-white for cards */
+    --card-border: #dddddd;
+    /* Light grey border */
     --button-bg: #800080;
+    /* Purple */
     --button-hover-bg: #9932CC;
-    --input-bg: #f9f9f9;
-    --input-text: #000000;
-    --input-placeholder: #888888;
-    --message-user-bg: #FFFFFF;
-    --message-user-text: #000000;
-    --message-character-bg: #1A1A1A;
-    --message-character-text: #FFFFFF;
-    --message-loading-bg: #555555;
-    /* Add more variables as needed */
+    /* Darker purple */
+    --input-bg: #eaeaea;
+    /* Light grey for inputs */
+    --input-text: #333333;
+    --input-placeholder: #999999;
+    --message-user-bg: #ffffff;
+    --message-user-text: #333333;
+    --message-character-bg: #f0f0f0;
+    /* Light grey for character messages in light mode */
+    --message-character-text: #333333;
+    --message-loading-bg: #cccccc;
+    /* Swiper Specific Variables */
+    --swiper-nav-color: #800080;
+    /* Purple */
+    --swiper-pagination-color: #800080;
+    /* Purple */
+    --swiper-pagination-active-color: #9932CC;
+    /* Darker purple */
+    --swiper-bullet-color: #333333;
+    /* White bullets */
+    --swiper-bullet-active-color: #800080;
+    /* Purple active bullet */
 }
 
 .dark {
     /* Dark Theme Colors */
-    --bg-color: #000000;
-    --text-color: #FFFFFF;
+    --bg-color: #121212;
+    /* Dark background */
+    --text-color: #e0e0e0;
+    /* Light grey text */
     --navbar-bg: rgba(0, 0, 0, 0.9);
-    --navbar-text: #FFFFFF;
+    --navbar-text: #e0e0e0;
     --card-bg-color: #1A1A1A;
     --card-border: #333333;
     --button-bg: #800080;
     --button-hover-bg: #9932CC;
     --input-bg: #333333;
-    --input-text: #FFFFFF;
+    --input-text: #e0e0e0;
     --input-placeholder: #BBBBBB;
-    --message-user-bg: #FFFFFF;
+    --message-user-bg: #ffffff;
     --message-user-text: #000000;
     --message-character-bg: #1A1A1A;
-    --message-character-text: #FFFFFF;
+    --message-character-text: #e0e0e0;
     --message-loading-bg: #555555;
-    /* Add more variables as needed */
+    /* Swiper Specific Variables */
+    --swiper-nav-color: #ffffff;
+    /* White */
+    --swiper-pagination-color: #ffffff;
+    /* White */
+    --swiper-pagination-active-color: #9932CC;
+    /* Darker purple */
+    --swiper-bullet-color: #ffffff;
+    /* White bullets */
+    --swiper-bullet-active-color: #800080;
+    /* Purple active bullet */
 }
 
 /* Reset and Base Styles */
@@ -56,7 +86,7 @@ body,
 html {
     margin: 0;
     padding: 0;
-    font-family: Inter, sans-serif;
+    font-family: 'Roboto', sans-serif;
     background: var(--bg-color);
     color: var(--text-color);
     height: 100%;
@@ -72,10 +102,19 @@ html {
     /* Use CSS variable */
     padding: 1rem 2rem;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+    border-bottom: 1px solid var(--card-border);
 }
 
+/* Logo Styles */
+.navbar img {
+    height: 40px;
+    width: 40px;
+    object-fit: contain;
+}
+
+/* Navbar Title */
 .navbar h1 {
-    font-size: 2rem;
+    font-size: 1.5rem;
     font-weight: 700;
     /* Bolder for prominence */
     color: var(--navbar-text);
@@ -94,18 +133,20 @@ html {
 /* Swiper Navigation Buttons */
 .swiper-button-prev,
 .swiper-button-next {
-    color: white !important;
+    color: var(--swiper-nav-color) !important;
+    /* Use CSS variable */
 }
 
 .swiper-button-prev:hover,
 .swiper-button-next:hover {
-    color: #9932CC !important;
+    color: var(--swiper-pagination-active-color) !important;
+    /* Darker purple on hover */
 }
 
 /* Swiper Pagination Bullets */
 .swiper-pagination-bullet {
-    background-color: #FFFFFF !important;
-    /* White bullets */
+    background-color: var(--swiper-bullet-color) !important;
+    /* Use CSS variable */
     opacity: 0.8;
     width: 12px;
     height: 12px;
@@ -114,8 +155,8 @@ html {
 }
 
 .swiper-pagination-bullet-active {
-    background-color: #800080 !important;
-    /* Purple for active bullet */
+    background-color: var(--swiper-pagination-active-color) !important;
+    /* Use CSS variable */
     transform: scale(1.2);
 }
 
@@ -184,8 +225,9 @@ html {
 
 .character-description {
     font-size: 0.9rem;
-    color: #D3D3D3;
-    /* Light gray for description */
+    color: #666666;
+    /* Dark grey for better readability in light mode */
+    /* Light grey for description */
     text-align: center;
     /* Centered text */
     line-height: 1.4;
@@ -208,7 +250,7 @@ html {
 .selected-select-button {
     background: #e79fe7;
     color: #FFFFFF;
-    opacity: .5;
+    opacity: 0.5;
     border: none;
     border-radius: 25px;
     padding: 10px 16px;
@@ -279,6 +321,8 @@ html {
     min-height: 100px;
     z-index: 1;
     position: relative;
+    scroll-behavior: smooth;
+    /* Smooth scrolling */
 }
 
 .messages::-webkit-scrollbar {
