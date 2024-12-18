@@ -11,7 +11,7 @@ interface ThemeToggleProps {
 
 const ThemeToggle: React.FC<ThemeToggleProps> = ({ toggleTheme, theme }) => {
     return (
-        <div className="flex items-center mr-4">
+        <div className="flex-items-center-mr-4">
             <Switch
                 onChange={toggleTheme}
                 checked={theme === 'dark'}

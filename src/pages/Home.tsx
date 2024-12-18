@@ -124,8 +124,9 @@ const Home: React.FC<HomeProps> = ({ toggleTheme, theme }) => {
     <div className="home-container min-h-screen flex flex-col">
       {/* Top Navbar */}
       <nav className="navbar flex justify-between items-center p-4 bg-transparent shadow-md">
-        <div className="flex items-center">
-          <h1 className="text-2xl font-bold">Make Crypto Great Again</h1>
+        <div className="flex-items-center">
+          <h1 className='title'>Make Crypto Great Again</h1>
+          
         </div>
         <div className="flex items-center">
           {/* Theme Toggle Switch */}
