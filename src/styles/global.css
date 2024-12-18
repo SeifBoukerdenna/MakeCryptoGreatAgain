@@ -1,4 +1,4 @@
-/* src/styles/globals.css */
+/* src/styles/global.css */
 
 /* Import Roboto Font */
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
@@ -8,14 +8,57 @@
 @tailwind components;
 @tailwind utilities;
 
+/* CSS Variables for Light and Dark Themes */
+:root {
+    /* Light Theme Colors */
+    --bg-color: #FFFFFF;
+    --text-color: #000000;
+    --navbar-bg: rgba(255, 255, 255, 0.9);
+    --navbar-text: #000000;
+    --card-bg-color: #f0f0f0;
+    --card-border: #cccccc;
+    --button-bg: #800080;
+    --button-hover-bg: #9932CC;
+    --input-bg: #f9f9f9;
+    --input-text: #000000;
+    --input-placeholder: #888888;
+    --message-user-bg: #FFFFFF;
+    --message-user-text: #000000;
+    --message-character-bg: #1A1A1A;
+    --message-character-text: #FFFFFF;
+    --message-loading-bg: #555555;
+    /* Add more variables as needed */
+}
+
+.dark {
+    /* Dark Theme Colors */
+    --bg-color: #000000;
+    --text-color: #FFFFFF;
+    --navbar-bg: rgba(0, 0, 0, 0.9);
+    --navbar-text: #FFFFFF;
+    --card-bg-color: #1A1A1A;
+    --card-border: #333333;
+    --button-bg: #800080;
+    --button-hover-bg: #9932CC;
+    --input-bg: #333333;
+    --input-text: #FFFFFF;
+    --input-placeholder: #BBBBBB;
+    --message-user-bg: #FFFFFF;
+    --message-user-text: #000000;
+    --message-character-bg: #1A1A1A;
+    --message-character-text: #FFFFFF;
+    --message-loading-bg: #555555;
+    /* Add more variables as needed */
+}
+
 /* Reset and Base Styles */
 body,
 html {
     margin: 0;
     padding: 0;
     font-family: Inter, sans-serif;
-    background: #000000;
-    color: #FFFFFF;
+    background: var(--bg-color);
+    color: var(--text-color);
     height: 100%;
     width: 100%;
 }
@@ -25,8 +68,8 @@ html {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: rgba(0, 0, 0, 0.9);
-    /* Semi-transparent black background */
+    background: var(--navbar-bg);
+    /* Use CSS variable */
     padding: 1rem 2rem;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
 }
@@ -35,8 +78,8 @@ html {
     font-size: 2rem;
     font-weight: 700;
     /* Bolder for prominence */
-    color: #FFFFFF;
-    /* White text for contrast */
+    color: var(--navbar-text);
+    /* Use CSS variable */
 }
 
 /* Swiper Slide Centering */
@@ -52,7 +95,6 @@ html {
 .swiper-button-prev,
 .swiper-button-next {
     color: white !important;
-    ;
 }
 
 .swiper-button-prev:hover,
@@ -83,10 +125,10 @@ html {
     flex-direction: column;
     align-items: center;
     justify-content: space-between;
-    background-color: #1A1A1A;
-    /* Darker card background */
-    border: 1px solid #333333;
-    /* Subtle border */
+    background-color: var(--card-bg-color);
+    /* Use CSS variable */
+    border: 1px solid var(--card-border);
+    /* Use CSS variable */
     border-radius: 12px;
     /* Slightly more rounded */
     padding: 20px;
@@ -136,8 +178,8 @@ html {
     font-size: 1.2rem;
     font-weight: 700;
     margin-bottom: 8px;
-    color: #FFFFFF;
-    /* White text */
+    color: var(--text-color);
+    /* Use CSS variable */
 }
 
 .character-description {
@@ -151,7 +193,8 @@ html {
 
 /* Select Button */
 .select-button {
-    background: #800080;
+    background: var(--button-bg);
+    /* Use CSS variable */
     color: #FFFFFF;
     border: none;
     border-radius: 25px;
@@ -176,8 +219,8 @@ html {
 }
 
 .select-button:hover {
-    background: #9932CC;
-    /* Darker purple on hover */
+    background: var(--button-hover-bg);
+    /* Use CSS variable */
 }
 
 .select-button:disabled {
@@ -187,8 +230,8 @@ html {
 
 /* Chat Area */
 .chat-area {
-    background-color: #1A1A1A;
-    /* Dark chat background */
+    background-color: var(--card-bg-color);
+    /* Use CSS variable */
     padding: 30px;
     margin: 20px;
     border-radius: 12px;
@@ -260,25 +303,25 @@ html {
 
 .message.user {
     align-self: flex-end;
-    background: #FFFFFF;
-    /* White background for user messages */
-    color: #000000;
-    /* Black text for contrast */
+    background: var(--message-user-bg);
+    /* Use CSS variable */
+    color: var(--message-user-text);
+    /* Use CSS variable */
 }
 
 .message.character {
     align-self: flex-start;
-    background: #1A1A1A;
-    /* Dark background for character messages */
-    color: #FFFFFF;
-    /* White text for contrast */
+    background: var(--message-character-bg);
+    /* Use CSS variable */
+    color: var(--message-character-text);
+    /* Use CSS variable */
     border: 1px solid #555555;
     /* Subtle border */
 }
 
 .message.loading {
-    background: #555555;
-    /* Gray background for loading state */
+    background: var(--message-loading-bg);
+    /* Use CSS variable */
 }
 
 /* Prompt Input */
@@ -292,17 +335,18 @@ html {
     padding: 0.75rem 1.5rem;
     border: none;
     border-radius: 30px;
-    background: #333333;
-    /* Dark input background */
-    color: #FFFFFF;
+    background: var(--input-bg);
+    /* Use CSS variable */
+    color: var(--input-text);
+    /* Use CSS variable */
     outline: none;
     font-size: 1rem;
     transition: box-shadow 0.3s ease;
 }
 
 .message-input::placeholder {
-    color: #D3D3D3;
-    /* Light gray placeholder */
+    color: var(--input-placeholder);
+    /* Use CSS variable */
     font-style: italic;
     font-size: 1rem;
 }
@@ -315,8 +359,8 @@ html {
 .send-button {
     margin-left: 0.75rem;
     font-size: 1rem;
-    background: #800080;
-    /* Purple background */
+    background: var(--button-bg);
+    /* Use CSS variable */
     color: #FFFFFF;
     padding: 0.75rem 1.5rem;
     border: none;
@@ -327,8 +371,8 @@ html {
 }
 
 .send-button:hover {
-    background: #9932CC;
-    /* Darker purple on hover */
+    background: var(--button-hover-bg);
+    /* Use CSS variable */
 }
 
 .send-button:disabled {
@@ -459,4 +503,21 @@ html {
         font-size: 0.85rem;
         padding: 6px 10px;
     }
+}
+
+/* Smooth Transitions for Theme Switching */
+html {
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.navbar,
+.character-card,
+.chat-area {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+button,
+.message-input,
+.send-button {
+    transition: background-color 0.3s ease, color 0.3s ease;
 }

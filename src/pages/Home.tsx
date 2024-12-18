@@ -13,7 +13,7 @@ import { streamGPTResponse } from '../utils/openai';
 import { useTTS } from '../hooks/useTTS';
 import Waveform from '../components/WaveForm';
 import { characters } from '../characters';
-
+import { FaSun, FaMoon } from 'react-icons/fa'; // Import React Icons for toggle
 
 interface Message {
   sender: 'user' | 'character';
@@ -21,7 +21,12 @@ interface Message {
   status: 'loading' | 'playing' | 'complete';
 }
 
-const Home: React.FC = () => {
+interface HomeProps {
+  toggleTheme: () => void;
+  theme: 'light' | 'dark';
+}
+
+const Home: React.FC<HomeProps> = ({ toggleTheme, theme }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [selectedCharacter, setSelectedCharacter] = useState<string>(characters[0].name);
   const [loadingResponse, setLoadingResponse] = useState(false);
@@ -116,11 +121,27 @@ const Home: React.FC = () => {
   };
 
   return (
-    <div className="home-container bg-black text-white min-h-screen flex flex-col">
+    <div className="home-container min-h-screen flex flex-col">
       {/* Top Navbar */}
       <nav className="navbar flex justify-between items-center p-4 bg-transparent shadow-md">
         <h1 className="text-2xl font-bold">Make Crypto Great Again</h1>
-        <ConnectWallet />
+        <div className="flex items-center">
+          {/* Theme Toggle Switch */}
+          <button
+            onClick={toggleTheme}
+            className="mr-4 focus:outline-none"
+            aria-label="Toggle Dark Mode"
+          >
+            {theme === 'dark' ? (
+              // Sun Icon for Light Mode
+              <FaSun className="h-6 w-6 text-yellow-400" />
+            ) : (
+              // Moon Icon for Dark Mode
+              <FaMoon className="h-6 w-6 text-gray-200" />
+            )}
+          </button>
+          <ConnectWallet />
+        </div>
       </nav>
 
       {/* Main Content */}

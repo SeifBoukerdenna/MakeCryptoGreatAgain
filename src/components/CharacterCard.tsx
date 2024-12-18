@@ -20,7 +20,8 @@ const CharacterCard: React.FC<CharacterCardProps> = ({
     isSelected,
 }) => {
     return (
-        <div key={id}
+        <div
+            key={id}
             className={`character-card ${isSelected ? 'selected-card' : ''}`}
             aria-disabled={isSelected}
         >
