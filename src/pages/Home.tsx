@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Navigation, Pagination } from 'swiper/modules'; // Import Swiper modules
+import { Navigation, Pagination } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
@@ -12,6 +12,7 @@ import { streamGPTResponse } from '../utils/openai';
 import { useTTS } from '../hooks/useTTS';
 import Waveform from '../components/WaveForm';
 import { characters } from '../characters';
+import useCharacterStore from '../stores/useCharacterStore';
 
 interface Message {
   sender: 'user' | 'character';
@@ -21,7 +22,8 @@ interface Message {
 
 const Home: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
-  const [selectedCharacter, setSelectedCharacter] = useState<string>(characters[0].name);
+  const selectedCharacter = useCharacterStore((state) => state.selectedCharacter);
+  const setSelectedCharacter = useCharacterStore((state) => state.setSelectedCharacter);
   const [loadingResponse, setLoadingResponse] = useState(false);
   const { isPlaying, error: ttsError, sendTTSRequest } = useTTS();
   const messagesEndRef = useRef<HTMLDivElement>(null);
