@@ -1,8 +1,8 @@
 // src/hooks/useCharacterSelection.ts
 
-import { useRef, useEffect } from "react";
+import { useRef } from "react";
 import SwiperCore from "swiper";
-import { characters } from "../characters";
+import { charactersConfig } from "../configs/characters.config";
 import useCharacterStore from "../stores/useCharacterStore";
 
 export const useCharacterSelection = () => {
@@ -14,18 +14,13 @@ export const useCharacterSelection = () => {
   );
   const swiperRef = useRef<SwiperCore>();
 
-  const selectedIndex = characters.findIndex(
+  // Find the index of the selected character
+  const selectedIndex = charactersConfig.findIndex(
     (char) => char.name === selectedCharacter
   );
 
-  useEffect(() => {
-    if (swiperRef.current && selectedIndex !== -1) {
-      swiperRef.current.slideToLoop(selectedIndex, 500);
-    }
-  }, [selectedCharacter, selectedIndex]);
-
   const getSelectedCharacter = () => {
-    return characters.find((char) => char.name === selectedCharacter);
+    return charactersConfig.find((char) => char.name === selectedCharacter);
   };
 
   return {
@@ -34,6 +29,6 @@ export const useCharacterSelection = () => {
     swiperRef,
     selectedIndex,
     getSelectedCharacter,
-    characters,
+    characters: charactersConfig, // Use the config array as the characters list
   };
 };

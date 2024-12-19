@@ -1,12 +1,14 @@
 // src/hooks/useMessages.ts
 
-import { useRef, useState } from "react";
+import { useState, useRef } from "react";
 import { streamGPTResponse } from "../utils/openai";
 import { useTTS } from "./useTTS";
 import useConversationStore, { Message } from "../stores/useConversationStore";
+import { useCharacterConfig } from "./useCharacterConfig";
 
 export const useMessages = () => {
   const [loadingResponse, setLoadingResponse] = useState(false);
+  const { systemPrompt, voiceId, voiceEngine } = useCharacterConfig();
   const { isPlaying, error: ttsError, sendTTSRequest } = useTTS();
   const fullResponseRef = useRef<string>("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -28,7 +30,7 @@ export const useMessages = () => {
 
     try {
       await new Promise<void>((resolve, reject) => {
-        streamGPTResponse(userText, (token: string) => {
+        streamGPTResponse(userText, systemPrompt, (token: string) => {
           if (!token) return;
 
           const needsSpace =
@@ -46,10 +48,15 @@ export const useMessages = () => {
 
       if (fullResponseRef.current) {
         updateLastMessage("", "loading");
-
-        await sendTTSRequest(fullResponseRef.current, () => {
-          updateLastMessage(fullResponseRef.current, "playing");
-        });
+        console.log("Voice config:", { voiceId, systemPrompt });
+        // Send TTS request with voice configuration
+        await sendTTSRequest(
+          fullResponseRef.current,
+          { voiceId, engine: voiceEngine },
+          () => {
+            updateLastMessage(fullResponseRef.current, "playing");
+          }
+        );
       }
     } catch (error) {
       console.error("Error:", error);

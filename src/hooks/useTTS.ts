@@ -1,13 +1,21 @@
-// /src/hooks/useTTS.ts
+// src/hooks/useTTS.ts
 
 import { useState, useRef, useCallback } from "react";
-import voices from "../configs/voices.json";
+
+interface VoiceConfig {
+  voiceId: string;
+  engine?: string;
+}
 
 interface UseTTSResult {
   isLoading: boolean;
   isPlaying: boolean;
   error: string | null;
-  sendTTSRequest: (text: string, onStart?: () => void) => void;
+  sendTTSRequest: (
+    text: string,
+    voiceConfig: VoiceConfig,
+    onStart?: () => void
+  ) => void;
 }
 
 export function useTTS(): UseTTSResult {
@@ -17,7 +25,7 @@ export function useTTS(): UseTTSResult {
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const sendTTSRequest = useCallback(
-    async (text: string, onStart?: () => void) => {
+    async (text: string, voiceConfig: VoiceConfig, onStart?: () => void) => {
       if (!text.trim()) return;
 
       setIsLoading(true);
@@ -27,7 +35,11 @@ export function useTTS(): UseTTSResult {
         const response = await fetch("/api/tts", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ text, voice: voices.trump.voice }),
+          body: JSON.stringify({
+            text,
+            voice: voiceConfig.voiceId,
+            engine: voiceConfig.engine,
+          }),
         });
 
         if (!response.ok) {
@@ -40,7 +52,6 @@ export function useTTS(): UseTTSResult {
         const audio = new Audio(audioURL);
 
         audioRef.current = audio;
-
         setIsPlaying(true);
 
         // Callback when audio starts playing

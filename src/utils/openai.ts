@@ -1,11 +1,14 @@
-// /src/utils/openai.ts
+// src/utils/openai.ts
 
 export async function streamGPTResponse(
   prompt: string,
+  systemPrompt: string,
   onToken: (token: string) => void
 ): Promise<void> {
   const response = await fetch(
-    `/api/stream-gpt?prompt=${encodeURIComponent(prompt)}`,
+    `/api/stream-gpt?prompt=${encodeURIComponent(
+      prompt
+    )}&systemPrompt=${encodeURIComponent(systemPrompt)}`,
     {
       method: "GET",
     }

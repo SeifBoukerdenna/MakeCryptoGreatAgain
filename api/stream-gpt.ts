@@ -3,17 +3,21 @@
 import { VercelRequest, VercelResponse } from "@vercel/node";
 import OpenAI from "openai";
 
-// Initialize OpenAI SDK with Environment Variable
 const openai = new OpenAI({
   apiKey:
     "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", // Ensure this is set in your environment variables
 });
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  const { prompt } = req.query;
+  const { prompt, systemPrompt } = req.query;
 
-  if (!prompt || typeof prompt !== "string") {
-    res.status(400).json({ error: "Prompt is required" });
+  if (
+    !prompt ||
+    typeof prompt !== "string" ||
+    !systemPrompt ||
+    typeof systemPrompt !== "string"
+  ) {
+    res.status(400).json({ error: "Prompt and system prompt are required" });
     return;
   }
 
@@ -25,7 +29,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const stream = await openai.chat.completions.create({
       model: "gpt-3.5-turbo",
       messages: [
-        { role: "system", content: "You are ChatGPT, a helpful assistant." },
+        { role: "system", content: systemPrompt },
         { role: "user", content: prompt },
       ],
       stream: true,
