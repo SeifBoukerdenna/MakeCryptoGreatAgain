@@ -1,16 +1,17 @@
-/* /src/components/Waveform.module.css */
-
 .waveformContainer {
     display: flex;
     align-items: flex-end;
-    height: 50px;
-    gap: 4px;
-    padding: 10px;
+    height: 30px;
+    gap: 3px;
+    padding: 5px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    backdrop-filter: blur(5px);
 }
 
 .bar {
-    width: 4px;
-    background-color: #4a90e2;
+    width: 3px;
+    background-color: #00ff00;
     animation: waveAnimation 1s infinite ease-in-out;
     transform-origin: bottom;
     height: 20%;

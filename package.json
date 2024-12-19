@@ -1,7 +1,7 @@
 {
   "name": "chronocoin",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.1.0",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
@@ -31,7 +31,8 @@
     "react-switch": "^7.1.0",
     "swiper": "^11.1.15",
     "vercel": "^39.2.2",
-    "wavesurfer.js": "^7.8.11"
+    "wavesurfer.js": "^7.8.11",
+    "zustand": "^5.0.2"
   },
   "devDependencies": {
     "@eslint/js": "^9.15.0",
