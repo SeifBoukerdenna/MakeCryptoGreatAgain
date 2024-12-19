@@ -1,24 +1,28 @@
-// /src/pages/Home.tsx
+// src/pages/Home.tsx
 
 import React, { useState, useEffect, useRef } from 'react';
-import TrumpAvatar from '../components/TrumpAvatar';
-import ConnectWallet from '../components/ConnectWallet';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Navigation, Pagination } from 'swiper/modules'; // Import Swiper modules
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
+import CharacterCard from '../components/CharacterCard';
+import PromptInput from '../components/PromptInput';
 import { streamGPTResponse } from '../utils/openai';
 import { useTTS } from '../hooks/useTTS';
-import MuskAvatar from '../components/MuskAvatar';
-import TateAvatar from '../components/TateAvatar';
-import PromptInput from '../components/PromptInput';
 import Waveform from '../components/WaveForm';
+import { characters } from '../characters';
 
 interface Message {
-  sender: 'user' | 'trump';
+  sender: 'user' | 'character';
   text: string;
   status: 'loading' | 'playing' | 'complete';
 }
 
 const Home: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
-  const [loadingTrumpResponse, setLoadingTrumpResponse] = useState(false);
+  const [selectedCharacter, setSelectedCharacter] = useState<string>(characters[0].name);
+  const [loadingResponse, setLoadingResponse] = useState(false);
   const { isPlaying, error: ttsError, sendTTSRequest } = useTTS();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fullResponseRef = useRef<string>('');
@@ -31,14 +35,7 @@ const Home: React.FC = () => {
 
   const processSentences = (text: string) => {
     const sentences = text.match(/[^.!?]+[.!?]+/g) || [];
-
-    sentences.forEach(sentence => {
-      const trimmedSentence = sentence.trim();
-      if (trimmedSentence) {
-        sentencesQueue.current.push(trimmedSentence);
-      }
-    });
-
+    sentencesQueue.current.push(...sentences.map((s) => s.trim()));
     return text.replace(sentences.join(''), '').trim();
   };
 
@@ -46,20 +43,14 @@ const Home: React.FC = () => {
     while (sentencesQueue.current.length > 0) {
       const sentence = sentencesQueue.current.shift();
       if (sentence) {
-        console.log("Sending TTS request with sentence:", sentence);
         await sendTTSRequest(sentence, () => {
-          // Update message status to playing when audio starts
-          setMessages(prev => {
+          setMessages((prev) => {
             const lastIndex = prev.length - 1;
-            if (lastIndex >= 0 && prev[lastIndex].sender === 'trump') {
-              const updatedMessages = [...prev];
-              updatedMessages[lastIndex] = {
-                ...updatedMessages[lastIndex],
-                status: 'playing'
-              };
-              return updatedMessages;
+            const updated = [...prev];
+            if (updated[lastIndex]?.sender === 'character') {
+              updated[lastIndex].status = 'playing';
             }
-            return prev;
+            return updated;
           });
         });
       }
@@ -68,40 +59,31 @@ const Home: React.FC = () => {
 
   const handleSend = async (userText: string) => {
     const userMessage: Message = { sender: 'user', text: userText, status: 'complete' };
-    setMessages(prev => [...prev, userMessage]);
+    setMessages((prev) => [...prev, userMessage]);
 
-    setLoadingTrumpResponse(true);
+    setLoadingResponse(true);
     fullResponseRef.current = '';
     responseBuffer.current = '';
     sentencesQueue.current = [];
 
     const handleToken = (token: string) => {
-      const spaceIfNeeded = fullResponseRef.current && !fullResponseRef.current.endsWith(' ') ? ' ' : '';
-      fullResponseRef.current += spaceIfNeeded + token;
-      responseBuffer.current += spaceIfNeeded + token;
+      fullResponseRef.current += token;
+      responseBuffer.current += token;
 
-      // Update or create trump message with loading status
-      setMessages(prev => {
-        const updatedMessages = [...prev];
-        const lastMessage = updatedMessages[updatedMessages.length - 1];
+      setMessages((prev) => {
+        const updated = [...prev];
+        const lastMessage = updated[updated.length - 1];
 
-        if (!lastMessage || lastMessage.sender !== 'trump') {
-          return [...prev, {
-            sender: 'trump',
-            text: fullResponseRef.current.trim(),
-            status: 'loading'
-          }];
+        if (!lastMessage || lastMessage.sender !== 'character') {
+          updated.push({ sender: 'character', text: fullResponseRef.current, status: 'loading' });
         } else {
-          updatedMessages[updatedMessages.length - 1] = {
-            ...lastMessage,
-            text: fullResponseRef.current.trim()
-          };
-          return updatedMessages;
+          updated[updated.length - 1].text = fullResponseRef.current;
         }
+        return updated;
       });
 
-      const remainingText = processSentences(responseBuffer.current);
-      responseBuffer.current = remainingText || '';
+      const remaining = processSentences(responseBuffer.current);
+      responseBuffer.current = remaining || '';
 
       if (sentencesQueue.current.length > 0) {
         processQueue();
@@ -116,56 +98,88 @@ const Home: React.FC = () => {
         processQueue();
       }
     } catch (error) {
-      console.error("Error fetching Trump response:", error);
-      const errorMessage: Message = {
-        sender: 'trump',
-        text: "Sorry, something went wrong. Huge problems!",
-        status: 'complete'
-      };
-      setMessages(prev => [...prev, errorMessage]);
+      console.error('Error:', error);
+      setMessages((prev) => [
+        ...prev,
+        { sender: 'character', text: 'Oops! Something went wrong.', status: 'complete' },
+      ]);
     } finally {
-      setLoadingTrumpResponse(false);
+      setLoadingResponse(false);
       responseBuffer.current = '';
     }
   };
 
+  const getSelectedCharacter = () => {
+    return characters.find((char) => char.name === selectedCharacter);
+  };
+
   return (
-    <div className="home-container">
-      <ConnectWallet />
-      <div className="main-content">
-        <div className="character-carousel">
-          <MuskAvatar />
-          <TateAvatar />
-        </div>
-        <div className="chat-area">
-          <div className="chat-header">
-            <TrumpAvatar />
+    <div className="home-container min-h-screen flex flex-col">
+      {/* Main Content */}
+      <div className="container mx-auto flex-1 p-6 space-y-16">
+        {/* Character Selection */}
+        <section className="px-4 mb-8 mt-8">
+          <div className="flex justify-center items-center">
+            <Swiper
+              modules={[Navigation, Pagination]}
+              spaceBetween={20}
+              slidesPerView={4}
+              centeredSlides={false} // Disable centered slides for fixed view
+              navigation
+              pagination={{
+                clickable: true,
+                bulletClass: 'swiper-pagination-bullet',
+                bulletActiveClass: 'swiper-pagination-bullet-active',
+              }}
+              loop={true}
+              className="mySwiper"
+            >
+              {characters.map((char) => (
+                <SwiperSlide key={char.id}>
+                  <CharacterCard
+                    id={char.id}
+                    name={char.name}
+                    avatar={char.avatar}
+                    description={char.description}
+                    onSelect={() => setSelectedCharacter(char.name)}
+                    isSelected={selectedCharacter === char.name}
+                  />
+                </SwiperSlide>
+              ))}
+            </Swiper>
           </div>
-          <div className="messages">
-            {messages.map((m, i) => (
-              <div key={i} className={`message ${m.sender} ${m.status}`}>
-                {m.status === 'loading' ? (
-                  <p>Preparing response...</p>
-                ) : (
-                  <p>{m.text}</p>
-                )}
-              </div>
-            ))}
-            {loadingTrumpResponse && (
-              <div className="message trump loading">
-                <p>Thinking... (in a very big way!)</p>
-              </div>
-            )}
-          </div>
-          {isPlaying && (
-            <div className="waveform-wrapper">
-              <Waveform />
+        </section>
+
+        {/* Chat Area */}
+        <section className="chat-area p-6 rounded-lg shadow-lg flex flex-col h-96 pt-6 mt-4 mb-4">
+          {/* Selected Character Icon */}
+          {getSelectedCharacter() && (
+            <div className="selected-character-icon flex justify-center mb-4">
+              <img
+                src={getSelectedCharacter()!.avatar}
+                alt={`${getSelectedCharacter()!.name} Avatar`}
+                className="selected-avatar"
+              />
             </div>
           )}
+
+          <div className="messages flex-1 overflow-y-auto mb-4">
+            {messages.map((m, i) => (
+              <div
+                key={i}
+                className={`message ${m.sender} ${m.status} ${m.sender === 'user' ? 'user' : 'character'
+                  }`}
+              >
+                {m.text}
+              </div>
+            ))}
+            <div ref={messagesEndRef} />
+          </div>
           <PromptInput onSubmit={handleSend} />
-          {ttsError && <p className="tts-error">{ttsError}</p>}
-          <div ref={messagesEndRef} />
-        </div>
+          {isPlaying && <Waveform />}
+          {ttsError && <p className="text-red-500 mt-2">{ttsError}</p>}
+          {loadingResponse && <p className="text-gray-400 mt-2">Loading response...</p>}
+        </section>
       </div>
     </div>
   );

@@ -1,4 +1,4 @@
-// /src/components/PromptInput.tsx
+// src/components/PromptInput.tsx
 
 import React, { useState } from 'react';
 
@@ -17,27 +17,21 @@ const PromptInput: React.FC<PromptInputProps> = ({ onSubmit }) => {
     };
 
     return (
-        <div className="flex w-full">
+        <div className="message-input-container flex items-center">
             <input
                 type="text"
                 placeholder="Ask your question..."
                 value={value}
                 onChange={(e) => setValue(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
-                className="flex-1 p-2 pl-8 bg-[#2c2f36] text-white rounded-full focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-blue-600"
-                style={{
-                    backgroundImage: 'url(/src/assets/mini-eagle-coin.png)',
-                    backgroundRepeat: 'no-repeat',
-                    backgroundPosition: 'left center',
-                    backgroundSize: '20px',
-                }}
+                className="message-input placeholder-gray-400"
             />
             <button
                 onClick={handleSubmit}
                 disabled={!value.trim()}
-                className="ml-2 bg-gradient-to-r from-red-600 to-blue-600 text-white px-4 py-2 rounded-full font-bold cursor-pointer disabled:opacity-50 transition-opacity"
+                className="send-button disabled:opacity-50 disabled:cursor-not-allowed"
             >
-                Submit
+                Send
             </button>
         </div>
     );

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { useWallet, useConnection } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
 import { PhantomWalletName } from '@solana/wallet-adapter-wallets';
@@ -15,7 +15,6 @@ interface TokenInfo {
 const ConnectWallet: React.FC = () => {
     const { connected, publicKey, connect, disconnect, select } = useWallet();
     const { connection } = useConnection();
-    const [tokens, setTokens] = useState<TokenInfo[]>([]);
 
     const handleConnect = useCallback(async () => {
         try {
@@ -29,7 +28,6 @@ const ConnectWallet: React.FC = () => {
     const handleDisconnect = useCallback(async () => {
         try {
             await disconnect();
-            setTokens([]);
         } catch (error) {
             console.error("Error disconnecting wallet:", error);
         }
@@ -62,8 +60,6 @@ const ConnectWallet: React.FC = () => {
                             });
                         }
                     }
-
-                    setTokens(fetchedTokens);
                 } catch (error) {
                     console.error("Error fetching tokens:", error);
                 }
@@ -85,18 +81,6 @@ const ConnectWallet: React.FC = () => {
                     <button className="wallet-button" onClick={handleDisconnect}>
                         Disconnect
                     </button>
-
-                    {/* Display Tokens */}
-                    <div className="token-list" style={{ marginTop: '1rem' }}>
-                        <h3>Your Tokens:</h3>
-                        {tokens.length === 0 && <p>No tokens found.</p>}
-                        {tokens.map((token, i) => (
-                            <div key={i} className="token-item" style={{ marginBottom: '0.5rem' }}>
-                                <p><strong>Mint:</strong> {token.mint}</p>
-                                <p><strong>Balance:</strong> {token.amount.toLocaleString()} (Decimals: {token.decimals})</p>
-                            </div>
-                        ))}
-                    </div>
                 </div>
             ) : (
                 <button className="wallet-button" onClick={handleConnect}>
