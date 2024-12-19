@@ -80,23 +80,27 @@ const Home: React.FC = () => {
           .catch(reject);
       });
 
-      // Once streaming is complete, update message status and trigger TTS
+      // Once streaming is complete, prepare for TTS
       if (fullResponseRef.current) {
+        // Hide the message until TTS starts
         setMessages(prev => {
           const updated = [...prev];
           const lastMessage = updated[updated.length - 1];
           if (lastMessage && lastMessage.sender === 'character') {
-            lastMessage.status = 'complete';
+            lastMessage.text = '';  // Clear the text until TTS starts
+            lastMessage.status = 'loading';
           }
           return updated;
         });
 
         // Send the complete response to TTS
         await sendTTSRequest(fullResponseRef.current, () => {
+          // Show the text only when TTS starts playing
           setMessages(prev => {
             const updated = [...prev];
             const lastMessage = updated[updated.length - 1];
             if (lastMessage && lastMessage.sender === 'character') {
+              lastMessage.text = fullResponseRef.current;  // Show the complete text
               lastMessage.status = 'playing';
             }
             return updated;
@@ -179,7 +183,8 @@ const Home: React.FC = () => {
                 key={i}
                 className={`message ${m.sender} ${m.status} ${m.sender === 'user' ? 'user' : 'character'}`}
               >
-                {m.text}
+                {m.sender === 'user' ? m.text :
+                  m.status === 'loading' ? 'Thinking...' : m.text}
               </div>
             ))}
             <div ref={messagesEndRef} />
