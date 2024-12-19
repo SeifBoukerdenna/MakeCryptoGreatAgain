@@ -1,13 +1,7 @@
-// src/pages/Home.tsx
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import SwiperCore from 'swiper';
 import { Navigation, Pagination } from 'swiper/modules';
-
-import 'swiper/css';
-import 'swiper/css/navigation';
-import 'swiper/css/pagination';
 import CharacterCard from '../components/CharacterCard';
 import PromptInput from '../components/PromptInput';
 import { streamGPTResponse } from '../utils/openai';
@@ -30,8 +24,6 @@ const Home: React.FC = () => {
   const { isPlaying, error: ttsError, sendTTSRequest } = useTTS();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fullResponseRef = useRef<string>('');
-  const responseBuffer = useRef<string>('');
-  const sentencesQueue = useRef<string[]>([]);
   const swiperRef = useRef<SwiperCore>();
 
   // Find the index of the selected character
@@ -43,84 +35,83 @@ const Home: React.FC = () => {
 
   useEffect(() => {
     if (swiperRef.current && selectedIndex !== -1) {
-      // Use slideToLoop to navigate correctly in loop mode
-      swiperRef.current.slideToLoop(selectedIndex, 500); // 500ms animation
+      swiperRef.current.slideToLoop(selectedIndex, 500);
     }
   }, [selectedCharacter, selectedIndex]);
 
-  const processSentences = (text: string) => {
-    const sentences = text.match(/[^.!?]+[.!?]+/g) || [];
-    sentencesQueue.current.push(...sentences.map((s) => s.trim()));
-    return text.replace(sentences.join(''), '').trim();
-  };
+  const handleSend = async (userText: string) => {
+    // Add user message
+    const userMessage: Message = { sender: 'user', text: userText, status: 'complete' };
+    setMessages(prev => [...prev, userMessage]);
 
-  const processQueue = async () => {
-    while (sentencesQueue.current.length > 0) {
-      const sentence = sentencesQueue.current.shift();
-      if (sentence) {
-        await sendTTSRequest(sentence, () => {
-          setMessages((prev) => {
-            const lastIndex = prev.length - 1;
+    setLoadingResponse(true);
+    fullResponseRef.current = '';
+
+    // Add initial AI message with loading status
+    setMessages(prev => [...prev, { sender: 'character', text: '', status: 'loading' }]);
+
+    try {
+      // Collect the full response
+      await new Promise<void>((resolve, reject) => {
+        streamGPTResponse(userText, (token: string) => {
+          // Skip empty tokens
+          if (!token) return;
+
+          // Add space before token if needed
+          const needsSpace = fullResponseRef.current.length > 0 &&
+            !fullResponseRef.current.endsWith(' ') &&
+            !token.startsWith(' ') &&
+            !token.match(/^[.,!?;:)'"%\]}]/) && // Don't add space before punctuation
+            !fullResponseRef.current.match(/[({\["'%]$/); // Don't add space after opening brackets/quotes
+
+          fullResponseRef.current += (needsSpace ? ' ' : '') + token;
+
+          // Update the last message with accumulated text
+          setMessages(prev => {
             const updated = [...prev];
-            if (updated[lastIndex]?.sender === 'character') {
-              updated[lastIndex].status = 'playing';
+            const lastMessage = updated[updated.length - 1];
+            if (lastMessage && lastMessage.sender === 'character') {
+              lastMessage.text = fullResponseRef.current;
+            }
+            return updated;
+          });
+        })
+          .then(() => resolve())
+          .catch(reject);
+      });
+
+      // Once streaming is complete, update message status and trigger TTS
+      if (fullResponseRef.current) {
+        setMessages(prev => {
+          const updated = [...prev];
+          const lastMessage = updated[updated.length - 1];
+          if (lastMessage && lastMessage.sender === 'character') {
+            lastMessage.status = 'complete';
+          }
+          return updated;
+        });
+
+        // Send the complete response to TTS
+        await sendTTSRequest(fullResponseRef.current, () => {
+          setMessages(prev => {
+            const updated = [...prev];
+            const lastMessage = updated[updated.length - 1];
+            if (lastMessage && lastMessage.sender === 'character') {
+              lastMessage.status = 'playing';
             }
             return updated;
           });
         });
       }
-    }
-  };
-
-  const handleSend = async (userText: string) => {
-    const userMessage: Message = { sender: 'user', text: userText, status: 'complete' };
-    setMessages((prev) => [...prev, userMessage]);
-
-    setLoadingResponse(true);
-    fullResponseRef.current = '';
-    responseBuffer.current = '';
-    sentencesQueue.current = [];
-
-    const handleToken = (token: string) => {
-      fullResponseRef.current += token;
-      responseBuffer.current += token;
-
-      setMessages((prev) => {
-        const updated = [...prev];
-        const lastMessage = updated[updated.length - 1];
-
-        if (!lastMessage || lastMessage.sender !== 'character') {
-          updated.push({ sender: 'character', text: fullResponseRef.current, status: 'loading' });
-        } else {
-          updated[updated.length - 1].text = fullResponseRef.current;
-        }
-        return updated;
-      });
-
-      const remaining = processSentences(responseBuffer.current);
-      responseBuffer.current = remaining || '';
-
-      if (sentencesQueue.current.length > 0) {
-        processQueue();
-      }
-    };
-
-    try {
-      await streamGPTResponse(userText, handleToken);
-
-      if (responseBuffer.current.trim()) {
-        sentencesQueue.current.push(responseBuffer.current.trim());
-        processQueue();
-      }
     } catch (error) {
       console.error('Error:', error);
-      setMessages((prev) => [
-        ...prev,
-        { sender: 'character', text: 'Oops! Something went wrong.', status: 'complete' },
+      setMessages(prev => [
+        ...prev.slice(0, -1), // Remove loading message
+        { sender: 'character', text: 'Oops! Something went wrong.', status: 'complete' }
       ]);
     } finally {
       setLoadingResponse(false);
-      responseBuffer.current = '';
+      fullResponseRef.current = '';
     }
   };
 
@@ -130,7 +121,6 @@ const Home: React.FC = () => {
 
   return (
     <div className="home-container min-h-screen flex flex-col">
-      {/* Main Content */}
       <div className="container mx-auto flex-1 p-6 space-y-16">
         {/* Character Selection */}
         <section className="px-4 mb-8 mt-8">
@@ -139,7 +129,7 @@ const Home: React.FC = () => {
               modules={[Navigation, Pagination]}
               spaceBetween={20}
               slidesPerView={4}
-              centeredSlides={false} // Disable centered slides for fixed view
+              centeredSlides={false}
               navigation
               pagination={{
                 clickable: true,
@@ -151,7 +141,7 @@ const Home: React.FC = () => {
               onSwiper={(swiper) => {
                 swiperRef.current = swiper;
                 if (selectedIndex !== -1) {
-                  swiper.slideToLoop(selectedIndex, 0); // Immediately navigate to selected slide on initialization
+                  swiper.slideToLoop(selectedIndex, 0);
                 }
               }}
             >
@@ -173,7 +163,6 @@ const Home: React.FC = () => {
 
         {/* Chat Area */}
         <section className="chat-area p-6 rounded-lg shadow-lg flex flex-col h-96 pt-6 mt-4 mb-4">
-          {/* Selected Character Icon */}
           {getSelectedCharacter() && (
             <div className="selected-character-icon flex justify-center mb-4">
               <img
@@ -188,14 +177,14 @@ const Home: React.FC = () => {
             {messages.map((m, i) => (
               <div
                 key={i}
-                className={`message ${m.sender} ${m.status} ${m.sender === 'user' ? 'user' : 'character'
-                  }`}
+                className={`message ${m.sender} ${m.status} ${m.sender === 'user' ? 'user' : 'character'}`}
               >
                 {m.text}
               </div>
             ))}
             <div ref={messagesEndRef} />
           </div>
+
           <PromptInput onSubmit={handleSend} />
           {isPlaying && <Waveform />}
           {ttsError && <p className="text-red-500 mt-2">{ttsError}</p>}
@@ -207,5 +196,3 @@ const Home: React.FC = () => {
 };
 
 export default Home;
-
-

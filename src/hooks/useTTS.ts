@@ -1,6 +1,6 @@
 // /src/hooks/useTTS.ts
 
-import { useState, useRef } from "react";
+import { useState, useRef, useCallback } from "react";
 import voices from "../configs/voices.json";
 
 interface UseTTSResult {
@@ -14,80 +14,66 @@ export function useTTS(): UseTTSResult {
   const [isLoading, setIsLoading] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const audioQueueRef = useRef<
-    { audio: HTMLAudioElement; onStart?: () => void }[]
-  >([]);
-  const isProcessingRef = useRef(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  const playNextInQueue = () => {
-    if (audioQueueRef.current.length === 0) {
-      setIsPlaying(false);
-      isProcessingRef.current = false;
-      return;
-    }
+  const sendTTSRequest = useCallback(
+    async (text: string, onStart?: () => void) => {
+      if (!text.trim()) return;
 
-    const { audio, onStart } = audioQueueRef.current.shift()!;
-    setIsPlaying(true);
+      setIsLoading(true);
+      setError(null);
 
-    // Call onStart callback when audio begins playing
-    audio.onplay = () => {
-      onStart?.();
-    };
+      try {
+        const response = await fetch("/api/tts", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text, voice: voices.trump.voice }),
+        });
 
-    audio.onended = () => {
-      URL.revokeObjectURL(audio.src);
-      playNextInQueue();
-    };
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || "Failed to fetch TTS");
+        }
 
-    audio.onerror = () => {
-      setError("Audio playback error");
-      setIsPlaying(false);
-      URL.revokeObjectURL(audio.src);
-      playNextInQueue();
-    };
+        const audioBlob = await response.blob();
+        const audioURL = URL.createObjectURL(audioBlob);
+        const audio = new Audio(audioURL);
 
-    audio.play().catch((err) => {
-      console.error("Playback error:", err);
-      setError("Failed to play audio");
-      setIsPlaying(false);
-      playNextInQueue();
-    });
-  };
+        audioRef.current = audio;
 
-  const sendTTSRequest = async (text: string, onStart?: () => void) => {
-    if (!text.trim()) return;
+        setIsPlaying(true);
 
-    setIsLoading(true);
-    setError(null);
+        // Callback when audio starts playing
+        audio.onplay = () => {
+          console.log("Audio started playing.");
+          onStart?.();
+        };
 
-    try {
-      const response = await fetch("/api/tts", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text, voice: voices.trump.voice }),
-      });
+        // Callback when audio ends
+        audio.onended = () => {
+          console.log("Audio ended.");
+          setIsPlaying(false);
+          URL.revokeObjectURL(audioURL);
+        };
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to fetch TTS");
+        // Callback on audio error
+        audio.onerror = () => {
+          console.error("Audio playback error");
+          setError("Audio playback error");
+          setIsPlaying(false);
+          URL.revokeObjectURL(audioURL);
+        };
+
+        await audio.play();
+      } catch (err: any) {
+        console.error("TTS Error:", err.message);
+        setError(err.message);
+      } finally {
+        setIsLoading(false);
       }
-
-      const audioBlob = await response.blob();
-      const audio = new Audio(URL.createObjectURL(audioBlob));
-
-      audioQueueRef.current.push({ audio, onStart });
-
-      if (!isProcessingRef.current) {
-        isProcessingRef.current = true;
-        playNextInQueue();
-      }
-    } catch (err: any) {
-      console.error("TTS Error:", err.message);
-      setError(err.message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    },
+    []
+  );
 
   return { isLoading, isPlaying, error, sendTTSRequest };
 }
