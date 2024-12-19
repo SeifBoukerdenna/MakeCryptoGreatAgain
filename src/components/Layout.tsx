@@ -1,3 +1,5 @@
+// src/components/Layout.tsx
+
 import React from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
 import ThemeToggle from './ThemeToggle';
@@ -12,14 +14,14 @@ const Layout: React.FC<LayoutProps> = ({ toggleTheme, theme }) => {
     return (
         <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-gray-900">
             {/* Top Navbar */}
-            <nav className="navbar">
+            <nav className="navbar flex justify-between items-center">
                 {/* Logo */}
                 <div className="logo">
-                    <h1>Make Crypto Great Again</h1>
+                    <h1 className="text-2xl font-bold">Make Crypto Great Again</h1>
                 </div>
 
                 {/* Navigation Links */}
-                <div className="navigation-links">
+                <div className="navigation-links flex space-x-8">
                     <NavLink
                         to="/"
                         className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}
@@ -35,14 +37,11 @@ const Layout: React.FC<LayoutProps> = ({ toggleTheme, theme }) => {
                 </div>
 
                 {/* Action Buttons */}
-                <div className="action-buttons">
-                    <div className="button-wrapper">
-                        <ThemeToggle toggleTheme={toggleTheme} theme={theme} />
-                    </div>
-                    <div className="button-wrapper">
-                        <ConnectWallet />
-                    </div>
+                <div className="action-buttons-column">
+                    <ThemeToggle toggleTheme={toggleTheme} theme={theme} />
+                    <ConnectWallet />
                 </div>
+
             </nav>
 
             {/* Main Content */}

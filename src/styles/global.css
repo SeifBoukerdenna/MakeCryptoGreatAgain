@@ -112,6 +112,65 @@ html {
     color: var(--navbar-text);
 }
 
+/* Navigation Links */
+.navigation-links {
+    display: flex;
+    gap: 1.5rem;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.nav-link {
+    font-size: 1rem;
+    font-weight: 600;
+    text-decoration: none;
+    color: var(--navbar-text);
+    position: relative;
+    padding: 0.25rem 0;
+    transition: color 0.3s ease;
+}
+
+.nav-link::after {
+    content: '';
+    position: absolute;
+    width: 0%;
+    height: 2px;
+    bottom: -2px;
+    left: 0;
+    background-color: #6b46c1;
+    transition: width 0.3s ease;
+}
+
+.nav-link:hover {
+    color: #6b46c1;
+}
+
+.nav-link:hover::after {
+    width: 100%;
+}
+
+.nav-link.active {
+    color: #6b46c1;
+}
+
+.nav-link.active::after {
+    width: 100%;
+}
+
+/* Remove existing button-like styles for nav-link */
+.nav-link {
+    background: none;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+}
+
+/* Optional: Add focus styles for accessibility */
+.nav-link:focus {
+    outline: 2px solid #6b46c1;
+    outline-offset: 2px;
+}
+
 /* Swiper Slide Centering */
 .mySwiper .swiper-slide {
     margin-top: 15px;
@@ -527,49 +586,7 @@ button,
     transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-.navigation-links {
-    display: flex;
-    gap: 1rem;
-    justify-content: center;
-    flex-grow: 1;
-    flex-wrap: wrap;
-}
-
-/* Base Button-like Link Styles */
-.nav-link {
-    padding: 10px 20px;
-    font-size: 1rem;
-    font-weight: 600;
-    text-decoration: none;
-    border-radius: 8px;
-    border: 2px solid transparent;
-    color: #555;
-    background-color: #f0f0f0;
-    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
-    display: inline-block;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-/* Hover State */
-.nav-link:hover {
-    background-color: #6b46c1;
-    color: #fff;
-}
-
-/* Active State */
-.nav-link.active {
-    background-color: #5a3ea6;
-    color: #fff;
-    border-color: #5a3ea6;
-    box-shadow: 0 6px 10px rgba(90, 62, 166, 0.3);
-}
-
-/* Focus State for Accessibility */
-.nav-link:focus {
-    outline: 3px solid #6b46c1;
-    outline-offset: 2px;
-}
-
+/* Action Buttons */
 .action-buttons {
     display: flex;
     align-items: center;
@@ -582,22 +599,42 @@ button,
     margin: 0.5rem 0;
 }
 
-.navbar>.navigation-links {
-    margin: 0 auto;
-}
-
-.wallet-button {
+/* Ensure the ConnectWallet button aligns well vertically */
+.connect-wallet .wallet-button {
     background: var(--button-bg);
     color: #FFFFFF;
     border: none;
     border-radius: 25px;
-    padding: 10px 16px;
+    padding: 8px 16px;
     font-size: 0.95rem;
     font-weight: 700;
     cursor: pointer;
     transition: background 0.3s ease, opacity 0.3s ease;
 }
 
-.wallet-button:hover {
+.connect-wallet .wallet-button:hover {
     background: var(--button-hover-bg);
+}
+
+.connect-wallet .wallet-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Optional: Adjust ConnectWallet in connected state */
+.wallet-connected p {
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+.wallet-connected .wallet-button {
+    padding: 6px 12px;
+}
+
+.action-buttons-column {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    /* Adjust the spacing between the elements */
 }
