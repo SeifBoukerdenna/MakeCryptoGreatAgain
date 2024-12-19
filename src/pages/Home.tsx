@@ -2,7 +2,9 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
+import SwiperCore from 'swiper';
 import { Navigation, Pagination } from 'swiper/modules';
+
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
@@ -30,10 +32,21 @@ const Home: React.FC = () => {
   const fullResponseRef = useRef<string>('');
   const responseBuffer = useRef<string>('');
   const sentencesQueue = useRef<string[]>([]);
+  const swiperRef = useRef<SwiperCore>();
+
+  // Find the index of the selected character
+  const selectedIndex = characters.findIndex((char) => char.name === selectedCharacter);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  useEffect(() => {
+    if (swiperRef.current && selectedIndex !== -1) {
+      // Use slideToLoop to navigate correctly in loop mode
+      swiperRef.current.slideToLoop(selectedIndex, 500); // 500ms animation
+    }
+  }, [selectedCharacter, selectedIndex]);
 
   const processSentences = (text: string) => {
     const sentences = text.match(/[^.!?]+[.!?]+/g) || [];
@@ -135,6 +148,12 @@ const Home: React.FC = () => {
               }}
               loop={true}
               className="mySwiper"
+              onSwiper={(swiper) => {
+                swiperRef.current = swiper;
+                if (selectedIndex !== -1) {
+                  swiper.slideToLoop(selectedIndex, 0); // Immediately navigate to selected slide on initialization
+                }
+              }}
             >
               {characters.map((char) => (
                 <SwiperSlide key={char.id}>
@@ -188,3 +207,5 @@ const Home: React.FC = () => {
 };
 
 export default Home;
+
+
