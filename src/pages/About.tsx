@@ -1,8 +1,7 @@
-// src/components/About.jsx
-
 import { FaLock, FaUsers, FaRocket, FaQuoteLeft } from 'react-icons/fa';
 import '../styles/about.css'; // Import the About page CSS
-import banner from "../assets/banner.png"
+import banner from "../assets/banner.png";
+
 const About = () => {
     return (
         <div className="about-container">
@@ -32,7 +31,7 @@ const About = () => {
                             secure, and authentic, creating unparalleled experiences for users worldwide.
                         </p>
                     </div>
-                    <div className="mission-image-wrapper" style={{ transform: 'scale(1.5)' }}>
+                    <div className="mission-image-wrapper">
                         <div className="mission-image-background"></div>
                         <img
                             src={banner}

@@ -1,11 +1,13 @@
 // src/hooks/useCharacterSelection.ts
 
-import { useRef } from "react";
+import { useRef, useEffect } from "react";
+import { useWallet } from "@solana/wallet-adapter-react";
 import SwiperCore from "swiper";
 import { charactersConfig } from "../configs/characters.config";
 import useCharacterStore from "../stores/useCharacterStore";
 
 export const useCharacterSelection = () => {
+  const { connected } = useWallet();
   const selectedCharacter = useCharacterStore(
     (state) => state.selectedCharacter
   );
@@ -14,13 +16,21 @@ export const useCharacterSelection = () => {
   );
   const swiperRef = useRef<SwiperCore>();
 
-  // Find the index of the selected character
-  const selectedIndex = charactersConfig.findIndex(
-    (char) => char.name === selectedCharacter
-  );
+  // Reset selection when wallet disconnects
+  useEffect(() => {
+    if (!connected) {
+      setSelectedCharacter(null);
+    }
+  }, [connected, setSelectedCharacter]);
+
+  const selectedIndex = selectedCharacter
+    ? charactersConfig.findIndex((char) => char.name === selectedCharacter)
+    : -1;
 
   const getSelectedCharacter = () => {
-    return charactersConfig.find((char) => char.name === selectedCharacter);
+    return selectedCharacter
+      ? charactersConfig.find((char) => char.name === selectedCharacter)
+      : null;
   };
 
   return {
@@ -29,6 +39,6 @@ export const useCharacterSelection = () => {
     swiperRef,
     selectedIndex,
     getSelectedCharacter,
-    characters: charactersConfig, // Use the config array as the characters list
+    characters: charactersConfig,
   };
 };

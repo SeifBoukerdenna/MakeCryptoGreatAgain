@@ -105,6 +105,11 @@ html {
     object-fit: contain;
 }
 
+.title{
+    box-shadow: 0 4px 6px rgba(216, 0, 191, 0.5);
+    width: 65%;
+}
+
 /* Navbar Title */
 .navbar h1 {
     font-size: 1.75rem;
@@ -115,7 +120,7 @@ html {
 /* Navigation Links */
 .navigation-links {
     display: flex;
-    gap: 1.5rem;
+    gap: 2.5rem;
     justify-content: flex-start;
     align-items: center;
 }
@@ -217,17 +222,59 @@ html {
     border-radius: 12px;
     padding: 20px;
     width: 220px;
-    height: 260px;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    opacity: 1;
-    pointer-events: auto;
+    height: 300px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
 }
 
 .character-card.selected-card {
-    background-color: #d5d3d5;
-    border-color: #d5d3d5;
-    opacity: 0.9;
-    pointer-events: none;
+    background: rgba(128, 0, 128, 0.1);
+    border: 2px solid rgba(128, 0, 128, 0.3);
+    box-shadow: 0 0 20px rgba(128, 0, 128, 0.2);
+    backdrop-filter: blur(10px);
+}
+
+.character-card.selected-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 12px;
+    background: linear-gradient(45deg,
+            rgba(128, 0, 128, 0.1) 0%,
+            rgba(153, 50, 204, 0.1) 100%);
+    z-index: 0;
+}
+
+.character-card.selected-card .avatar {
+    border-color: rgba(128, 0, 128, 0.5);
+    box-shadow: 0 0 15px rgba(128, 0, 128, 0.3);
+}
+
+.character-card.selected-card .character-name {
+    color: #9932CC;
+    text-shadow: 0 0 10px rgba(153, 50, 204, 0.3);
+}
+
+.selected-select-button {
+    background: linear-gradient(45deg, #800080, #9932CC) !important;
+    color: white;
+    opacity: 1;
+    border: none;
+    border-radius: 25px;
+    padding: 10px 20px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: default;
+    box-shadow: 0 4px 15px rgba(128, 0, 128, 0.3);
+    transition: all 0.3s ease;
+}
+
+.character-card.selected-card .character-description {
+    color: rgba(153, 50, 204, 0.8);
 }
 
 .character-card:hover {
@@ -464,7 +511,25 @@ html {
 /* Responsive Design */
 @media (max-width: 768px) {
     .navbar {
-        padding: 1rem;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .navigation-links {
+        margin-top: 1rem;
+    }
+
+    .action-buttons-column {
+        margin-top: 1rem;
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .balance-display {
+        position: static;
+        transform: none;
+        margin-top: 0.5rem;
+        text-align: center;
     }
 
     .navbar h1 {
@@ -487,7 +552,7 @@ html {
 
     .character-card {
         width: 180px;
-        height: 220px;
+        height: 260px;
         padding: 16px;
         margin: 20px;
     }
@@ -517,12 +582,12 @@ html {
 }
 
 @media (max-width: 480px) {
-    .navbar {
-        padding: 0.5rem 1rem;
+    .balance-display {
+        margin-top: 0.5rem;
     }
 
-    .logo h1 {
-        font-size: 1.25rem;
+    .navbar h1 {
+        font-size: 1.5rem;
     }
 
     .navigation-links {
@@ -530,42 +595,10 @@ html {
         gap: 0.5rem;
     }
 
-    .action-buttons {
+    .action-buttons-column {
         flex-direction: column;
+        align-items: flex-start;
         gap: 0.5rem;
-    }
-
-    .button-wrapper {
-        margin: 0.25rem 0;
-    }
-
-    .character-card {
-        width: 160px;
-        height: 200px;
-        padding: 14px;
-    }
-
-    .character-card .avatar {
-        width: 60px;
-        height: 60px;
-    }
-
-    .selected-avatar {
-        width: 90px;
-        height: 90px;
-    }
-
-    .character-name {
-        font-size: 1rem;
-    }
-
-    .character-description {
-        font-size: 0.8rem;
-    }
-
-    .select-button {
-        font-size: 0.85rem;
-        padding: 6px 10px;
     }
 }
 
@@ -610,6 +643,14 @@ button,
     font-weight: 700;
     cursor: pointer;
     transition: background 0.3s ease, opacity 0.3s ease;
+    width: 150px;
+    /* Set a consistent width */
+    height: 40px;
+    /* Set a consistent height */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
 }
 
 .connect-wallet .wallet-button:hover {
@@ -625,10 +666,16 @@ button,
 .wallet-connected p {
     margin: 0;
     font-size: 0.9rem;
+    text-align: center;
 }
 
 .wallet-connected .wallet-button {
-    padding: 6px 12px;
+    width: 150px;
+    /* Matches the Connect button */
+    height: 40px;
+    /* Matches the Connect button */
+    padding: 8px 16px;
+    /* Matches the Connect button padding */
 }
 
 .action-buttons-column {
@@ -669,4 +716,108 @@ button,
 .selected-avatar.speaking {
     border-color: #00ff00;
     animation: pulseBorder 2s infinite;
+}
+
+.balance-display {
+    background: var(--card-bg-color);
+    border: 1px solid var(--card-border);
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+}
+
+/* Updated navbar layout */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    background: var(--navbar-bg);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-bottom: 1px solid var(--card-border);
+}
+
+.navbar>div {
+    flex: 1;
+}
+
+.navbar .logo {
+    flex: 1;
+}
+
+.navbar .center-section {
+    flex: 2;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 2rem;
+}
+
+.navbar .action-buttons-column {
+    flex: 1;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.character-card.unavailable {
+    opacity: 0.7;
+    filter: grayscale(0.5);
+    cursor: not-allowed;
+}
+
+.character-card .character-price {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-top: 0.5rem;
+}
+
+.unavailable-button {
+    background: #666666 !important;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.unavailable-button:hover {
+    background: #666666 !important;
+    transform: none !important;
+}
+
+.balance-container {
+    display: flex;
+    gap: 1rem;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 0.5rem;
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+}
+
+.balance-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.balance-item.sol {
+    background: rgba(139, 92, 246, 0.15);
+    border: 1px solid rgba(139, 92, 246, 0.3);
+}
+
+.balance-item.mcga {
+    background: rgba(52, 211, 153, 0.15);
+    border: 1px solid rgba(52, 211, 153, 0.3);
+}
+
+.balance-amount {
+    font-family: 'Poppins', monospace;
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.balance-symbol {
+    font-size: 0.85rem;
+    opacity: 0.8;
+    font-weight: 500;
+    text-transform: uppercase;
 }
