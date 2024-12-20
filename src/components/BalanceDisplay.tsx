@@ -1,6 +1,7 @@
-// components/BalanceDisplay.tsx
+// src/components/BalanceDisplay.tsx
+
 import React from 'react';
-import { Coins, CircleDollarSign } from 'lucide-react';
+import { CircleDollarSign, Coins } from 'lucide-react';
 
 interface BalanceDisplayProps {
     solBalance: number | null;
@@ -13,10 +14,8 @@ const BalanceDisplay: React.FC<BalanceDisplayProps> = ({
     mcgaBalance,
     formatToK,
 }) => {
-    if (!solBalance && !mcgaBalance) return null;
-
     return (
-        <div className="balance-container">
+        <>
             {solBalance !== null && (
                 <div className="balance-item sol">
                     <CircleDollarSign className="h-5 w-5 text-violet-400" />
@@ -39,7 +38,7 @@ const BalanceDisplay: React.FC<BalanceDisplayProps> = ({
                     </div>
                 </div>
             )}
-        </div>
+        </>
     );
 };
 

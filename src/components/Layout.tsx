@@ -61,38 +61,46 @@ const Layout: React.FC<LayoutProps> = ({ toggleTheme, theme }) => {
 
     return (
         <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-gray-900">
-            <nav className="navbar flex justify-between items-center">
+            <nav className="navbar">
+                {/* Logo Section */}
                 <div className="logo">
-                    <h1 className="title">Make Crypto Great Again</h1>
+                    <h1 className="text-xl font-bold">Make Crypto Great Again</h1>
                 </div>
 
-                <div className="flex items-center gap-8">
-                    {connected && (
-                        <BalanceDisplay
-                            solBalance={solBalance}
-                            mcgaBalance={mcgaBalance}
-                            formatToK={formatToK}
-                        />
-                    )}
+                {/* Navigation Links */}
+                <div className="navigation-links">
+                    <NavLink
+                        to="/"
+                        className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
+                    >
+                        Home
+                    </NavLink>
+                    <NavLink
+                        to="/about"
+                        className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
+                    >
+                        About
+                    </NavLink>
+                </div>
 
-                    <div className="navigation-links flex space-x-8">
-                        <NavLink
-                            to="/"
-                            className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}
-                        >
-                            Home
-                        </NavLink>
-                        <NavLink
-                            to="/about"
-                            className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}
-                        >
-                            About
-                        </NavLink>
+                {/* Balance and Wallet Section */}
+                <div className="wallet-balance-container">
+                    {connected && (
+                        <div className="balance-items">
+                            <BalanceDisplay
+                                solBalance={solBalance}
+                                mcgaBalance={mcgaBalance}
+                                formatToK={formatToK}
+                            />
+                        </div>
+                    )}
+                    <div className="wallet-connect">
+                        <ConnectWallet />
                     </div>
                 </div>
 
-                <div className="action-buttons-column">
-                    <ConnectWallet />
+                {/* Theme Toggle */}
+                <div className="theme-toggle">
                     <ThemeToggle toggleTheme={toggleTheme} theme={theme} />
                 </div>
             </nav>
