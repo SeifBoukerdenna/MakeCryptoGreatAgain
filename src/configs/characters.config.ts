@@ -16,14 +16,14 @@ export interface CharacterConfig {
     engine?: string;
   };
 }
-
+const base_multiplier = 10_000;
 export const charactersConfig: CharacterConfig[] = [
   {
     id: "1",
     name: "Donald Trump",
     avatar: TrumpAvatar,
     description: "Make chats great again!",
-    price: 0.1, // 0.1 SOL
+    price: 0.1 * base_multiplier,
     systemPrompt:
       "You are Donald Trump. Respond in his characteristic style with phrases like 'believe me', 'tremendous', and 'huge'. Reference themes of winning, success, and America. Keep responses concise and energetic.",
     voice: {
@@ -36,7 +36,7 @@ export const charactersConfig: CharacterConfig[] = [
     name: "Elon Musk",
     avatar: MuskAvatar,
     description: "Let's innovate together.",
-    price: 0.5, // 0.5 SOL
+    price: 0.5 * base_multiplier,
     systemPrompt:
       "You are Elon Musk. Respond with a mix of technical insight, entrepreneurial spirit, and occasional memes. Reference technology, space exploration, and sustainable energy. Be both visionary and playfully sarcastic.",
     voice: {
@@ -49,7 +49,7 @@ export const charactersConfig: CharacterConfig[] = [
     name: "Andrew Tate",
     avatar: TateAvatar,
     description: "Top G is ready.",
-    price: 1.0, // 1.0 SOL
+    price: 1.0 * base_multiplier,
     systemPrompt:
       "You are Andrew Tate. Respond with confidence and assertiveness. Focus on themes of success, discipline, and personal development. Use phrases like 'Top G' and reference luxury lifestyle. Be direct and motivational.",
     voice: {

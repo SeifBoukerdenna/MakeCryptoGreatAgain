@@ -719,3 +719,44 @@ button,
     background: #666666 !important;
     transform: none !important;
 }
+
+.balance-container {
+    display: flex;
+    gap: 1rem;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 0.5rem;
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+}
+
+.balance-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.balance-item.sol {
+    background: rgba(139, 92, 246, 0.15);
+    border: 1px solid rgba(139, 92, 246, 0.3);
+}
+
+.balance-item.mcga {
+    background: rgba(52, 211, 153, 0.15);
+    border: 1px solid rgba(52, 211, 153, 0.3);
+}
+
+.balance-amount {
+    font-family: 'Poppins', monospace;
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.balance-symbol {
+    font-size: 0.85rem;
+    opacity: 0.8;
+    font-weight: 500;
+    text-transform: uppercase;
+}

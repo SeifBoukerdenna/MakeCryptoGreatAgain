@@ -3,13 +3,17 @@
 import { create } from "zustand";
 
 interface BalanceState {
-  balance: number | null;
-  setBalance: (balance: number | null) => void;
+  solBalance: number | null;
+  mcgaBalance: number | null;
+  setSolBalance: (balance: number | null) => void;
+  setMcgaBalance: (balance: number | null) => void;
 }
 
 const useBalanceStore = create<BalanceState>((set) => ({
-  balance: null,
-  setBalance: (balance) => set({ balance }),
+  solBalance: null,
+  mcgaBalance: null,
+  setSolBalance: (balance) => set({ solBalance: balance }),
+  setMcgaBalance: (balance) => set({ mcgaBalance: balance }),
 }));
 
 export default useBalanceStore;

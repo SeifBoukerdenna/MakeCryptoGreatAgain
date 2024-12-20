@@ -4,6 +4,7 @@ import React from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { TEST_MODE, FREE_CHARACTER_ID } from '../configs/test.config';
 import useBalanceStore from '../hooks/useBalanceStore';
+import { formatToK } from '../utils/numberFormat';
 
 interface CharacterCardProps {
     id: string;
@@ -25,16 +26,12 @@ const CharacterCard: React.FC<CharacterCardProps> = ({
     isSelected,
 }) => {
     const { connected } = useWallet();
-    const { balance } = useBalanceStore();
+    const { mcgaBalance } = useBalanceStore();
 
-    // Character is available if:
-    // 1. It's test mode and it's the free character (Trump), OR
-    // 2. User is connected and has sufficient balance
     const isAvailable =
         (TEST_MODE && id === FREE_CHARACTER_ID) ||
-        (connected && balance !== null && balance >= price);
+        (connected && mcgaBalance !== null && mcgaBalance >= price);
 
-    // Only show price when connected and it's not in test mode or not the free character
     const showPrice = connected && (!TEST_MODE || id !== FREE_CHARACTER_ID);
 
     return (
@@ -54,7 +51,7 @@ const CharacterCard: React.FC<CharacterCardProps> = ({
                 <div className="character-description">{description}</div>
                 {showPrice && (
                     <div className={`character-price ${isAvailable ? 'text-green-500' : 'text-red-500'}`}>
-                        {price} SOL
+                        {formatToK(price)} MCGA
                     </div>
                 )}
                 {TEST_MODE && id === FREE_CHARACTER_ID && (
@@ -75,7 +72,7 @@ const CharacterCard: React.FC<CharacterCardProps> = ({
                     : !connected && !(TEST_MODE && id === FREE_CHARACTER_ID)
                         ? 'Connect Wallet'
                         : !isAvailable
-                            ? 'Insufficient Balance'
+                            ? 'Insufficient MCGA'
                             : 'Select'
                 }
             </button>

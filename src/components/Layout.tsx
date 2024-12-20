@@ -5,6 +5,9 @@ import { NavLink, Outlet } from 'react-router-dom';
 import { useWallet, useConnection } from '@solana/wallet-adapter-react';
 import ThemeToggle from './ThemeToggle';
 import ConnectWallet from './ConnectWallet';
+import { MCGA_TOKEN_MINT } from '../constants/tokens';
+import { formatToK } from '../utils/numberFormat';
+import BalanceDisplay from './BalanceDisplay';
 import useBalanceStore from '../hooks/useBalanceStore';
 
 interface LayoutProps {
@@ -15,27 +18,46 @@ interface LayoutProps {
 const Layout: React.FC<LayoutProps> = ({ toggleTheme, theme }) => {
     const { connected, publicKey } = useWallet();
     const { connection } = useConnection();
-    const { balance, setBalance } = useBalanceStore();
+    const { solBalance, mcgaBalance, setSolBalance, setMcgaBalance } = useBalanceStore();
 
     useEffect(() => {
-        const fetchBalance = async () => {
+        const fetchBalances = async () => {
             if (connected && publicKey) {
                 try {
-                    const balance = await connection.getBalance(publicKey);
-                    setBalance(balance / 1e9); // Convert lamports to SOL
+                    // Fetch SOL balance
+                    const solBalance = await connection.getBalance(publicKey);
+                    setSolBalance(solBalance / 1e9);
+
+                    // Fetch MCGA token balance
+                    const tokenAccounts = await connection.getParsedTokenAccountsByOwner(
+                        publicKey,
+                        { mint: MCGA_TOKEN_MINT }
+                    );
+
+                    // Find MCGA token account
+                    const mcgaAccount = tokenAccounts.value[0];
+                    if (mcgaAccount) {
+                        const tokenAmount = mcgaAccount.account.data.parsed.info.tokenAmount;
+                        const mcgaBalance = parseInt(tokenAmount.amount) / Math.pow(10, tokenAmount.decimals);
+                        setMcgaBalance(mcgaBalance);
+                    } else {
+                        setMcgaBalance(0);
+                    }
                 } catch (error) {
-                    console.error('Error fetching balance:', error);
-                    setBalance(null);
+                    console.error('Error fetching balances:', error);
+                    setSolBalance(null);
+                    setMcgaBalance(null);
                 }
             } else {
-                setBalance(null);
+                setSolBalance(null);
+                setMcgaBalance(null);
             }
         };
 
-        fetchBalance();
-        const intervalId = setInterval(fetchBalance, 30000);
+        fetchBalances();
+        const intervalId = setInterval(fetchBalances, 30000);
         return () => clearInterval(intervalId);
-    }, [connected, publicKey, connection, setBalance]);
+    }, [connected, publicKey, connection, setSolBalance, setMcgaBalance]);
 
     return (
         <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-gray-900">
@@ -45,10 +67,12 @@ const Layout: React.FC<LayoutProps> = ({ toggleTheme, theme }) => {
                 </div>
 
                 <div className="flex items-center gap-8">
-                    {connected && balance !== null && (
-                        <div className="text-base font-medium px-4 py-2 rounded-lg bg-opacity-20 bg-purple-500 text-purple-200">
-                            {balance.toFixed(4)} SOL
-                        </div>
+                    {connected && (
+                        <BalanceDisplay
+                            solBalance={solBalance}
+                            mcgaBalance={mcgaBalance}
+                            formatToK={formatToK}
+                        />
                     )}
 
                     <div className="navigation-links flex space-x-8">
