@@ -105,6 +105,11 @@ html {
     object-fit: contain;
 }
 
+.title{
+    box-shadow: 0 4px 6px rgba(216, 0, 191, 0.5);
+    width: 65%;
+}
+
 /* Navbar Title */
 .navbar h1 {
     font-size: 1.75rem;

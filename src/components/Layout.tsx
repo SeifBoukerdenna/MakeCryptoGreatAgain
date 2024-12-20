@@ -63,7 +63,7 @@ const Layout: React.FC<LayoutProps> = ({ toggleTheme, theme }) => {
         <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-gray-900">
             <nav className="navbar flex justify-between items-center">
                 <div className="logo">
-                    <h1 className="text-2xl font-bold">Make Crypto Great Again</h1>
+                    <h1 className="title">Make Crypto Great Again</h1>
                 </div>
 
                 <div className="flex items-center gap-8">
