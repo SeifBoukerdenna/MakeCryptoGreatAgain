@@ -218,16 +218,58 @@ html {
     padding: 20px;
     width: 220px;
     height: 260px;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    opacity: 1;
-    pointer-events: auto;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
 }
 
 .character-card.selected-card {
-    background-color: #d5d3d5;
-    border-color: #d5d3d5;
-    opacity: 0.9;
-    pointer-events: none;
+    background: rgba(128, 0, 128, 0.1);
+    border: 2px solid rgba(128, 0, 128, 0.3);
+    box-shadow: 0 0 20px rgba(128, 0, 128, 0.2);
+    backdrop-filter: blur(10px);
+}
+
+.character-card.selected-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 12px;
+    background: linear-gradient(45deg,
+            rgba(128, 0, 128, 0.1) 0%,
+            rgba(153, 50, 204, 0.1) 100%);
+    z-index: 0;
+}
+
+.character-card.selected-card .avatar {
+    border-color: rgba(128, 0, 128, 0.5);
+    box-shadow: 0 0 15px rgba(128, 0, 128, 0.3);
+}
+
+.character-card.selected-card .character-name {
+    color: #9932CC;
+    text-shadow: 0 0 10px rgba(153, 50, 204, 0.3);
+}
+
+.selected-select-button {
+    background: linear-gradient(45deg, #800080, #9932CC) !important;
+    color: white;
+    opacity: 1;
+    border: none;
+    border-radius: 25px;
+    padding: 10px 20px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: default;
+    box-shadow: 0 4px 15px rgba(128, 0, 128, 0.3);
+    transition: all 0.3s ease;
+}
+
+.character-card.selected-card .character-description {
+    color: rgba(153, 50, 204, 0.8);
 }
 
 .character-card:hover {
