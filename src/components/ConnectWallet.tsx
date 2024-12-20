@@ -1,7 +1,10 @@
+// src/components/ConnectWallet.tsx
+
 import React, { useCallback, useEffect } from 'react';
 import { useWallet, useConnection } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
 import { PhantomWalletName } from '@solana/wallet-adapter-wallets';
+import { Wallet } from 'lucide-react';
 
 // The SPL Token Program ID
 const TOKEN_PROGRAM_ID = new PublicKey("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA");
@@ -60,6 +63,8 @@ const ConnectWallet: React.FC = () => {
                             });
                         }
                     }
+
+                    // You can handle fetchedTokens as needed
                 } catch (error) {
                     console.error("Error fetching tokens:", error);
                 }
@@ -74,18 +79,43 @@ const ConnectWallet: React.FC = () => {
         : '';
 
     return (
-        <div className="connect-wallet">
+        <div className="balance-container">
             {connected && publicKey ? (
-                <div className="wallet-connected">
-                    <p>Wallet: {truncatedAddress}</p>
-                    <button className="wallet-button" onClick={handleDisconnect}>
+                <div className="balance-item wallet">
+                    <Wallet className="h-5 w-5 text-yellow-400" />
+                    <div className="flex flex-col">
+                        <span className="balance-amount text-yellow-200">
+                            {truncatedAddress}
+                        </span>
+                        <span className="balance-symbol text-yellow-300">
+                            {/* Wallet */}
+                        </span>
+                    </div>
+                    <button
+                        className="select-button mt-2"
+                        onClick={handleDisconnect}
+                    >
                         Disconnect
                     </button>
                 </div>
             ) : (
-                <button className="wallet-button" onClick={handleConnect}>
-                    Connect Wallet
-                </button>
+                <div className="balance-item wallet">
+                    <Wallet className="h-5 w-5 text-yellow-400" />
+                    <div className="flex flex-col">
+                        <span className="balance-amount text-yellow-200">
+                            Not Connected
+                        </span>
+                        <span className="balance-symbol text-yellow-300">
+                            {/* Wallet */}
+                        </span>
+                    </div>
+                    <button
+                        className="select-button mt-2"
+                        onClick={handleConnect}
+                    >
+                        Connect
+                    </button>
+                </div>
             )}
         </div>
     );

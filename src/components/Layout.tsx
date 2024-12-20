@@ -92,8 +92,8 @@ const Layout: React.FC<LayoutProps> = ({ toggleTheme, theme }) => {
                 </div>
 
                 <div className="action-buttons-column">
-                    <ThemeToggle toggleTheme={toggleTheme} theme={theme} />
                     <ConnectWallet />
+                    <ThemeToggle toggleTheme={toggleTheme} theme={theme} />
                 </div>
             </nav>
 

@@ -105,9 +105,9 @@ html {
     object-fit: contain;
 }
 
-.title{
+.title {
     box-shadow: 0 4px 6px rgba(216, 0, 191, 0.5);
-    width: 65%;
+    width: 80%;
 }
 
 /* Navbar Title */
@@ -820,4 +820,33 @@ button,
     opacity: 0.8;
     font-weight: 500;
     text-transform: uppercase;
+}
+
+.balance-item.wallet {
+    background: rgba(255, 215, 0, 0.15);
+    /* Gold-like background */
+    border: 1px solid rgba(255, 215, 0, 0.3);
+    /* Gold-like border */
+}
+
+.balance-item.wallet .balance-amount {
+    color: #FFD700;
+    /* Gold color */
+}
+
+.balance-item.wallet .balance-symbol {
+    color: #FFA500;
+    /* Orange color */
+}
+
+.balance-item.wallet .select-button {
+    background: #FFD700;
+    /* Gold background */
+    color: #333333;
+    /* Dark text */
+}
+
+.balance-item.wallet .select-button:hover {
+    background: #FFC107;
+    /* Darker gold on hover */
 }
