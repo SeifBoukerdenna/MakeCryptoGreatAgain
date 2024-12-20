@@ -638,6 +638,14 @@ button,
     font-weight: 700;
     cursor: pointer;
     transition: background 0.3s ease, opacity 0.3s ease;
+    width: 150px;
+    /* Set a consistent width */
+    height: 40px;
+    /* Set a consistent height */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
 }
 
 .connect-wallet .wallet-button:hover {
@@ -653,10 +661,16 @@ button,
 .wallet-connected p {
     margin: 0;
     font-size: 0.9rem;
+    text-align: center;
 }
 
 .wallet-connected .wallet-button {
-    padding: 6px 12px;
+    width: 150px;
+    /* Matches the Connect button */
+    height: 40px;
+    /* Matches the Connect button */
+    padding: 8px 16px;
+    /* Matches the Connect button padding */
 }
 
 .action-buttons-column {
