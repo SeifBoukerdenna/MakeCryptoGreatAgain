@@ -217,7 +217,7 @@ html {
     border-radius: 12px;
     padding: 20px;
     width: 220px;
-    height: 260px;
+    height: 300px;
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
@@ -547,7 +547,7 @@ html {
 
     .character-card {
         width: 180px;
-        height: 220px;
+        height: 260px;
         padding: 16px;
         margin: 20px;
     }

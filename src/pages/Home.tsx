@@ -4,6 +4,9 @@ import React, { useEffect } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination } from 'swiper/modules';
+import 'swiper/css'; // Ensure Swiper styles are imported
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
 import CharacterCard from '../components/CharacterCard';
 import PromptInput from '../components/PromptInput';
 import Waveform from '../components/WaveForm';
@@ -112,7 +115,18 @@ const Home: React.FC = () => {
             <Swiper
               modules={[Navigation, Pagination]}
               spaceBetween={20}
-              slidesPerView={4}
+              // Remove the static slidesPerView
+              // slidesPerView={4}
+              breakpoints={{
+                // when window width is >= 0px
+                0: {
+                  slidesPerView: 2,
+                },
+                // when window width is >= 640px
+                640: {
+                  slidesPerView: 4,
+                },
+              }}
               centeredSlides={false}
               navigation
               pagination={{

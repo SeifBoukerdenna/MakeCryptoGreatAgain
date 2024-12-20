@@ -21,7 +21,6 @@
     position: absolute;
     inset: 0;
     background-color: rgba(147, 51, 234, 0.1);
-    /* Consider using a variable if needed */
     opacity: 0.2;
     background-image: linear-gradient(#cbd5e1 1px, transparent 1px),
         linear-gradient(to right, #cbd5e1 1px, transparent 1px);
@@ -63,8 +62,10 @@
     max-width: 72rem;
     margin: 0 auto;
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 1fr;
     gap: 3rem;
+    align-items: center;
+    /* Center items vertically */
 }
 
 .mission-content {
@@ -89,6 +90,9 @@
 
 .mission-image-wrapper {
     position: relative;
+    width: 100%;
+    /* Ensure it takes full width */
+    height: auto;
 }
 
 .mission-image-background {
@@ -102,6 +106,8 @@
 
 .mission-image {
     position: relative;
+    width: 100%;
+    height: auto;
     border-radius: 0.5rem;
     box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
     transform: rotate(-3deg);
@@ -145,6 +151,10 @@
     padding: 2rem;
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease, background-color 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
 }
 
 .feature-card:hover {
@@ -155,7 +165,6 @@
 .feature-icon {
     font-size: 3rem;
     color: #7e22ce;
-    /* Consider using a variable if needed */
     margin-bottom: 1.5rem;
 }
 
@@ -206,12 +215,15 @@
     padding: 2rem;
     position: relative;
     transition: background-color 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    /* Ensure equal height */
 }
 
 .quote-icon {
     font-size: 2.5rem;
     color: rgba(147, 51, 234, 0.3);
-    /* Consider using a variable if needed */
     position: absolute;
     top: 1rem;
     left: 1rem;
@@ -221,7 +233,8 @@
     font-size: 1.125rem;
     color: var(--testimonial-text-color);
     font-style: italic;
-    margin-left: 2rem;
+    margin-left: 3rem;
+    /* Provide space for the quote icon */
     margin-bottom: 1rem;
     transition: color 0.3s ease;
 }
@@ -231,6 +244,8 @@
     font-weight: 600;
     color: var(--testimonial-author-color);
     transition: color 0.3s ease;
+    margin-top: auto;
+    /* Push author to the bottom */
 }
 
 /* CTA Section */
@@ -271,75 +286,167 @@
     flex-wrap: wrap;
 }
 
-.cta-button-primary {
-    background-color: var(--cta-button-primary-bg);
-    color: var(--cta-button-primary-text);
-    padding: 1rem 2rem;
+.cta-button-primary,
+.cta-button-secondary {
+    padding: 0.75rem 1.5rem;
+    /* Reduced padding for smaller screens */
     border-radius: 9999px;
     font-weight: 700;
     transition: background-color 0.3s ease, color 0.3s ease;
+    min-width: 120px;
+    /* Ensure buttons are large enough */
+}
+
+.cta-button-primary {
+    background-color: var(--cta-button-primary-bg);
+    color: var(--cta-button-primary-text);
 }
 
 .cta-button-primary:hover {
     background-color: #f3e8ff;
-    /* Consider using a variable if needed */
 }
 
 .cta-button-secondary {
     background-color: var(--cta-button-secondary-bg);
     color: var(--cta-button-secondary-text);
-    padding: 1rem 2rem;
-    border-radius: 9999px;
-    font-weight: 700;
     border: 2px solid white;
-    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .cta-button-secondary:hover {
     background-color: #6b21a8;
-    /* Consider using a variable if needed */
 }
 
 /* Responsive Design within About Page */
+@media (max-width: 1024px) {
+    .mission-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .features-grid {
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    }
+
+    .testimonials-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
 @media (max-width: 768px) {
+
+    /* Hero Section */
+    .hero-section {
+        padding: 3rem 1rem;
+    }
+
     .hero-title {
         font-size: 2.5rem;
     }
 
+    .hero-text {
+        font-size: 1.25rem;
+    }
+
+    /* Mission Section */
     .mission-grid {
         grid-template-columns: 1fr;
     }
 
+    .mission-image-wrapper {
+        margin-top: 2rem;
+    }
+
+    /* Features Section */
     .features-grid {
         grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     }
 
+    .feature-card {
+        padding: 1.5rem;
+    }
+
+    /* Testimonials Section */
     .testimonials-grid {
         grid-template-columns: 1fr;
     }
 
+    .testimonial-text {
+        margin-left: 2rem;
+    }
+
+    /* CTA Section */
+    .cta-section {
+        padding: 4rem 1rem;
+    }
+
+    .cta-title {
+        font-size: 2rem;
+    }
+
+    .cta-text {
+        font-size: 1.125rem;
+    }
+
     .cta-buttons {
         flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .cta-button-primary,
+    .cta-button-secondary {
+        width: 100%;
+        max-width: 300px;
+        padding: 0.75rem 1rem;
     }
 }
 
 @media (max-width: 480px) {
+
+    /* Hero Section */
     .hero-title {
         font-size: 2rem;
     }
 
+    .hero-text {
+        font-size: 1rem;
+    }
+
+    /* Mission Section */
     .mission-title {
         font-size: 2rem;
     }
 
+    .mission-text {
+        font-size: 1rem;
+    }
+
+    /* Features Section */
     .features-title {
         font-size: 2rem;
     }
 
+    .feature-title {
+        font-size: 1.25rem;
+    }
+
+    .feature-description {
+        font-size: 0.95rem;
+    }
+
+    /* Testimonials Section */
     .testimonials-title {
         font-size: 2rem;
     }
 
+    .testimonial-text {
+        font-size: 1rem;
+        margin-left: 1.5rem;
+    }
+
+    .testimonial-author {
+        font-size: 0.95rem;
+    }
+
+    /* CTA Section */
     .cta-title {
         font-size: 2rem;
     }
