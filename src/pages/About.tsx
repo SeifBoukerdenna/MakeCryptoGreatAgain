@@ -1,5 +1,5 @@
 import { FaLock, FaUsers, FaRocket, FaQuoteLeft } from 'react-icons/fa';
-import '../styles/about.css'; // Import the About page CSS
+import '../styles/about.css';
 import banner from "../assets/banner.png";
 
 const About = () => {
@@ -9,10 +9,11 @@ const About = () => {
             <section className="hero-section">
                 <div className="hero-background"></div>
                 <div className="hero-content">
-                    <h1 className="hero-title">About Make Crypto Great Again</h1>
+                    <h1 className="hero-title">Connect with Icons Through Crypto</h1>
                     <p className="hero-text">
-                        We're harnessing the power of decentralization to revolutionize digital interactions,
-                        creating meaningful connections between fans and their favorite personalities.
+                        Experience revolutionary AI-powered conversations with your favorite celebrities,
+                        secured and authenticated by blockchain technology. Own tokens, unlock exclusive
+                        interactions, and be part of a new era of fan engagement.
                     </p>
                 </div>
             </section>
@@ -21,21 +22,25 @@ const About = () => {
             <section className="mission-section">
                 <div className="mission-grid">
                     <div className="mission-content">
-                        <h2 className="mission-title">Our Mission</h2>
+                        <h2 className="mission-title">How It Works</h2>
                         <p className="mission-text">
-                            We're democratizing access to exclusive interactions, breaking down barriers
-                            between fans and their idols through innovative blockchain technology.
+                            Connect your crypto wallet and use MCGA tokens to unlock personalized
+                            conversations with AI-powered versions of influential figures. Each
+                            interaction is unique, secured by blockchain, and enhanced by
+                            cutting-edge voice synthesis technology.
                         </p>
                         <p className="mission-text">
-                            By leveraging decentralized platforms, we ensure every interaction is transparent,
-                            secure, and authentic, creating unparalleled experiences for users worldwide.
+                            Our platform combines the security of blockchain with advanced AI to
+                            create authentic, engaging conversations that feel remarkably real.
+                            Choose your icon, start chatting, and experience interactions that
+                            were never before possible.
                         </p>
                     </div>
                     <div className="mission-image-wrapper">
                         <div className="mission-image-background"></div>
                         <img
                             src={banner}
-                            alt="Our Mission"
+                            alt="Platform Preview"
                             className="mission-image"
                         />
                     </div>
@@ -45,23 +50,23 @@ const About = () => {
             {/* Features Section */}
             <section className="features-section">
                 <div className="features-container">
-                    <h2 className="features-title">Why Choose Us?</h2>
+                    <h2 className="features-title">Platform Features</h2>
                     <div className="features-grid">
                         {[
                             {
                                 icon: FaLock,
-                                title: "Secure & Transparent",
-                                description: "State-of-the-art blockchain encryption ensuring your data and conversations remain protected and tamper-proof."
+                                title: "Blockchain Security",
+                                description: "Your interactions and tokens are secured by Solana blockchain, ensuring transparent, verifiable ownership and access to exclusive content."
                             },
                             {
                                 icon: FaUsers,
-                                title: "Authentic Interactions",
-                                description: "Connect with verified celebrities and industry leaders in real-time, ensuring genuine and meaningful conversations."
+                                title: "AI-Powered Conversations",
+                                description: "Experience natural, context-aware conversations powered by advanced language models and voice synthesis technology."
                             },
                             {
                                 icon: FaRocket,
-                                title: "Innovative Technology",
-                                description: "Leading the integration of AI and blockchain for seamless, engaging experiences that keep you ahead of the curve."
+                                title: "Token-Gated Access",
+                                description: "Use MCGA tokens to unlock premium characters, exclusive conversations, and special features in our decentralized ecosystem."
                             }
                         ].map((feature, index) => (
                             <div key={index} className="feature-card">
@@ -74,27 +79,25 @@ const About = () => {
                 </div>
             </section>
 
-            {/* Testimonials Section */}
+            {/* Value Proposition Section (replacing Testimonials) */}
             <section className="testimonials-section">
                 <div className="testimonials-container">
-                    <h2 className="testimonials-title">What Our Users Say</h2>
+                    <h2 className="testimonials-title">Why MCGA Tokens?</h2>
                     <div className="testimonials-grid">
                         {[
                             {
-                                quote: "Make Crypto Great Again has transformed how I connect with my favorite artists. The interactions feel so real and personal!",
-                                author: "Jane Doe"
+                                title: "Exclusive Access",
+                                description: "MCGA tokens are your key to unlocking premium characters and special features. The more tokens you hold, the more exclusive content you can access."
                             },
                             {
-                                quote: "The security and transparency provided by the platform give me peace of mind. It's a game-changer in the crypto space.",
-                                author: "John Smith"
+                                title: "Community Growth",
+                                description: "As our platform expands with more celebrity personalities and features, early token holders will benefit from increased utility and platform adoption."
                             }
-                        ].map((testimonial, index) => (
+                        ].map((item, index) => (
                             <div key={index} className="testimonial-card">
                                 <FaQuoteLeft className="quote-icon" />
-                                <blockquote className="testimonial-text">
-                                    {testimonial.quote}
-                                </blockquote>
-                                <p className="testimonial-author">- {testimonial.author}</p>
+                                <h3 className="testimonial-text font-bold mb-2">{item.title}</h3>
+                                <p className="testimonial-text">{item.description}</p>
                             </div>
                         ))}
                     </div>
@@ -104,17 +107,18 @@ const About = () => {
             {/* CTA Section */}
             <section className="cta-section">
                 <div className="cta-container">
-                    <h2 className="cta-title">Join Our Revolution</h2>
+                    <h2 className="cta-title">Start Chatting Today</h2>
                     <p className="cta-text">
-                        Be part of the future of decentralized interactions. Your investment helps build
-                        a platform that connects fans with their idols like never before.
+                        Join the revolution in celebrity-fan interactions. Connect your wallet,
+                        acquire MCGA tokens, and start having meaningful conversations with
+                        your favorite personalities.
                     </p>
                     <div className="cta-buttons">
                         <button className="cta-button-primary">
-                            Buy Tokens
+                            Get MCGA Tokens
                         </button>
                         <button className="cta-button-secondary">
-                            Learn More
+                            View Characters
                         </button>
                     </div>
                 </div>
