@@ -5,6 +5,8 @@ import { MCGA_TOKEN_MINT } from '../constants/tokens';
 import { formatToK } from '../utils/numberFormat';
 import { Copy, Check } from 'lucide-react';
 import '../styles/social.css';
+import CharacterStats from '../components/CharacterStats';
+import { useMessageStats } from '../hooks/useMessageStats';
 
 interface TokenHolder {
     address: string;
@@ -18,6 +20,8 @@ interface CopiedState {
 
 const Social = () => {
     const { connection } = useConnection();
+    const { characterStats, isLoading: isLoadingStats, error: errorStats } = useMessageStats();
+
     const [holders, setHolders] = useState<TokenHolder[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -199,6 +203,11 @@ const Social = () => {
                     </table>
                 )}
             </div>
+            <CharacterStats
+                characterStats={characterStats}
+                isLoading={isLoading}
+                error={error}
+            />
         </div>
     );
 };
