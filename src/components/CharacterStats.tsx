@@ -1,4 +1,3 @@
-// src/components/CharacterStats.tsx
 import React from 'react';
 import { formatDistanceToNow } from 'date-fns';
 import { Loader2 } from 'lucide-react';
@@ -16,16 +15,16 @@ const CharacterStats: React.FC<CharacterStatsProps> = ({
 }) => {
     if (isLoading) {
         return (
-            <div className="token-holder-card mt-8 flex justify-center items-center py-12">
-                <Loader2 className="w-8 h-8 animate-spin text-purple-500" />
+            <div className="token-holder-card loading-container">
+                <Loader2 className="loading-icon" />
             </div>
         );
     }
 
     if (error) {
         return (
-            <div className="token-holder-card mt-8">
-                <div className="text-red-500 text-center py-8">
+            <div className="token-holder-card">
+                <div className="error-loading-stats">
                     Error loading character stats: {error}
                 </div>
             </div>
@@ -38,8 +37,12 @@ const CharacterStats: React.FC<CharacterStatsProps> = ({
     );
 
     return (
-        <div className="token-holder-card mt-8">
-            <div className="holder-stats">
+        <div className="token-holder-card character-stats-card">
+            <h2 className="character-stats-title">
+                Character Statistics
+            </h2>
+
+            <div className="character-stats-summary">
                 <div className="stat-item">
                     <div className="stat-label">Total Messages</div>
                     <div className="stat-value">{totalMessages}</div>
@@ -50,35 +53,44 @@ const CharacterStats: React.FC<CharacterStatsProps> = ({
                 </div>
             </div>
 
-            <table className="holders-table">
+            <table className="character-stats-table">
                 <thead>
                     <tr>
                         <th>Rank</th>
                         <th>Character</th>
-                        <th>Messages Sent</th>
+                        <th className="stats-center">Messages Sent</th>
                         <th>Last Used</th>
                     </tr>
                 </thead>
                 <tbody>
                     {characterStats.map((character, index) => (
-                        <tr key={character.id}>
+                        <tr key={character.id} className="character-row">
                             <td className="rank-cell">
-                                <span className={`rank-badge ${index < 3 ? ['gold', 'silver', 'bronze'][index] : ''}`}>
+                                <span
+                                    className={`rank-badge ${index < 3
+                                        ? ['gold', 'silver', 'bronze'][index]
+                                        : ''
+                                        }`}
+                                >
                                     #{index + 1}
                                 </span>
                             </td>
-                            <td className="address-cell">
-                                <div className="flex items-center gap-3">
-                                    <img
-                                        src={character.avatar}
-                                        alt={character.name}
-                                        className="w-8 h-8 rounded-full"
-                                    />
-                                    {character.name}
+                            <td className="character-cell">
+                                <div className="character-content">
+                                    <div className="avatar-wrapper">
+                                        <img
+                                            src={character.avatar}
+                                            alt={character.name}
+                                            className="avatar"
+                                        />
+                                    </div>
+                                    <span className="character-name">{character.name}</span>
                                 </div>
                             </td>
-                            <td className="mcga-balance">{character.message_count}</td>
-                            <td className="text-gray-600 dark:text-gray-400">
+                            <td className="stats-center mcga-balance">
+                                {character.message_count}
+                            </td>
+                            <td className="character-time">
                                 {formatDistanceToNow(new Date(character.last_used), {
                                     addSuffix: true
                                 })}
@@ -87,7 +99,7 @@ const CharacterStats: React.FC<CharacterStatsProps> = ({
                     ))}
                     {characterStats.length === 0 && (
                         <tr>
-                            <td colSpan={4} className="text-center py-8 text-gray-500">
+                            <td colSpan={4} className="no-data">
                                 No character usage data yet
                             </td>
                         </tr>

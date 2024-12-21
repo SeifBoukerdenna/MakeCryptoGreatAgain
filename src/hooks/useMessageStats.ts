@@ -16,7 +16,6 @@ export const useMessageStats = () => {
   const [error, setError] = useState<string | null>(null);
   const { publicKey } = useWallet();
 
-  // Fetch stats for all characters
   const fetchStats = async () => {
     try {
       setIsLoading(true);
@@ -27,7 +26,6 @@ export const useMessageStats = () => {
 
       if (error) throw error;
 
-      // Combine with character info
       const statsWithCharInfo = data.map((stat) => ({
         ...stat,
         ...(charactersConfig.find((char) => char.id === stat.character_id) || {
@@ -45,58 +43,81 @@ export const useMessageStats = () => {
     }
   };
 
-  // Increment message count for a character
   const incrementMessageCount = async (characterId: string) => {
     if (!publicKey) return;
 
     const walletAddress = publicKey.toString();
 
     try {
-      // Try to update existing record
-      const { data, error: fetchError } = await supabase
+      // First, try to get the existing record
+      const { data: existingRecord, error: fetchError } = await supabase
         .from("message_stats")
         .select("*")
         .eq("character_id", characterId)
         .eq("wallet_address", walletAddress)
-        .single();
+        .maybeSingle();
 
-      if (fetchError && fetchError.code !== "PGRST116") {
-        throw fetchError;
+      if (fetchError) {
+        console.error("Error checking existing record:", fetchError);
+        return;
       }
 
-      if (data) {
+      if (existingRecord) {
         // Update existing record
-        const { error } = await supabase
+        const { error: updateError } = await supabase
           .from("message_stats")
           .update({
-            message_count: data.message_count + 1,
+            message_count: existingRecord.message_count + 1,
             last_used: new Date().toISOString(),
           })
-          .eq("id", data.id);
+          .eq("character_id", characterId)
+          .eq("wallet_address", walletAddress);
 
-        if (error) throw error;
+        if (updateError) {
+          console.error("Error updating count:", updateError);
+          return;
+        }
       } else {
         // Insert new record
-        const { error } = await supabase.from("message_stats").insert({
-          character_id: characterId,
-          wallet_address: walletAddress,
-          message_count: 1,
-          last_used: new Date().toISOString(),
-        });
+        const { error: insertError } = await supabase
+          .from("message_stats")
+          .insert({
+            character_id: characterId,
+            wallet_address: walletAddress,
+            message_count: 1,
+            last_used: new Date().toISOString(),
+          });
 
-        if (error) throw error;
+        if (insertError) {
+          console.error("Error inserting new record:", insertError);
+          return;
+        }
       }
 
-      // Refresh stats
+      // Refresh stats after successful update
       await fetchStats();
     } catch (err) {
       console.error("Error updating message count:", err);
     }
   };
 
-  // Fetch stats on mount and when wallet changes
   useEffect(() => {
     fetchStats();
+    // Set up real-time subscription
+    const subscription = supabase
+      .channel("message_stats_changes")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "message_stats" },
+        () => {
+          fetchStats();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, [publicKey]);
 
   return {

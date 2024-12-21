@@ -267,3 +267,256 @@
 .copy-address-button:hover .copy-icon {
     opacity: 1;
 }
+
+/* Add these to your social.css */
+
+.character-cell {
+    padding: 1rem;
+}
+
+.character-cell img {
+    transition: transform 0.3s ease;
+}
+
+.character-cell:hover img {
+    transform: scale(1.1);
+}
+
+.token-holder-card h2 {
+    color: var(--text-primary);
+    background: var(--stats-bg);
+    border-radius: 1rem 1rem 0 0;
+}
+
+.token-holder-card thead th {
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-size: 0.875rem;
+}
+
+.token-holder-card tbody tr {
+    transition: all 0.2s ease;
+}
+
+.token-holder-card tbody tr:hover {
+    background: var(--row-hover);
+    transform: translateX(4px);
+}
+
+/* Updated rank badges */
+.rank-badge {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    transition: all 0.2s ease;
+}
+
+.rank-badge.gold {
+    background: rgba(234, 179, 8, 0.15);
+    color: #D97706;
+    border: 1px solid rgba(234, 179, 8, 0.3);
+}
+
+.rank-badge.silver {
+    background: rgba(156, 163, 175, 0.15);
+    color: #6B7280;
+    border: 1px solid rgba(156, 163, 175, 0.3);
+}
+
+.rank-badge.bronze {
+    background: rgba(180, 83, 9, 0.15);
+    color: #B45309;
+    border: 1px solid rgba(180, 83, 9, 0.3);
+}
+
+.dark .rank-badge.gold {
+    background: rgba(234, 179, 8, 0.2);
+    color: #FBBF24;
+}
+
+.dark .rank-badge.silver {
+    background: rgba(156, 163, 175, 0.2);
+    color: #D1D5DB;
+}
+
+.dark .rank-badge.bronze {
+    background: rgba(180, 83, 9, 0.2);
+    color: #D97706;
+}
+
+/* Responsive design for character stats */
+@media (max-width: 768px) {
+    .character-cell {
+        padding: 0.75rem;
+    }
+
+    .character-cell .font-semibold {
+        font-size: 0.875rem;
+    }
+
+    .token-holder-card thead th:last-child,
+    .token-holder-card tbody td:last-child {
+        display: none;
+    }
+}
+
+@media (max-width: 640px) {
+    .token-holder-card h2 {
+        font-size: 1.5rem;
+        padding: 1rem;
+    }
+
+    .rank-badge {
+        font-size: 0.7rem;
+        padding: 0.2rem 0.5rem;
+    }
+
+    .character-cell img {
+        width: 2rem;
+        height: 2rem;
+    }
+}
+
+.character-stats-card {
+    margin-top: 3rem;
+}
+
+.character-stats-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--card-border);
+    color: var(--text-primary);
+    background: var(--stats-bg);
+    border-radius: 1rem 1rem 0 0;
+}
+
+/* Summary at the top (Total Messages / Active Characters) */
+.character-stats-summary {
+    display: flex;
+    padding: 1rem;
+    border-bottom: 1px solid var(--card-border);
+    background: var(--stats-bg);
+    border-radius: 0 0 1rem 1rem;
+    gap: 1rem;
+    justify-content: start;
+}
+
+/* Re-using existing .stat-item, .stat-label, .stat-value, etc. if you have them */
+
+/* Table for character stats */
+.character-stats-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+.character-stats-table thead th {
+    text-transform: uppercase;
+    font-size: 0.875rem;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+    background: var(--table-header-bg);
+    color: var(--text-secondary);
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--table-border);
+}
+
+.character-stats-table tbody td {
+    padding: 1rem;
+    border-bottom: 1px solid var(--table-border);
+    color: var(--text-primary);
+}
+
+.character-row:hover {
+    background: var(--row-hover);
+    transition: all 0.2s ease;
+}
+
+/* Avatar & Character Info */
+.character-cell {
+    padding: 0.75rem 1rem;
+}
+
+.character-content {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.avatar-wrapper {
+    width: 2rem;
+    height: 2rem;
+    overflow: hidden;
+    border: 1px solid var(--card-border);
+    border-radius: 9999px;
+    /* same effect as "rounded-full" */
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.avatar {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.character-name {
+    font-weight: 600;
+    font-size: 0.875rem;
+}
+
+/* Optional hover effect for the avatar image */
+.avatar-wrapper:hover .avatar {
+    transform: scale(1.1);
+}
+
+/* Center align for the messages sent column */
+.stats-center {
+    text-align: center;
+}
+
+.character-time {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+}
+
+/* Handle 'no data' row */
+.no-data {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+}
+
+/* Loader and error states can still be overridden with classes if desired */
+.loading-container {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 3rem;
+}
+
+.loading-icon {
+    width: 2rem;
+    height: 2rem;
+    animation: spin 1s linear infinite;
+    color: #800080;
+}
+
+.error-loading-stats {
+    color: #DC2626;
+    text-align: center;
+    padding: 2rem;
+    font-size: 1rem;
+}
