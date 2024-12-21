@@ -86,16 +86,15 @@ html {
     width: 100%;
 }
 
-/* Navbar Styles */
 .navbar {
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: auto 1fr auto auto;
     align-items: center;
-    background: var(--navbar-bg);
+    gap: 2rem;
     padding: 1rem 2rem;
+    background: var(--navbar-bg);
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     border-bottom: 1px solid var(--card-border);
-    flex-wrap: wrap;
 }
 
 /* Logo Styles */
@@ -105,9 +104,8 @@ html {
     object-fit: contain;
 }
 
-.title{
+.title {
     box-shadow: 0 4px 6px rgba(216, 0, 191, 0.5);
-    width: 65%;
 }
 
 /* Navbar Title */
@@ -508,82 +506,85 @@ html {
     }
 }
 
+.balances {
+    display: flex;
+    gap: 1rem;
+    /* justify-content: center; */
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .navbar {
         flex-direction: column;
         align-items: flex-start;
+        flex-wrap: wrap;
+    }
+
+    .balances {
+        flex-direction: column;
+        align-items: flex-start;
+        flex-wrap: wrap;
+    }
+
+    .title h1 {
+        font-size: 1.5rem;
     }
 
     .navigation-links {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
         margin-top: 1rem;
+        flex-wrap: wrap;
     }
 
-    .action-buttons-column {
+    .wallet-balance-container {
+        flex-direction: column;
+        align-items: flex-start;
         margin-top: 1rem;
-        width: 100%;
-        justify-content: space-between;
+        gap: 1rem;
+        flex-wrap: wrap;
     }
 
-    .balance-display {
-        position: static;
-        transform: none;
-        margin-top: 0.5rem;
-        text-align: center;
+    .theme-toggle {
+        margin-top: 1rem;
+        flex-direction: column;
+        align-items: flex-start;
+        flex-wrap: wrap;
     }
+}
 
-    .navbar h1 {
-        font-size: 1.6rem;
-    }
+.wallet-container {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    max-width: 200px;
+    /* Restricts the maximum width */
+    flex-shrink: 0;
+    /* Prevents the container from shrinking */
+}
 
-    .chat-area {
-        padding: 20px;
-        margin: 15px;
-    }
+.wallet-info .balance-amount {
+    font-family: 'Poppins', monospace;
+    font-weight: 600;
+    font-size: 1.1rem;
+    white-space: nowrap;
+    /* Prevents address from wrapping */
+}
 
-    .message-input {
-        font-size: 0.95rem;
-    }
-
-    .send-button {
-        font-size: 0.95rem;
-        padding: 0.6rem 1.2rem;
-    }
-
-    .character-card {
-        width: 180px;
-        height: 260px;
-        padding: 16px;
-        margin: 20px;
-    }
-
-    .character-card .avatar {
-        width: 70px;
-        height: 70px;
-    }
-
-    .selected-avatar {
-        width: 100px;
-        height: 100px;
-    }
-
-    .character-name {
-        font-size: 1.1rem;
-    }
-
-    .character-description {
-        font-size: 0.85rem;
-    }
-
-    .select-button {
-        font-size: 0.9rem;
-        padding: 8px 12px;
-    }
+.wallet-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+    width: 100%;
 }
 
 @media (max-width: 480px) {
     .balance-display {
         margin-top: 0.5rem;
+        padding: 0.25rem;
     }
 
     .navbar h1 {
@@ -638,12 +639,12 @@ button,
     color: #FFFFFF;
     border: none;
     border-radius: 25px;
-    padding: 8px 16px;
+    /* padding: 8px 16px; */
     font-size: 0.95rem;
     font-weight: 700;
     cursor: pointer;
     transition: background 0.3s ease, opacity 0.3s ease;
-    width: 150px;
+    /* width: 150px; */
     /* Set a consistent width */
     height: 40px;
     /* Set a consistent height */
@@ -670,7 +671,7 @@ button,
 }
 
 .wallet-connected .wallet-button {
-    width: 150px;
+    /* width: 150px; */
     /* Matches the Connect button */
     height: 40px;
     /* Matches the Connect button */
@@ -727,13 +728,20 @@ button,
 
 /* Updated navbar layout */
 .navbar {
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: auto 1fr auto auto;
     align-items: center;
+    gap: 2rem;
     padding: 1rem 2rem;
     background: var(--navbar-bg);
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     border-bottom: 1px solid var(--card-border);
+}
+
+.balance-items {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
 }
 
 .navbar>div {
@@ -744,18 +752,36 @@ button,
     flex: 1;
 }
 
-.navbar .center-section {
-    flex: 2;
+.wallet-icon:hover {
+    cursor: pointer;
+    background-color: rgba(255, 215, 0, 0.3);
+    border-radius: 20%;
+}
+
+.wallet-balance-container {
     display: flex;
-    justify-content: center;
+    gap: 1rem;
+    flex-direction: row;
+}
+
+.navbar .center-section {
+    justify-self: start;
+    display: flex;
     align-items: center;
     gap: 2rem;
 }
 
 .navbar .action-buttons-column {
-    flex: 1;
     display: flex;
-    justify-content: flex-end;
+    align-items: center;
+    gap: 1rem;
+}
+
+.navbar .theme-toggle {
+    /* margin-left: 1rem; */
+    display: flex;
+    /* align-items: center; */
+    flex-wrap: wrap;
 }
 
 .character-card.unavailable {
@@ -788,6 +814,14 @@ button,
     padding: 0.5rem;
     border-radius: 12px;
     backdrop-filter: blur(10px);
+    align-items: center;
+    /* Center items vertically */
+}
+
+.balance-item.wallet button {
+    margin-top: 0.5rem;
+    width: 100%;
+    /* Ensures the button spans the entire width of the balance item */
 }
 
 .balance-item {
@@ -797,6 +831,10 @@ button,
     padding: 0.5rem 1rem;
     border-radius: 8px;
     transition: all 0.3s ease;
+    /* flex: 1; */
+    /* Ensure all items take equal space */
+    /* min-width: 120px; */
+    /* Optional: Set a minimum width for consistency */
 }
 
 .balance-item.sol {
@@ -820,4 +858,33 @@ button,
     opacity: 0.8;
     font-weight: 500;
     text-transform: uppercase;
+}
+
+.balance-item.wallet {
+    background: rgba(255, 215, 0, 0.15);
+    /* Gold-like background */
+    border: 1px solid rgba(255, 215, 0, 0.3);
+    /* Gold-like border */
+}
+
+.balance-item.wallet .balance-amount {
+    color: #FFD700;
+    /* Gold color */
+}
+
+.balance-item.wallet .balance-symbol {
+    color: #FFA500;
+    /* Orange color */
+}
+
+.balance-item.wallet .select-button {
+    background: #FFD700;
+    /* Gold background */
+    color: #333333;
+    /* Dark text */
+}
+
+.balance-item.wallet .select-button:hover {
+    background: #FFC107;
+    /* Darker gold on hover */
 }

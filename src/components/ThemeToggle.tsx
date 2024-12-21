@@ -41,8 +41,7 @@ const ThemeToggle: React.FC<ThemeToggleProps> = ({ toggleTheme, theme }) => {
     }, [theme]); // Re-run if the theme changes
 
     return (
-        <div className="flex items-center mr-4">
-            <FaSun className="text-yellow-500 mr-2" />
+        <div className="flex items-center">
             <Switch
                 onChange={toggleTheme}
                 checked={isDark}
@@ -58,10 +57,10 @@ const ThemeToggle: React.FC<ThemeToggleProps> = ({ toggleTheme, theme }) => {
                             justifyContent: 'center',
                             height: '100%',
                             fontSize: 16,
-                            paddingLeft: 2,
+                            paddingLeft: 4,
                         }}
                     >
-                        {/* <FaSun color="#FFA500" /> Orange Sun */}
+                        <FaSun color="#FFA500" size={12} />
                     </div>
                 }
                 checkedIcon={
@@ -72,10 +71,10 @@ const ThemeToggle: React.FC<ThemeToggleProps> = ({ toggleTheme, theme }) => {
                             justifyContent: 'center',
                             height: '100%',
                             fontSize: 16,
-                            paddingRight: 2,
+                            paddingRight: 4,
                         }}
                     >
-                        {/* <FaMoon color="#4B5563" /> Cool Gray Moon */}
+                        <FaMoon color="#4B5563" size={12} />
                     </div>
                 }
                 height={24}
@@ -84,7 +83,6 @@ const ThemeToggle: React.FC<ThemeToggleProps> = ({ toggleTheme, theme }) => {
                 aria-label="Toggle Dark Mode"
                 className="react-switch"
             />
-            <FaMoon className="text-gray-700 ml-2" />
         </div>
     );
 };
