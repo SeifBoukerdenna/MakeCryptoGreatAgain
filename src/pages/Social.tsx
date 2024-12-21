@@ -20,7 +20,7 @@ interface CopiedState {
 
 const Social = () => {
     const { connection } = useConnection();
-    const { characterStats, isLoading: isLoadingStats, error: errorStats } = useMessageStats();
+    const { characterStats } = useMessageStats();
 
     const [holders, setHolders] = useState<TokenHolder[]>([]);
     const [isLoading, setIsLoading] = useState(true);
