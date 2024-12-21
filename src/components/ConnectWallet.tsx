@@ -82,11 +82,9 @@ const ConnectWallet: React.FC = () => {
             {connected && publicKey ? (
                 <div className="balance-item wallet">
                     <Wallet className="wallet-icon h-5 w-5 text-yellow-400" onClick={handleDisconnect} />
-                    <div className="flex flex-col">
-                        <span className="balance-amount text-yellow-200">
-                            {truncatedAddress}
-                        </span>
-                    </div>
+                    <span className="balance-amount text-yellow-200">
+                        {truncatedAddress}
+                    </span>
                 </div>
             ) : (
                 <div className="balance-item wallet">

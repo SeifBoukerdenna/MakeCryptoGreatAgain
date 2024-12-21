@@ -86,7 +86,6 @@ html {
     width: 100%;
 }
 
-/* Navbar Styles */
 .navbar {
     display: grid;
     grid-template-columns: auto 1fr auto auto;
@@ -107,7 +106,6 @@ html {
 
 .title {
     box-shadow: 0 4px 6px rgba(216, 0, 191, 0.5);
-    width: 80%;
 }
 
 /* Navbar Title */
@@ -508,97 +506,57 @@ html {
     }
 }
 
+.balances {
+    display: flex;
+    gap: 1rem;
+    /* justify-content: center; */
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .navbar {
         flex-direction: column;
         align-items: flex-start;
+        flex-wrap: wrap;
     }
 
-    .wallet-balance-container {
-        display: flex;
-        gap: 1rem;
+    .balances {
         flex-direction: column;
+        align-items: flex-start;
+        flex-wrap: wrap;
     }
 
-    .balance-container {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .balance-item {
-        width: 100%;
-        /* padding: 0.25rem 0.5rem; */
+    .title h1 {
+        font-size: 1.5rem;
     }
 
     .navigation-links {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
         margin-top: 1rem;
+        flex-wrap: wrap;
     }
 
-    .action-buttons-column {
+    .wallet-balance-container {
+        flex-direction: column;
+        align-items: flex-start;
         margin-top: 1rem;
-        width: 100%;
-        justify-content: space-between;
+        gap: 1rem;
+        flex-wrap: wrap;
     }
 
-    .balance-display {
-        position: static;
-        transform: none;
-        margin-top: 0.5rem;
-        text-align: center;
-    }
-
-    .navbar h1 {
-        font-size: 1.6rem;
-    }
-
-    .chat-area {
-        padding: 20px;
-        margin: 15px;
-    }
-
-    .message-input {
-        font-size: 0.95rem;
-    }
-
-    .send-button {
-        font-size: 0.95rem;
-        padding: 0.6rem 1.2rem;
-    }
-
-    .character-card {
-        width: 180px;
-        height: 260px;
-        padding: 16px;
-        margin: 20px;
-    }
-
-    .character-card .avatar {
-        width: 70px;
-        height: 70px;
-    }
-
-    .selected-avatar {
-        width: 100px;
-        height: 100px;
-    }
-
-    .character-name {
-        font-size: 1.1rem;
-    }
-
-    .character-description {
-        font-size: 0.85rem;
-    }
-
-    .select-button {
-        font-size: 0.9rem;
-        padding: 8px 12px;
+    .theme-toggle {
+        margin-top: 1rem;
+        flex-direction: column;
+        align-items: flex-start;
+        flex-wrap: wrap;
     }
 }
 
 .wallet-container {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     gap: 0.5rem;
     max-width: 200px;
@@ -820,7 +778,10 @@ button,
 }
 
 .navbar .theme-toggle {
-    margin-left: 1rem;
+    /* margin-left: 1rem; */
+    display: flex;
+    /* align-items: center; */
+    flex-wrap: wrap;
 }
 
 .character-card.unavailable {

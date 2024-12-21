@@ -62,9 +62,8 @@ const Layout: React.FC<LayoutProps> = ({ toggleTheme, theme }) => {
     return (
         <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-gray-900">
             <nav className="navbar">
-                {/* Logo Section */}
-                <div className="logo">
-                    <h1 className="text-xl font-bold">Make Crypto Great Again</h1>
+                <div className="title">
+                    <h1 className="text-xl font-bold text-gray-800 dark:text-gray-200">Make Crypto Great Again</h1>
                 </div>
 
                 {/* Navigation Links */}
