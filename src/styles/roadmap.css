@@ -342,3 +342,69 @@
         align-self: flex-start;
     }
 }
+
+.voting-power {
+    background: rgba(147, 51, 234, 0.1);
+}
+
+.power-info {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    margin-top: 0.25rem;
+}
+
+.power-progress {
+    height: 4px;
+    background: rgba(147, 51, 234, 0.1);
+    border-radius: 2px;
+    margin: 0.75rem 0;
+    overflow: hidden;
+}
+
+.power-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #6366F1 0%, #D946EF 100%);
+    transition: width 0.3s ease;
+}
+
+.power-tips {
+    font-size: 0.75rem;
+    color: #8B5CF6;
+}
+
+/* Modified Vote Button Styles */
+.vote-button {
+    background: linear-gradient(90deg, #6366F1 0%, #D946EF 100%);
+}
+
+.vote-button:not(:disabled):hover {
+    background: linear-gradient(90deg, #4F46E5 0%, #C026D3 100%);
+}
+
+.vote-button.voted {
+    background: #059669;
+}
+
+.vote-button.voted:hover {
+    background: #047857;
+}
+
+/* Add sparkling animation for high voting power */
+@keyframes sparkle {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.1);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+.voting-power[data-power="100"] .stat-value {
+    animation: sparkle 2s infinite;
+    color: #D946EF;
+}
