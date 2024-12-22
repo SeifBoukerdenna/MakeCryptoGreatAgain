@@ -1,3 +1,121 @@
+/* src/styles/social.css */
+
+/* Existing styles above */
+
+/* Remove the media queries that hide columns */
+
+/* Removed the following media queries:
+
+   @media (max-width: 768px) {
+       .holders-table th:nth-child(4),
+       .holders-table td:nth-child(4) {
+           display: none;
+       }
+   }
+
+   @media (max-width: 640px) {
+       .holders-table th:nth-child(3),
+       .holders-table td:nth-child(3) {
+           display: none;
+       }
+
+       .social-container {
+           padding: 1rem;
+       }
+   }
+*/
+
+/* Add scrollable container around the table */
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    /* Smooth scrolling on iOS */
+    margin-top: 1rem;
+}
+
+/* Ensure the table takes full width and has a minimum width */
+.holders-table {
+    width: 100%;
+    min-width: 600px;
+    /* Adjust based on your table's content */
+    border-collapse: collapse;
+    /* Optional: Add border-spacing for better readability */
+    border-spacing: 0;
+}
+
+/* Improve table styling for better mobile readability */
+.holders-table th,
+.holders-table td {
+    padding: 0.75rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--table-border);
+}
+
+.holders-table th {
+    background: var(--table-header-bg);
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    /* Optional: Increase font-weight for better readability */
+    font-weight: 600;
+}
+
+.holders-table td {
+    color: var(--text-primary);
+    font-size: 0.9rem;
+}
+
+/* Adjust padding and font sizes on smaller screens for better readability */
+@media (max-width: 768px) {
+
+    .holders-table th,
+    .holders-table td {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.85rem;
+    }
+}
+
+@media (max-width: 480px) {
+
+    .holders-table th,
+    .holders-table td {
+        padding: 0.5rem;
+        font-size: 0.8rem;
+    }
+
+    /* Optional: Reduce the size of icons in the copy buttons */
+    .copy-icon {
+        width: 14px;
+        height: 14px;
+    }
+
+    /* Adjust rank badge size */
+    .rank-badge {
+        font-size: 0.7rem;
+        padding: 0.2rem 0.5rem;
+    }
+}
+
+/* Optional: Improve table accessibility */
+.holders-table th {
+    position: sticky;
+    top: 0;
+    background: var(--table-header-bg);
+    z-index: 1;
+}
+
+/* Optional: Add zebra striping for better row differentiation */
+.holders-table tbody tr:nth-child(even) {
+    background: rgba(0, 0, 0, 0.02);
+}
+
+.holders-table tbody tr:nth-child(odd) {
+    background: rgba(0, 0, 0, 0.01);
+}
+
+/* Existing styles below */
+
+/* social-container styles */
 .social-container {
     min-height: calc(100vh - 80px);
     padding: 2rem;
@@ -74,13 +192,8 @@
     color: var(--text-primary);
 }
 
-.holders-table {
-    width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
-}
-
-.holders-table th {
+.holders-table th,
+.holders-table td {
     padding: 1rem;
     font-weight: 600;
     color: var(--text-secondary);
@@ -213,29 +326,12 @@
     .stat-item {
         width: 100%;
     }
-
-    .holders-table th:nth-child(4),
-    .holders-table td:nth-child(4) {
-        display: none;
-    }
 }
 
 @media (max-width: 640px) {
-
-    .holders-table th:nth-child(3),
-    .holders-table td:nth-child(3) {
-        display: none;
-    }
-
     .social-container {
         padding: 1rem;
     }
-}
-
-
-.address-cell {
-    font-family: 'Roboto Mono', monospace;
-    color: var(--text-primary);
 }
 
 .copy-address-button {
@@ -268,7 +364,7 @@
     opacity: 1;
 }
 
-/* Add these to your social.css */
+/* Character Stats and Related Styles */
 
 .character-cell {
     padding: 1rem;
@@ -361,7 +457,8 @@
 
     .token-holder-card thead th:last-child,
     .token-holder-card tbody td:last-child {
-        display: none;
+        display: table-cell;
+        /* Ensure all columns are visible */
     }
 }
 
@@ -407,8 +504,6 @@
     gap: 1rem;
     justify-content: start;
 }
-
-/* Re-using existing .stat-item, .stat-label, .stat-value, etc. if you have them */
 
 /* Table for character stats */
 .character-stats-table {
@@ -475,7 +570,6 @@
     font-size: 0.875rem;
 }
 
-/* Optional hover effect for the avatar image */
 .avatar-wrapper:hover .avatar {
     transform: scale(1.1);
 }
