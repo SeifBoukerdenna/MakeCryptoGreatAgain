@@ -438,6 +438,7 @@ html {
 /* Prompt Input */
 .message-input-container {
     display: flex;
+    gap: .5rem;
     align-items: center;
 }
 
@@ -887,4 +888,13 @@ button,
 .balance-item.wallet .select-button:hover {
     background: #FFC107;
     /* Darker gold on hover */
+}
+
+.message-input-container button:hover {
+    color: var(--button-hover-bg);
+}
+
+/* Ensure the microphone button has a smooth transition */
+.message-input-container button {
+    transition: color 0.3s ease;
 }

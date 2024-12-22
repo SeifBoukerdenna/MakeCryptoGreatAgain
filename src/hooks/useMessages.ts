@@ -1,17 +1,21 @@
 // src/hooks/useMessages.ts
-
 import { useState, useRef } from "react";
 import { streamGPTResponse } from "../utils/openai";
 import { useTTS } from "./useTTS";
 import useConversationStore, { Message } from "../stores/useConversationStore";
 import { useCharacterConfig } from "./useCharacterConfig";
+import { useMessageStats } from "./useMessageStats";
+import { supabase } from "../lib/supabase";
+import { useWallet } from "@solana/wallet-adapter-react";
 
 export const useMessages = () => {
   const [loadingResponse, setLoadingResponse] = useState(false);
-  const { systemPrompt, voiceId, voiceEngine } = useCharacterConfig();
+  const { systemPrompt, voiceId, voiceEngine, config } = useCharacterConfig();
   const { isPlaying, error: ttsError, sendTTSRequest } = useTTS();
   const fullResponseRef = useRef<string>("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const { incrementMessageCount } = useMessageStats();
+  const { publicKey } = useWallet();
 
   const { messages, addMessage, updateLastMessage } = useConversationStore();
 
@@ -48,8 +52,6 @@ export const useMessages = () => {
 
       if (fullResponseRef.current) {
         updateLastMessage("", "loading");
-        console.log("Voice config:", { voiceId, systemPrompt });
-        // Send TTS request with voice configuration
         await sendTTSRequest(
           fullResponseRef.current,
           { voiceId, engine: voiceEngine },
@@ -57,6 +59,57 @@ export const useMessages = () => {
             updateLastMessage(fullResponseRef.current, "playing");
           }
         );
+
+        // Log attempt to increment message count
+        console.log("Attempting to increment message count for:", {
+          characterId: config.id,
+          walletAddress: publicKey?.toString(),
+        });
+
+        // Direct database update for debugging
+        if (publicKey) {
+          try {
+            const walletAddress = publicKey.toString();
+
+            // First try to get existing record
+            const { data: existingRecord } = await supabase
+              .from("message_stats")
+              .select("*")
+              .eq("character_id", config.id)
+              .eq("wallet_address", walletAddress)
+              .single();
+
+            if (existingRecord) {
+              // Update existing record
+              const { error: updateError } = await supabase
+                .from("message_stats")
+                .update({
+                  message_count: existingRecord.message_count + 1,
+                  last_used: new Date().toISOString(),
+                })
+                .eq("id", existingRecord.id);
+
+              console.log("Update result:", updateError || "Success");
+            } else {
+              // Insert new record
+              const { error: insertError } = await supabase
+                .from("message_stats")
+                .insert({
+                  character_id: config.id,
+                  wallet_address: walletAddress,
+                  message_count: 1,
+                  last_used: new Date().toISOString(),
+                });
+
+              console.log("Insert result:", insertError || "Success");
+            }
+          } catch (err) {
+            console.error("Direct DB update error:", err);
+          }
+        }
+
+        // Call the hook method as well
+        await incrementMessageCount(config.id);
       }
     } catch (error) {
       console.error("Error:", error);
