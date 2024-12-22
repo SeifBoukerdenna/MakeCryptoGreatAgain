@@ -10,6 +10,8 @@ import { PhantomWalletAdapter } from '@solana/wallet-adapter-phantom';
 import { injectSpeedInsights } from '@vercel/speed-insights';
 import Layout from './components/Layout';
 import Social from './pages/Social';
+import RoadmapPage from './pages/RoadMap';
+import AdminCharacters from './pages/AdminCharacters';
 
 const endpoint = 'https://api.devnet.solana.com';
 const wallets = [new PhantomWalletAdapter()];
@@ -45,6 +47,8 @@ const App = () => {
                 <Route index element={<Home />} />
                 <Route path="about" element={<About />} />
                 <Route path="social" element={<Social />} />
+                <Route path="roadmap" element={<RoadmapPage />} />
+                <Route path="/admin/characters" element={<AdminCharacters />} />
               </Route>
             </Routes>
           </Router>
