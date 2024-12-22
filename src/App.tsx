@@ -7,6 +7,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react';
 import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
 import { PhantomWalletAdapter } from '@solana/wallet-adapter-phantom';
+import { injectSpeedInsights } from '@vercel/speed-insights';
 import Layout from './components/Layout';
 import Social from './pages/Social';
 
@@ -14,6 +15,7 @@ const endpoint = 'https://api.devnet.solana.com';
 const wallets = [new PhantomWalletAdapter()];
 
 const App = () => {
+  injectSpeedInsights();
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
 
   useEffect(() => {
