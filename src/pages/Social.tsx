@@ -1,3 +1,5 @@
+// src/components/Social.tsx
+
 import { useEffect, useState } from 'react';
 import { useConnection } from '@solana/wallet-adapter-react';
 import { PublicKey, ParsedAccountData } from '@solana/web3.js';
@@ -162,45 +164,48 @@ const Social = () => {
                         <div className="error-message">{error}</div>
                     </div>
                 ) : (
-                    <table className="holders-table">
-                        <thead>
-                            <tr>
-                                <th>Rank</th>
-                                <th>Address</th>
-                                <th>MCGA Balance</th>
-                                <th>SOL Balance</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {holders.map((holder, index) => (
-                                <tr key={holder.address}>
-                                    <td className="rank-cell">
-                                        {getRankBadge(index)}
-                                    </td>
-                                    <td className="address-cell">
-                                        <button
-                                            onClick={() => handleCopy(holder.address)}
-                                            className="copy-address-button"
-                                            title="Click to copy address"
-                                        >
-                                            <span>{truncateAddress(holder.address)}</span>
-                                            {copiedStates[holder.address] ? (
-                                                <Check className="copy-icon" size={16} />
-                                            ) : (
-                                                <Copy className="copy-icon" size={16} />
-                                            )}
-                                        </button>
-                                    </td>
-                                    <td className="mcga-balance">
-                                        {formatToK(holder.mcgaBalance)}
-                                    </td>
-                                    <td className="sol-balance">
-                                        {formatToK(holder.solBalance)}
-                                    </td>
+                    /* Scrollable table container */
+                    <div className="table-responsive">
+                        <table className="holders-table">
+                            <thead>
+                                <tr>
+                                    <th>Rank</th>
+                                    <th>Address</th>
+                                    <th>MCGA Balance</th>
+                                    <th>SOL Balance</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                {holders.map((holder, index) => (
+                                    <tr key={holder.address}>
+                                        <td className="rank-cell">
+                                            {getRankBadge(index)}
+                                        </td>
+                                        <td className="address-cell">
+                                            <button
+                                                onClick={() => handleCopy(holder.address)}
+                                                className="copy-address-button"
+                                                title="Click to copy address"
+                                            >
+                                                <span>{truncateAddress(holder.address)}</span>
+                                                {copiedStates[holder.address] ? (
+                                                    <Check className="copy-icon" size={16} />
+                                                ) : (
+                                                    <Copy className="copy-icon" size={16} />
+                                                )}
+                                            </button>
+                                        </td>
+                                        <td className="mcga-balance">
+                                            {formatToK(holder.mcgaBalance)}
+                                        </td>
+                                        <td className="sol-balance">
+                                            {formatToK(holder.solBalance)}
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
                 )}
             </div>
             <CharacterStats
