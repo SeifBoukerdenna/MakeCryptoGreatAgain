@@ -123,7 +123,7 @@ const ChallengePage = () => {
                                                 {!connected
                                                     ? 'Wallet not connected'
                                                     : isSolved
-                                                        ? 'Solved'
+                                                        ? 'Secret found'
                                                         : hasResult
                                                             ? isCorrect
                                                                 ? 'Correct!'
@@ -202,7 +202,6 @@ const ChallengePage = () => {
                             <h3 className="winner-name">{character.name}</h3>
                             {winners[character.id] ? (
                                 <div className="winner-address">
-                                    <span>Winner:</span>
                                     <button
                                         onClick={() => handleCopy(winners[character.id])}
                                         className="copy-address-button"

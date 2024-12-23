@@ -13,6 +13,16 @@
     overflow: hidden;
 }
 
+.holder-stats {
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    padding: 1rem;
+    border-bottom: 1px solid var(--card-border);
+    background: var(--stats-bg);
+    border-radius: 0 0 1rem 1rem;
+}
+
 /* Header Styles */
 .challenge-card .header {
     display: flex;
