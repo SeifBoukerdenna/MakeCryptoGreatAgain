@@ -126,32 +126,42 @@
 
 :root {
     /* Light theme variables */
-    --social-gradient-start: rgba(128, 0, 128, 0.03);
-    --social-gradient-end: rgba(255, 255, 255, 0);
-    --card-bg: rgba(255, 255, 255, 0.9);
-    --card-border: rgba(128, 0, 128, 0.1);
-    --stats-bg: rgba(128, 0, 128, 0.03);
-    --stat-item-bg: rgba(128, 0, 128, 0.05);
+    --social-gradient-start: rgba(147, 51, 234, 0.05);
+    --social-gradient-end: rgba(0, 0, 0, 0);
+    /* Card, stats backgrounds, borders, etc. using a more translucent purple theme */
+    --card-bg: rgba(255, 255, 255, 0.05);
+    --card-border: rgba(147, 51, 234, 0.2);
+    --stats-bg: rgba(147, 51, 234, 0.05);
+    --stat-item-bg: rgba(147, 51, 234, 0.1);
+
+    /* Text colors that pair well with the new gradient */
     --text-primary: #1F2937;
+    /* Dark grey for primary text */
     --text-secondary: #4B5563;
-    --row-hover: rgba(128, 0, 128, 0.05);
-    --table-header-bg: rgba(128, 0, 128, 0.08);
-    --table-border: rgba(128, 0, 128, 0.1);
+    /* Slightly lighter grey */
+
+    /* Table row hover, headers, borders with purple tints */
+    --row-hover: rgba(147, 51, 234, 0.05);
+    --table-header-bg: rgba(147, 51, 234, 0.08);
+    --table-border: rgba(147, 51, 234, 0.1);
 }
 
 .dark {
     /* Dark theme variables */
-    --social-gradient-start: rgba(128, 0, 128, 0.05);
+    --social-gradient-start: rgba(147, 51, 234, 0.05);
     --social-gradient-end: rgba(0, 0, 0, 0);
-    --card-bg: rgba(26, 26, 26, 0.8);
-    --card-border: rgba(128, 0, 128, 0.2);
-    --stats-bg: rgba(128, 0, 128, 0.05);
-    --stat-item-bg: rgba(0, 0, 0, 0.2);
+    --card-bg: rgba(0, 0, 0, 0.2);
+    --card-border: rgba(147, 51, 234, 0.2);
+    --stats-bg: rgba(147, 51, 234, 0.05);
+    --stat-item-bg: rgba(0, 0, 0, 0.3);
+
+    /* Adjust dark-mode text colors to remain readable on purple backgrounds */
     --text-primary: #E5E7EB;
     --text-secondary: #9CA3AF;
-    --row-hover: rgba(128, 0, 128, 0.1);
+
+    --row-hover: rgba(147, 51, 234, 0.1);
     --table-header-bg: rgba(0, 0, 0, 0.2);
-    --table-border: rgba(128, 0, 128, 0.2);
+    --table-border: rgba(147, 51, 234, 0.2);
 }
 
 .token-holder-card {

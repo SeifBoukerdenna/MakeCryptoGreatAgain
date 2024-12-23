@@ -11,67 +11,128 @@
 /* CSS Variables for Light and Dark Themes */
 :root {
     /* Light Theme Colors */
-    --bg-color: #f5f5f5;
-    --text-color: #333333;
-    --navbar-bg: linear-gradient(90deg, #ffffff, #f0f0f0);
-    --navbar-text: #333333;
-    --card-bg-color: #ffffff;
-    --card-border: #dddddd;
-    --button-bg: #800080;
-    --button-hover-bg: #9932CC;
-    --input-bg: #eaeaea;
-    --input-text: #333333;
-    --input-placeholder: #999999;
-    --message-user-bg: #ffffff;
-    --message-user-text: #333333;
-    --message-character-bg: #f0f0f0;
-    --message-character-text: #333333;
-    --message-loading-bg: #cccccc;
-    --swiper-nav-color: #800080;
-    --swiper-pagination-color: #800080;
-    --swiper-pagination-active-color: #9932CC;
-    --swiper-bullet-color: #333333;
-    --swiper-bullet-active-color: #800080;
+    /* -------------------------------------------------------------- */
+    /* A slightly off-white background with subtle purple accents     */
+    /* and neutral text for better readability.                       */
+    /* -------------------------------------------------------------- */
 
-    /* Theme Toggle Specific Variables */
-    --toggle-bg-light: #e2e8f0;
-    /* Light grey for toggle background in light mode */
-    --toggle-bg-dark: #4a5568;
-    /* Dark grey for toggle background in dark mode */
-    --toggle-handle-light: #ffffff;
-    /* White handle in light mode */
-    --toggle-handle-dark: #2d3748;
-    /* Dark handle in dark mode */
+    --bg-color: #F9FAFB;
+    /* Light background */
+    --text-color: #1F2937;
+    /* Dark grey text */
+
+    /* Navbar gets a soft gradient that hints at your roadmap’s purples */
+    --navbar-bg: linear-gradient(90deg,
+            rgba(147, 51, 234, 0.05) 0%,
+            rgba(147, 51, 234, 0.15) 100%);
+    --navbar-text: #4B5563;
+    /* Medium grey text in navbar */
+
+    /* Cards maintain a white background with a slight purple border */
+    --card-bg-color: #FFFFFF;
+    --card-border: #E0E0E0;
+
+    /*
+      Buttons use a purple gradient similar to the roadmap's
+      (#6366F1 → #D946EF).
+    */
+    --button-bg: linear-gradient(90deg, #6366F1 0%, #D946EF 100%);
+    --button-hover-bg: linear-gradient(90deg, #4F46E5 0%, #C026D3 100%);
+
+    --input-bg: #F3F4F6;
+    --input-text: #1F2937;
+    --input-placeholder: #9CA3AF;
+
+    /* Message backgrounds mimic card styling, but with subtle contrasts */
+    --message-user-bg: #FFFFFF;
+    --message-user-text: #1F2937;
+    --message-character-bg: #F3F4F6;
+    --message-character-text: #1F2937;
+
+    /* Loader or “loading” backgrounds get a very light grey */
+    --message-loading-bg: #E5E7EB;
+
+    /*
+      Swiper or carousel arrows, bullets, and active states
+      should also match the new purple shades.
+    */
+    --swiper-nav-color: #8B5CF6;
+    --swiper-pagination-color: #8B5CF6;
+    --swiper-pagination-active-color: #D946EF;
+    --swiper-bullet-color: #6B7280;
+    /* Medium grey bullets */
+    --swiper-bullet-active-color: #8B5CF6;
+    /* Purple bullet on active */
+
+    /* Toggle background colors for the theme switcher */
+    --toggle-bg-light: #E2E8F0;
+    /* Light grey in light mode */
+    --toggle-bg-dark: #4A5568;
+    /* Dark grey in dark mode */
+    --toggle-handle-light: #FFFFFF;
+    --toggle-handle-dark: #2D3748;
 }
 
 .dark {
     /* Dark Theme Colors */
-    --bg-color: #121212;
-    --text-color: #e0e0e0;
-    --navbar-bg: rgba(0, 0, 0, 0.9);
-    --navbar-text: #e0e0e0;
-    --card-bg-color: #1A1A1A;
-    --card-border: #333333;
-    --button-bg: #800080;
-    --button-hover-bg: #9932CC;
-    --input-bg: #333333;
-    --input-text: #e0e0e0;
-    --input-placeholder: #BBBBBB;
-    --message-user-bg: #ffffff;
-    --message-user-text: #000000;
-    --message-character-bg: #1A1A1A;
-    --message-character-text: #e0e0e0;
-    --message-loading-bg: #555555;
-    --swiper-nav-color: #ffffff;
-    --swiper-pagination-color: #ffffff;
-    --swiper-pagination-active-color: #9932CC;
-    --swiper-bullet-color: #ffffff;
-    --swiper-bullet-active-color: #800080;
+    /* -------------------------------------------------------------- */
+    /* Deep background, lighter text, and preserved purple gradients  */
+    /* for buttons, nav, and highlights.                              */
+    /* -------------------------------------------------------------- */
 
-    --toggle-bg-light: #2d3748;
-    --toggle-bg-dark: #e2e8f0;
-    --toggle-handle-light: #ffffff;
-    --toggle-handle-dark: #2d3748;
+    --bg-color: #121212;
+    /* Very dark background */
+    --text-color: #E5E7EB;
+    /* Light grey text */
+
+    /*
+      Navbar in dark mode: keep it slightly transparent black
+      or apply a subtle purple gradient overlay if desired.
+    */
+    --navbar-bg: rgba(0, 0, 0, 0.8);
+    --navbar-text: #9CA3AF;
+    /* Softer grey for text in dark mode */
+
+    /*
+      Slightly darker card background, with a matching border
+      that isn’t too stark.
+    */
+    --card-bg-color: #1F1F1F;
+    --card-border: #2A2A2A;
+
+    /* Same purple gradient for dark mode buttons */
+    --button-bg: linear-gradient(90deg, #6366F1 0%, #D946EF 100%);
+    --button-hover-bg: linear-gradient(90deg, #4F46E5 0%, #C026D3 100%);
+
+    --input-bg: #2A2A2A;
+    --input-text: #E5E7EB;
+    --input-placeholder: #A3A3A3;
+
+    /* Chat bubbles: keep user vs. character distinct but subtle */
+    --message-user-bg: #111827;
+    /* Off-black for user messages */
+    --message-user-text: #F9FAFB;
+    --message-character-bg: #1F1F1F;
+    --message-character-text: #E5E7EB;
+
+    /* Loading background with a mid-range grey tone */
+    --message-loading-bg: #3B3B3B;
+
+    /*
+      Swiper or carousel controls in dark mode:
+      Keep them white/purple to pop against the dark background.
+    */
+    --swiper-nav-color: #E5E7EB;
+    --swiper-pagination-color: #E5E7EB;
+    --swiper-pagination-active-color: #D946EF;
+    --swiper-bullet-color: #9CA3AF;
+    --swiper-bullet-active-color: #8B5CF6;
+
+    /* Toggle backgrounds reversed in dark mode */
+    --toggle-bg-light: #2D3748;
+    --toggle-bg-dark: #E2E8F0;
+    --toggle-handle-light: #FFFFFF;
+    --toggle-handle-dark: #2D3748;
 }
 
 /* Reset and Base Styles */
@@ -105,12 +166,13 @@ html {
 }
 
 .title {
-    box-shadow: 0 4px 6px rgba(216, 0, 191, 0.5);
+    box-shadow: 0 4px 4px 4px rgba(147, 51, 234, 0.5);
+    border-radius: 8px;
 }
 
 /* Navbar Title */
 .navbar h1 {
-    font-size: 1.75rem;
+    font-size: 1.5rem;
     font-weight: 700;
     color: var(--navbar-text);
 }
@@ -140,12 +202,14 @@ html {
     height: 2px;
     bottom: -2px;
     left: 0;
-    background-color: #6b46c1;
+    /* Replaces #6b46c1 with a variable that matches your new purples */
+    background-color: var(--swiper-pagination-active-color);
     transition: width 0.3s ease;
 }
 
 .nav-link:hover {
-    color: #6b46c1;
+    /* Replaces #6b46c1 with your new active purple */
+    color: var(--swiper-pagination-active-color);
 }
 
 .nav-link:hover::after {
@@ -153,7 +217,7 @@ html {
 }
 
 .nav-link.active {
-    color: #6b46c1;
+    color: var(--swiper-pagination-active-color);
 }
 
 .nav-link.active::after {
@@ -170,7 +234,8 @@ html {
 
 /* Optional: Add focus styles for accessibility */
 .nav-link:focus {
-    outline: 2px solid #6b46c1;
+    /* Replaces #6b46c1 */
+    outline: 2px solid var(--swiper-pagination-active-color);
     outline-offset: 2px;
 }
 
@@ -226,10 +291,14 @@ html {
     overflow: hidden;
 }
 
+/* Updated Selected-Card styling with new purple values */
 .character-card.selected-card {
-    background: rgba(128, 0, 128, 0.1);
-    border: 2px solid rgba(128, 0, 128, 0.3);
-    box-shadow: 0 0 20px rgba(128, 0, 128, 0.2);
+    /* Old: rgba(128, 0, 128, 0.1) => new: rgba(147, 51, 234, 0.1) */
+    background: rgba(147, 51, 234, 0.1);
+    /* Old: rgba(128, 0, 128, 0.3) => new: rgba(147, 51, 234, 0.3) */
+    border: 2px solid rgba(147, 51, 234, 0.3);
+    /* Old: rgba(128, 0, 128, 0.2) => new: rgba(147, 51, 234, 0.2) */
+    box-shadow: 0 0 20px rgba(147, 51, 234, 0.2);
     backdrop-filter: blur(10px);
 }
 
@@ -241,25 +310,31 @@ html {
     right: 0;
     bottom: 0;
     border-radius: 12px;
+    /* Old: linear-gradient(45deg, rgba(128, 0, 128, 0.1), rgba(153, 50, 204, 0.1)) */
     background: linear-gradient(45deg,
-            rgba(128, 0, 128, 0.1) 0%,
-            rgba(153, 50, 204, 0.1) 100%);
+            rgba(147, 51, 234, 0.1) 0%,
+            rgba(217, 70, 239, 0.1) 100%);
     z-index: 0;
 }
 
 .character-card.selected-card .avatar {
-    border-color: rgba(128, 0, 128, 0.5);
-    box-shadow: 0 0 15px rgba(128, 0, 128, 0.3);
+    /* Old: rgba(128, 0, 128, 0.5) => new: rgba(147, 51, 234, 0.5) */
+    border-color: rgba(147, 51, 234, 0.5);
+    /* Old: rgba(128, 0, 128, 0.3) => new: rgba(147, 51, 234, 0.3) */
+    box-shadow: 0 0 15px rgba(147, 51, 234, 0.3);
 }
 
+/* Old color #9932CC => new uses your active pinkish-purple or a near variant */
 .character-card.selected-card .character-name {
-    color: #9932CC;
-    text-shadow: 0 0 10px rgba(153, 50, 204, 0.3);
+    color: var(--swiper-pagination-active-color);
+    /* text-shadow with #9932CC => switch to #D946EF or a near RGBA */
+    text-shadow: 0 0 10px rgba(217, 70, 239, 0.3);
 }
 
+/* Instead of linear-gradient(45deg, #800080, #9932CC) */
 .selected-select-button {
-    background: linear-gradient(45deg, #800080, #9932CC) !important;
-    color: white;
+    background: var(--button-bg) !important;
+    color: #FFFFFF;
     opacity: 1;
     border: none;
     border-radius: 25px;
@@ -267,17 +342,20 @@ html {
     font-size: 1rem;
     font-weight: 700;
     cursor: default;
-    box-shadow: 0 4px 15px rgba(128, 0, 128, 0.3);
+    /* Replaced old shadow with new purple RGBA */
+    box-shadow: 0 4px 15px rgba(147, 51, 234, 0.3);
     transition: all 0.3s ease;
 }
 
+/* Old: rgba(153, 50, 204, 0.8) => new: a near #D946EF variant */
 .character-card.selected-card .character-description {
-    color: rgba(153, 50, 204, 0.8);
+    color: rgba(217, 70, 239, 0.8);
 }
 
 .character-card:hover {
     transform: scale(1.05);
-    box-shadow: 0 4px 20px rgba(128, 0, 128, 0.4);
+    /* Old: rgba(128, 0, 128, 0.4) => new: rgba(147, 51, 234, 0.4) */
+    box-shadow: 0 4px 20px rgba(147, 51, 234, 0.4);
 }
 
 /* Avatar Circle */
@@ -309,6 +387,7 @@ html {
 .character-description {
     font-size: 1rem;
     color: #666666;
+    /* Could use a var(--text-secondary) if you like */
     text-align: center;
     line-height: 1.6;
 }
@@ -326,6 +405,7 @@ html {
     transition: background 0.3s ease, opacity 0.3s ease;
 }
 
+/* If you want a “selected” state that’s different from the main gradient: */
 .selected-select-button {
     background: #e79fe7;
     color: #FFFFFF;
@@ -350,7 +430,7 @@ html {
 
 /* Chat Area */
 .chat-area {
-    background-color: var(--card-bg-color);
+    background: linear-gradient(180deg, rgba(147, 51, 234, 0.05) 0%, rgba(0, 0, 0, 0) 100%);
     padding: 30px;
     margin: 20px;
     border-radius: 12px;
@@ -362,8 +442,11 @@ html {
 
 /* Selected Character Icon */
 .selected-character-icon {
+    position: relative;
+    /* Allows absolute positioning of waveform */
     display: flex;
     justify-content: center;
+    align-items: center;
     margin-bottom: 1.5rem;
 }
 
@@ -373,7 +456,18 @@ html {
     border-radius: 50%;
     border: 4px solid #D3D3D3;
     object-fit: cover;
-    box-shadow: 0 0 20px rgba(128, 0, 128, 0.5);
+    /* Updated box-shadow already handled above */
+    box-shadow: 0 0 20px rgba(147, 51, 234, 0.5);
+}
+
+.waveform-under-avatar {
+    position: absolute;
+    bottom: -50px;
+    /* Adjust as needed to position below the avatar */
+    left: 50%;
+    transform: translateX(-50%);
+    /* Optional: Add additional styles such as width */
+    /* width: 80px; */
 }
 
 .isSelected-avatar {
@@ -438,7 +532,7 @@ html {
 /* Prompt Input */
 .message-input-container {
     display: flex;
-    gap: .5rem;
+    gap: 0.5rem;
     align-items: center;
 }
 
@@ -460,8 +554,9 @@ html {
     font-size: 1rem;
 }
 
+/* Updated focus shadow with new purple */
 .message-input:focus {
-    box-shadow: 0 0 15px #800080;
+    box-shadow: 0 0 15px rgba(147, 51, 234, 0.5);
 }
 
 .send-button {
@@ -604,7 +699,9 @@ html {
 .navbar,
 .character-card,
 .chat-area {
-    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+    transition: background-color 0.3s ease,
+        color 0.3s ease,
+        border-color 0.3s ease;
 }
 
 button,
@@ -632,15 +729,11 @@ button,
     color: #FFFFFF;
     border: none;
     border-radius: 25px;
-    /* padding: 8px 16px; */
     font-size: 0.95rem;
     font-weight: 700;
     cursor: pointer;
     transition: background 0.3s ease, opacity 0.3s ease;
-    /* width: 150px; */
-    /* Set a consistent width */
     height: 40px;
-    /* Set a consistent height */
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -664,14 +757,11 @@ button,
 }
 
 .wallet-connected .wallet-button {
-    /* width: 150px; */
-    /* Matches the Connect button */
     height: 40px;
-    /* Matches the Connect button */
     padding: 8px 16px;
-    /* Matches the Connect button padding */
 }
 
+/* Column Action Buttons */
 .action-buttons-column {
     display: flex;
     flex-direction: column;
@@ -680,6 +770,7 @@ button,
     /* Adjust the spacing between the elements */
 }
 
+/* Border animation for 'speaking' avatars */
 @keyframes pulseBorder {
     0% {
         border-color: #00ff00;
@@ -703,7 +794,7 @@ button,
     border-radius: 50%;
     border: 4px solid #D3D3D3;
     object-fit: cover;
-    box-shadow: 0 0 20px rgba(128, 0, 128, 0.5);
+    box-shadow: 0 0 20px rgba(147, 51, 234, 0.5);
     transition: border-color 0.3s ease;
 }
 
@@ -719,14 +810,14 @@ button,
     padding: 0.5rem 1rem;
 }
 
-/* Updated navbar layout */
+/* Updated navbar layout (redundant for clarity, but left as is) */
 .navbar {
     display: grid;
     grid-template-columns: auto 1fr auto auto;
     align-items: center;
     gap: 2rem;
     padding: 1rem 2rem;
-    background: var(--navbar-bg);
+    background: linear-gradient(180deg, rgba(147, 51, 234, 0.05) 0%, rgba(0, 0, 0, 0) 100%);
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     border-bottom: 1px solid var(--card-border);
 }
@@ -771,9 +862,7 @@ button,
 }
 
 .navbar .theme-toggle {
-    /* margin-left: 1rem; */
     display: flex;
-    /* align-items: center; */
     flex-wrap: wrap;
 }
 
@@ -824,10 +913,6 @@ button,
     padding: 0.5rem 1rem;
     border-radius: 8px;
     transition: all 0.3s ease;
-    /* flex: 1; */
-    /* Ensure all items take equal space */
-    /* min-width: 120px; */
-    /* Optional: Set a minimum width for consistency */
 }
 
 .balance-item.sol {
@@ -860,10 +945,6 @@ button,
     /* Gold-like border */
 }
 
-.balance-item.wallet .balance-amount {
-    color: #FFD700;
-    /* Gold color */
-}
 
 .balance-item.wallet .balance-symbol {
     color: #FFA500;
