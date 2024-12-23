@@ -1,30 +1,5 @@
 /* src/styles/social.css */
 
-/* Existing styles above */
-
-/* Remove the media queries that hide columns */
-
-/* Removed the following media queries:
-
-   @media (max-width: 768px) {
-       .holders-table th:nth-child(4),
-       .holders-table td:nth-child(4) {
-           display: none;
-       }
-   }
-
-   @media (max-width: 640px) {
-       .holders-table th:nth-child(3),
-       .holders-table td:nth-child(3) {
-           display: none;
-       }
-
-       .social-container {
-           padding: 1rem;
-       }
-   }
-*/
-
 /* Add scrollable container around the table */
 .table-responsive {
     width: 100%;
