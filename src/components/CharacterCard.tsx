@@ -8,12 +8,11 @@ import { formatToK } from '../utils/numberFormat';
 import Switch from 'react-switch';
 import { Eye, Lock } from 'lucide-react';
 import useModeStore from '../stores/useModeStore'; // Ensure the correct path
+import { CharacterConfig } from '../configs/characters.config';
 
-interface CharacterCardProps {
+
+interface CharacterCardProps extends Partial<CharacterConfig> {
     id: string;
-    name: string;
-    avatar: string;
-    description: string;
     price: number;
     onSelect: () => void;
     isSelected: boolean;
@@ -31,6 +30,7 @@ const CharacterCard: React.FC<CharacterCardProps> = ({
     name,
     avatar,
     description,
+    description_secondary,
     price,
     onSelect,
     isSelected,
@@ -70,7 +70,7 @@ const CharacterCard: React.FC<CharacterCardProps> = ({
             <div className="character-details">
                 <div className="character-name">{name}</div>
                 <div className="character-description">
-                    {mode === 'normal' ? description : 'This is a secret mode description!'}
+                    {mode === 'normal' ? description : description_secondary}
                 </div>
 
                 {/* Mode Selector: Toggle Switch */}

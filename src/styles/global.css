@@ -3,10 +3,6 @@
 /* Import Poppins Font */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
-/* Tailwind CSS Directives */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
 
 /* CSS Variables for Light and Dark Themes */
 :root {
@@ -285,7 +281,7 @@ html {
     border-radius: 12px;
     padding: 20px;
     width: 220px;
-    height: 300px;
+    height: 340px;
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
