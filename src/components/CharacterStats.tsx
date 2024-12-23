@@ -1,6 +1,9 @@
+// src/components/CharacterStats.tsx
+
 import React from 'react';
 import { formatDistanceToNow } from 'date-fns';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Copy, Check } from 'lucide-react';
+import { useState } from 'react';
 
 interface CharacterStatsProps {
     characterStats: any[];
@@ -8,11 +11,29 @@ interface CharacterStatsProps {
     error: string | null;
 }
 
+interface CopiedState {
+    [key: string]: boolean;
+}
+
 const CharacterStats: React.FC<CharacterStatsProps> = ({
     characterStats,
     isLoading,
     error
 }) => {
+    const [copiedStates, setCopiedStates] = useState<CopiedState>({});
+
+    const handleCopy = async (address: string) => {
+        try {
+            await navigator.clipboard.writeText(address);
+            setCopiedStates(prev => ({ ...prev, [address]: true }));
+            setTimeout(() => {
+                setCopiedStates(prev => ({ ...prev, [address]: false }));
+            }, 2000);
+        } catch (err) {
+            console.error('Failed to copy address:', err);
+        }
+    };
+
     if (isLoading) {
         return (
             <div className="token-holder-card loading-container">
@@ -60,6 +81,7 @@ const CharacterStats: React.FC<CharacterStatsProps> = ({
                         <th>Character</th>
                         <th className="stats-center">Messages Sent</th>
                         <th>Last Used</th>
+                        <th>Wallet Address</th> {/* New Column */}
                     </tr>
                 </thead>
                 <tbody>
@@ -95,11 +117,25 @@ const CharacterStats: React.FC<CharacterStatsProps> = ({
                                     addSuffix: true
                                 })}
                             </td>
+                            <td className="wallet-address-cell">
+                                <button
+                                    onClick={() => handleCopy(character.wallet_address)}
+                                    className="copy-address-button"
+                                    title="Click to copy wallet address"
+                                >
+                                    <span>{truncateAddress(character.wallet_address)}</span>
+                                    {copiedStates[character.wallet_address] ? (
+                                        <Check className="copy-icon" size={16} />
+                                    ) : (
+                                        <Copy className="copy-icon" size={16} />
+                                    )}
+                                </button>
+                            </td>
                         </tr>
                     ))}
                     {characterStats.length === 0 && (
                         <tr>
-                            <td colSpan={4} className="no-data">
+                            <td colSpan={5} className="no-data">
                                 No character usage data yet
                             </td>
                         </tr>
@@ -109,5 +145,8 @@ const CharacterStats: React.FC<CharacterStatsProps> = ({
         </div>
     );
 };
+
+const truncateAddress = (address: string) =>
+    `${address.slice(0, 4)}...${address.slice(-4)}`;
 
 export default CharacterStats;
