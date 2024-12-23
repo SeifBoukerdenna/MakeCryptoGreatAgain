@@ -9,7 +9,6 @@ import { Copy, Check } from 'lucide-react';
 import '../styles/social.css';
 import CharacterStats from '../components/CharacterStats';
 import { useMessageStats } from '../hooks/useMessageStats';
-import CharacterChallenge from '../components/CharacterChallenge';
 
 interface TokenHolder {
     address: string;
@@ -209,8 +208,6 @@ const Social = () => {
                     </div>
                 )}
             </div>
-            <CharacterChallenge />
-
             <CharacterStats
                 characterStats={characterStats}
                 isLoading={isLoading}

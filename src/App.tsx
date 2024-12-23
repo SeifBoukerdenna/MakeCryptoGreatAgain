@@ -12,6 +12,7 @@ import Layout from './components/Layout';
 import Social from './pages/Social';
 import RoadmapPage from './pages/RoadMap';
 import AdminCharacters from './pages/Admin';
+import ChallengePage from './pages/Challenge';
 
 const endpoint = 'https://api.devnet.solana.com';
 const wallets = [new PhantomWalletAdapter()];
@@ -47,6 +48,7 @@ const App = () => {
                 <Route index element={<Home />} />
                 <Route path="about" element={<About />} />
                 <Route path="social" element={<Social />} />
+                <Route path="/challenge" element={<ChallengePage />} />
                 <Route path="roadmap" element={<RoadmapPage />} />
                 <Route path="/admin" element={<AdminCharacters />} />
               </Route>
