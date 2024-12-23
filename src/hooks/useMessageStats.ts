@@ -1,15 +1,7 @@
-// src/hooks/useMessageStats.ts
-
 import { useState, useEffect } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { supabase } from "../lib/supabase";
-import type { MessageStat } from "../lib/supabase";
 import { charactersConfig } from "../configs/characters.config";
-
-interface CharacterStats extends MessageStat {
-  name: string;
-  avatar: string;
-}
 
 interface AggregatedCharacterStats {
   character_id: string;
