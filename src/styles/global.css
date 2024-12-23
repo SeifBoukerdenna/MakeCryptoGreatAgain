@@ -512,22 +512,6 @@ html {
     animation: fadeInUp 0.3s ease;
 }
 
-.message.user {
-    align-self: flex-end;
-    background: var(--message-user-bg);
-    color: var(--message-user-text);
-}
-
-.message.character {
-    align-self: flex-start;
-    background: var(--message-character-bg);
-    color: var(--message-character-text);
-    border: 1px solid #555555;
-}
-
-.message.loading {
-    background: var(--message-loading-bg);
-}
 
 /* Prompt Input */
 .message-input-container {
@@ -553,6 +537,30 @@ html {
     font-style: italic;
     font-size: 1rem;
 }
+
+.user-message {
+    text-align: right; 
+    background-color: var(--message-user-bg);
+    color: var(--message-user-text);
+    width: fit-content;
+    border-radius: 5px;
+    margin-left: auto;  
+    margin-bottom: 0.5rem; 
+  }
+  
+  .character-message {
+    background-color: var(--message-character-bg);
+    color: var(--message-character-text);
+    width: fit-content;
+    text-align: left;
+    border-radius: 5px;
+    margin-right: auto;
+    margin-bottom: 0.5rem;
+  }
+  
+  
+
+  
 
 /* Updated focus shadow with new purple */
 .message-input:focus {

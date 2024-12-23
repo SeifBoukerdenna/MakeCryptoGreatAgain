@@ -4,7 +4,7 @@ import React, { useEffect } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination } from 'swiper/modules';
-import 'swiper/css'; // Ensure Swiper styles are imported
+import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import CharacterCard from '../components/CharacterCard';
@@ -14,6 +14,7 @@ import { useMessages } from '../hooks/useMessages';
 import { useCharacterSelection } from '../hooks/useCharacterSelection';
 import { TEST_MODE, FREE_CHARACTER_ID } from '../configs/test.config';
 import { charactersConfig } from '../configs/characters.config';
+import { thinkingMessages } from '../configs/thinkingmessages';
 
 const Home: React.FC = () => {
   const { connected } = useWallet();
@@ -40,7 +41,6 @@ const Home: React.FC = () => {
   }, [messages]);
 
   const renderChatArea = () => {
-    // In test mode, allow chat if Trump is selected
     const isTrumpSelectedInTestMode = TEST_MODE &&
       selectedCharacter === charactersConfig.find(char => char.id === FREE_CHARACTER_ID)?.name;
 
@@ -86,22 +86,34 @@ const Home: React.FC = () => {
           </div>
         )}
 
-        <div className="messages flex-1 overflow-y-auto mb-4">
-          {messages.map((m, i) => (
-            <div
-              key={i}
-              className={`message ${m.sender} ${m.status} ${m.sender === 'user' ? 'user' : 'character'
-                }`}
-            >
-              {m.sender === 'user' ? m.text : m.status === 'loading' ? 'Thinking...' : m.text}
-            </div>
-          ))}
+        <div className="messages flex-1 overflow-y-auto mb-4 p-2 text-sm max-w-[75%] rounded-lg bg-gray-200">
+          {messages.map((m, i) => {
+            let messageText = m.text;
+            if (m.sender !== 'user' && m.status === 'loading') {
+              // Select a random message from the character's thinking messages
+              const characterThinkingMessages = thinkingMessages[selectedCharacter] || [];
+              messageText = characterThinkingMessages[Math.floor(Math.random() * characterThinkingMessages.length)] || 'Thinking...';
+            }
+            
+            const messageClass =
+              m.sender === 'user'
+                ? 'user-message p-2 text-sm max-w-[75%] rounded-lg bg-blue-200 mb-2'
+                : 'character-message p-2 text-sm max-w-[75%] rounded-lg bg-green-200 mb-2';
+
+            return (
+              <div key={i} className={messageClass}>
+                {m.sender === 'user' ? m.text : messageText}
+              </div>
+            );
+          })}
           <div ref={messagesEndRef} />
         </div>
 
         <PromptInput onSubmit={handleSend} />
-        {ttsError && <p className="text-red-500 mt-2">{ttsError}</p>}
-        {loadingResponse && <p className="text-gray-400 mt-2">Loading response...</p>}
+        {loadingResponse && (
+          <p className="message-response">
+          </p>
+        )}
       </>
     );
   };
@@ -115,14 +127,10 @@ const Home: React.FC = () => {
             <Swiper
               modules={[Navigation, Pagination]}
               spaceBetween={20}
-              // Remove the static slidesPerView
-              // slidesPerView={4}
               breakpoints={{
-                // when window width is >= 0px
                 0: {
                   slidesPerView: 2,
                 },
-                // when window width is >= 640px
                 640: {
                   slidesPerView: 4,
                 },
