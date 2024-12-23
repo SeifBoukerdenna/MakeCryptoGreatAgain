@@ -40,16 +40,15 @@ const ChallengePage = () => {
     const [winners, setWinners] = useState<Record<string, string>>({});
     const [copiedStates, setCopiedStates] = useState<Record<string, boolean>>({});
 
-    // Update timer every second to refresh cooldowns
+    // 1. Update timer every second to refresh cooldowns
     useEffect(() => {
         const timer = setInterval(() => {
-            // Force update by updating a dummy state
             setCooldowns((prev) => ({ ...prev }));
         }, 1000);
         return () => clearInterval(timer);
     }, []);
 
-    // Clean up expired cooldowns and clear results for expired cooldowns
+    // 2. Clean up expired cooldowns and clear results for expired cooldowns
     useEffect(() => {
         const cleanupInterval = setInterval(() => {
             setCooldowns((prevCooldowns) => {
@@ -83,7 +82,7 @@ const ChallengePage = () => {
         return () => clearInterval(cleanupInterval);
     }, []);
 
-    // Fetch cooldowns when wallet is connected or disconnected
+    // 3. Fetch cooldowns when wallet is connected or disconnected
     useEffect(() => {
         if (publicKey) {
             fetchUserCooldowns();
@@ -92,12 +91,12 @@ const ChallengePage = () => {
         }
     }, [publicKey]);
 
-    // Fetch total attempts on page load and whenever there's a guess submission
+    // 4. Fetch total attempts on page load and whenever there's a guess submission
     useEffect(() => {
         fetchTotalAttempts();
     }, [submittingId]);
 
-    // Fetch winners on page load and set up realtime subscription
+    // 5. Fetch winners on page load and set up realtime subscription
     useEffect(() => {
         fetchWinners();
 
@@ -107,7 +106,7 @@ const ChallengePage = () => {
                 console.log('INSERT payload:', payload);
                 const newRecord = payload.new as CharacterChallenge;
                 if (newRecord.success) {
-                    setWinners(prev => ({
+                    setWinners((prev) => ({
                         ...prev,
                         [newRecord.character_id]: newRecord.wallet_address,
                     }));
@@ -117,7 +116,7 @@ const ChallengePage = () => {
                 console.log('UPDATE payload:', payload);
                 const updatedRecord = payload.new as CharacterChallenge;
                 if (updatedRecord.success) {
-                    setWinners(prev => ({
+                    setWinners((prev) => ({
                         ...prev,
                         [updatedRecord.character_id]: updatedRecord.wallet_address,
                     }));
@@ -125,8 +124,8 @@ const ChallengePage = () => {
             })
             .subscribe();
 
-        // Polling as a fallback
-        const interval = setInterval(fetchWinners, 60000); // Fetch winners every 60 seconds
+        // Polling as a fallback every 60s
+        const interval = setInterval(fetchWinners, 60000);
 
         return () => {
             subscription.unsubscribe();
@@ -134,10 +133,10 @@ const ChallengePage = () => {
         };
     }, []);
 
-    // Function to fetch user's cooldowns
+    // --- Supabase / Data Fetching Functions ---
+
     const fetchUserCooldowns = async () => {
         if (!publicKey) return;
-
         const { data, error } = await supabase
             .from('character_challenges')
             .select('character_id, last_attempt')
@@ -160,9 +159,10 @@ const ChallengePage = () => {
         }
     };
 
-    // Function to fetch the total number of attempts (across all users/characters)
     const fetchTotalAttempts = async () => {
-        const { data, error } = await supabase.from('character_challenges').select('attempts');
+        const { data, error } = await supabase
+            .from('character_challenges')
+            .select('attempts');
 
         if (error) {
             console.error('Error fetching total attempts:', error);
@@ -170,13 +170,14 @@ const ChallengePage = () => {
         }
 
         if (data && Array.isArray(data)) {
-            // Sum up all attempts from each row
-            const total = data.reduce((acc: number, row: any) => acc + (row.attempts || 0), 0);
+            const total = data.reduce(
+                (acc: number, row: any) => acc + (row.attempts || 0),
+                0
+            );
             setTotalAttempts(total);
         }
     };
 
-    // Function to fetch winners
     const fetchWinners = async () => {
         try {
             const { data, error } = await supabase
@@ -185,9 +186,7 @@ const ChallengePage = () => {
                 .eq('success', true)
                 .order('last_attempt', { ascending: false });
 
-            if (error) {
-                throw error;
-            }
+            if (error) throw error;
 
             if (data) {
                 const winnersMap: Record<string, string> = {};
@@ -205,7 +204,8 @@ const ChallengePage = () => {
         }
     };
 
-    // Function to handle guess submissions
+    // --- Core Guess Logic ---
+
     const handleGuess = async (characterId: string) => {
         if (!publicKey || !connected) return;
 
@@ -224,81 +224,79 @@ const ChallengePage = () => {
         setSubmittingId(characterId);
 
         try {
+            // 1. Fetch the secret from supabase
             const { data: secretData, error } = await supabase
                 .from('character_secrets')
                 .select('secret')
                 .eq('character_id', characterId)
                 .single();
 
-            if (error) {
-                throw error;
+            if (error) throw error;
+            if (!secretData) return;
+
+            // 2. Compare user's guess with the correct secret
+            const userGuess = guesses[characterId]?.trim().toLowerCase() || '';
+            const correctAnswer = secretData.secret.trim().toLowerCase();
+            const isCorrect = userGuess === correctAnswer;
+
+            setResults((prev) => ({ ...prev, [characterId]: isCorrect }));
+
+            // 3. Fetch existing row to increment attempts
+            const { data: existing, error: existingError } = await supabase
+                .from('character_challenges')
+                .select('*')
+                .eq('wallet_address', publicKey.toString())
+                .eq('character_id', characterId)
+                .single();
+
+            let currentAttempts = 0;
+            if (!existingError && existing) {
+                currentAttempts = existing.attempts || 0;
             }
 
-            if (secretData) {
-                const userGuess = guesses[characterId]?.trim().toLowerCase();
-                const correctAnswer = secretData.secret.trim().toLowerCase();
-                const isCorrect = userGuess === correctAnswer;
+            // 4. Upsert new data
+            const upsertData: any = {
+                wallet_address: publicKey.toString(),
+                character_id: characterId,
+                success: isCorrect,
+                attempts: currentAttempts + 1,
+                last_attempt: new Date().toISOString(), // always set last_attempt
+            };
 
-                setResults((prev) => ({ ...prev, [characterId]: isCorrect }));
+            const { error: upsertError } = await supabase
+                .from('character_challenges')
+                .upsert(upsertData, { onConflict: 'wallet_address,character_id' });
 
-                // Fetch the existing row to increment attempts
-                const { data: existing, error: existingError } = await supabase
-                    .from('character_challenges')
-                    .select('*')
-                    .eq('wallet_address', publicKey.toString())
-                    .eq('character_id', characterId)
-                    .single();
+            if (upsertError) throw upsertError;
 
-                // We'll increment existing attempts by 1 or set it to 1 if there's no row
-                let currentAttempts = 0;
-                if (!existingError && existing) {
-                    currentAttempts = existing.attempts || 0;
-                }
+            // 5. Handle local states
+            if (!isCorrect) {
+                // Wrong answer => set cooldown, clear guess
+                setCooldowns((prev) => ({
+                    ...prev,
+                    [characterId]: new Date(),
+                }));
+                setGuesses((prev) => ({
+                    ...prev,
+                    [characterId]: '',
+                }));
+            } else {
+                // Correct answer => remove from cooldown, optimistically mark solved
+                setCooldowns((prev) => {
+                    const { [characterId]: _, ...rest } = prev;
+                    return rest;
+                });
 
-                const upsertData: any = {
-                    wallet_address: publicKey.toString(),
-                    character_id: characterId,
-                    success: isCorrect,
-                    attempts: currentAttempts + 1,
-                    last_attempt: new Date().toISOString(), // Always set last_attempt
-                };
-
-                // Upsert the updated attempts or cooldown
-                const { error: upsertError } = await supabase
-                    .from('character_challenges')
-                    .upsert(upsertData, { onConflict: 'wallet_address,character_id' });
-
-                if (upsertError) {
-                    throw upsertError;
-                }
-
-                // Update local cooldowns state if guess was wrong
-                if (!isCorrect) {
-                    const newDate = new Date();
-                    setCooldowns((prev) => ({
-                        ...prev,
-                        [characterId]: newDate,
-                    }));
-
-                    // Clear guess if incorrect
-                    setGuesses((prev) => ({
-                        ...prev,
-                        [characterId]: '',
-                    }));
-                } else {
-                    // Remove from cooldowns if correct
-                    setCooldowns((prev) => {
-                        const { [characterId]: _, ...rest } = prev;
-                        return rest;
-                    });
-
-                    // Update winners since a correct guess was made
-                    // This is handled by the subscription
-                }
-
-                // Finally, re-fetch the total attempts
-                await fetchTotalAttempts();
+                // +++ OPTIMISTIC UPDATE: Mark as solved in local winners
+                setWinners((prev) => ({
+                    ...prev,
+                    [characterId]: publicKey.toString(),
+                }));
             }
+
+            // 6. Re-fetch total attempts
+            await fetchTotalAttempts();
+
         } catch (error) {
             console.error('Error submitting guess:', error);
         } finally {
@@ -307,23 +305,21 @@ const ChallengePage = () => {
         }
     };
 
-    // Helper to format cooldown time
+    // --- Utility Functions ---
+
     const formatTimeRemaining = (milliseconds: number) => {
         const minutes = Math.floor(milliseconds / (60 * 1000));
         const seconds = Math.floor((milliseconds % (60 * 1000)) / 1000);
         return `${minutes}:${seconds.toString().padStart(2, '0')}`;
     };
 
-    // Calculate remaining cooldown time
     const getCooldownRemaining = (characterId: string) => {
         const lastAttempt = cooldowns[characterId];
         if (!lastAttempt) return 0;
-
         const timePassed = Date.now() - lastAttempt.getTime();
         return Math.max(COOLDOWN_DURATION - timePassed, 0);
     };
 
-    // Function to handle copying addresses
     const handleCopy = async (address: string) => {
         try {
             await navigator.clipboard.writeText(address);
@@ -335,6 +331,8 @@ const ChallengePage = () => {
             console.error('Failed to copy address:', err);
         }
     };
+
+    // --- Render ---
 
     return (
         <div className="container mx-auto px-4 py-8">
@@ -350,25 +348,29 @@ const ChallengePage = () => {
                         <div className="stat-value">{charactersConfig.length}</div>
                     </div>
 
-                    {/* Display total attempts here */}
                     <div className="stat-item">
                         <div className="stat-label">Total Attempts</div>
                         <div className="stat-value">{totalAttempts}</div>
                     </div>
                 </div>
 
+                {/* The Grid of Characters */}
                 <div className="challenge-grid">
                     {charactersConfig.map((character) => {
                         const cooldownMs = getCooldownRemaining(character.id);
                         const hasResult = results[character.id] !== undefined;
                         const isCorrect = results[character.id];
                         const isCooldown = cooldownMs > 0;
-                        const isSolved = winners[character.id] ? true : false;
+                        const isSolved = !!winners[character.id];
 
                         return (
                             <div
                                 key={character.id}
-                                className={`challenge-card ${isSolved ? 'solved' : hasResult ? (isCorrect ? 'success' : 'error') : ''
+                                className={`challenge-card ${isSolved
+                                    ? 'solved'
+                                    : hasResult
+                                        ? (isCorrect ? 'success' : 'error')
+                                        : ''
                                     }`}
                             >
                                 <div className="header">
@@ -418,21 +420,17 @@ const ChallengePage = () => {
                                                 )}
                                             </div>
                                             <div className="status-text">
-                                                {!connected ? (
-                                                    'Wallet not connected'
-                                                ) : isSolved ? (
-                                                    'Solved'
-                                                ) : hasResult ? (
-                                                    isCorrect ? (
-                                                        'Correct!'
-                                                    ) : (
-                                                        'Wrong answer'
-                                                    )
-                                                ) : isCooldown ? (
-                                                    'Cooldown active'
-                                                ) : (
-                                                    'Ready to guess'
-                                                )}
+                                                {!connected
+                                                    ? 'Wallet not connected'
+                                                    : isSolved
+                                                        ? 'Solved'
+                                                        : hasResult
+                                                            ? isCorrect
+                                                                ? 'Correct!'
+                                                                : 'Wrong answer'
+                                                            : isCooldown
+                                                                ? 'Cooldown active'
+                                                                : 'Ready to guess'}
                                             </div>
                                         </div>
 
@@ -496,7 +494,11 @@ const ChallengePage = () => {
                 <div className="winner-grid">
                     {charactersConfig.map((character) => (
                         <div key={character.id} className="winner-card">
-                            <img src={character.avatar} alt={character.name} className="winner-avatar" />
+                            <img
+                                src={character.avatar}
+                                alt={character.name}
+                                className="winner-avatar"
+                            />
                             <h3 className="winner-name">{character.name}</h3>
                             {winners[character.id] ? (
                                 <div className="winner-address">
@@ -523,7 +525,6 @@ const ChallengePage = () => {
             </div>
         </div>
     );
-
 };
 
 export default ChallengePage;
