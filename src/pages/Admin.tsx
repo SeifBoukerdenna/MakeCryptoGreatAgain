@@ -129,6 +129,9 @@ const AdminPage = () => {
     const handleDeleteCharacter = async (id: string) => {
         if (!isAdmin) return;
 
+        const confirmDelete = window.confirm('Are you sure you want to delete this character?');
+        if (!confirmDelete) return;
+
         try {
             setIsLoading(true);
             const { error: deleteError } = await supabase
@@ -285,8 +288,9 @@ const AdminPage = () => {
                                 <button
                                     onClick={() => handleDeleteCharacter(character.id)}
                                     className="delete-button"
+                                    aria-label="Delete character"
                                 >
-                                    <Trash2 className="icon" />
+                                    <Trash2 className="icon" size={20} color="#EF4444" />
                                 </button>
                             </div>
                         ))}

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useWallet, useConnection } from '@solana/wallet-adapter-react';
 import { supabase } from '../lib/supabase';
 import { Loader2, ThumbsUp, Timer, Users, ChevronRight, Wallet } from 'lucide-react';
@@ -77,9 +77,6 @@ const RoadmapPage = () => {
                 // Calculate time until next second
                 return 1000 - milliseconds;
             };
-
-            // Initial update
-            const nextTick = updateTimer();
 
             // Set up interval with dynamic timing
             const timer = setInterval(() => {
@@ -401,7 +398,7 @@ const RoadmapPage = () => {
                                     paddingAngle={5}
                                     dataKey="value"
                                 >
-                                    {chartData.map((entry, index) => (
+                                    {chartData.map((_, index) => (
                                         <Cell
                                             key={`cell-${index}`}
                                             fill={COLORS[index % COLORS.length]}
