@@ -1,4 +1,5 @@
 // src/hooks/useMessages.ts
+
 import { useState, useRef } from "react";
 import { streamGPTResponse } from "../utils/openai";
 import { useTTS } from "./useTTS";
@@ -7,6 +8,8 @@ import { useCharacterConfig } from "./useCharacterConfig";
 import { useMessageStats } from "./useMessageStats";
 import { supabase } from "../lib/supabase";
 import { useWallet } from "@solana/wallet-adapter-react";
+
+import useLanguageStore from "../stores/useLanguageStore";
 
 export const useMessages = () => {
   const [loadingResponse, setLoadingResponse] = useState(false);
@@ -19,6 +22,9 @@ export const useMessages = () => {
 
   const { messages, addMessage, updateLastMessage } = useConversationStore();
 
+  const { languages } = useLanguageStore();
+  const characterLanguage = languages[config.id] || "english";
+
   const handleSend = async (userText: string) => {
     const userMessage: Message = {
       sender: "user",
@@ -30,11 +36,22 @@ export const useMessages = () => {
     setLoadingResponse(true);
     fullResponseRef.current = "";
 
+    // 3) Build a dynamic prompt specifying the desired language
+    //    so ChatGPT knows how to respond.
+    //    You might tweak the phrasing as you wish.
+    const languageRequirement = `\n(Please respond strictly in ${characterLanguage}.)`;
+
+    // 4) For the final system prompt we send to GPT,
+    //    we can combine systemPrompt + languageRequirement
+    const finalSystemPrompt = systemPrompt + languageRequirement;
+
+    // Insert a "loading" placeholder for the AI's upcoming response
     addMessage({ sender: "character", text: "", status: "loading" });
 
     try {
       await new Promise<void>((resolve, reject) => {
-        streamGPTResponse(userText, systemPrompt, (token: string) => {
+        // 5) Pass finalSystemPrompt to the streamGPTResponse
+        streamGPTResponse(userText, finalSystemPrompt, (token: string) => {
           if (!token) return;
 
           const needsSpace =
@@ -52,6 +69,7 @@ export const useMessages = () => {
 
       if (fullResponseRef.current) {
         updateLastMessage("", "loading");
+
         await sendTTSRequest(
           fullResponseRef.current,
           { voiceId, engine: voiceEngine },
@@ -108,7 +126,7 @@ export const useMessages = () => {
           }
         }
 
-        // Call the hook method as well
+        // Also call the local hook method
         await incrementMessageCount(config.id);
       }
     } catch (error) {

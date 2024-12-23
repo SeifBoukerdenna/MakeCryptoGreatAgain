@@ -22,11 +22,11 @@ interface CopiedState {
 
 const Social = () => {
     const { connection } = useConnection();
-    const { characterStats } = useMessageStats();
+    const { characterStats, isLoading, error } = useMessageStats();
 
     const [holders, setHolders] = useState<TokenHolder[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
+    const [isLoadingHolders, setIsLoadingHolders] = useState(true);
+    const [errorHolders, setErrorHolders] = useState<string | null>(null);
     const [copiedStates, setCopiedStates] = useState<CopiedState>({});
     const TOP_N = 10;
 
@@ -45,13 +45,13 @@ const Social = () => {
     useEffect(() => {
         const fetchLargestHolders = async () => {
             try {
-                setIsLoading(true);
-                setError(null);
+                setIsLoadingHolders(true);
+                setErrorHolders(null);
                 console.log('Fetching top token holders for mint:', MCGA_TOKEN_MINT.toBase58());
 
                 const largestAccounts = await connection.getTokenLargestAccounts(MCGA_TOKEN_MINT);
                 if (!largestAccounts.value || largestAccounts.value.length === 0) {
-                    setError('No token holders found');
+                    setErrorHolders('No token holders found');
                     setHolders([]);
                     return;
                 }
@@ -95,9 +95,9 @@ const Social = () => {
                 setHolders(validHolders);
             } catch (err) {
                 console.error('Error fetching largest token holders:', err);
-                setError('Failed to fetch token holders');
+                setErrorHolders('Failed to fetch token holders');
             } finally {
-                setIsLoading(false);
+                setIsLoadingHolders(false);
             }
         };
 
@@ -155,13 +155,13 @@ const Social = () => {
                     </div>
                 </div>
 
-                {isLoading ? (
+                {isLoadingHolders ? (
                     <div className="flex justify-center items-center py-16">
                         <div className="loading-spinner"></div>
                     </div>
-                ) : error ? (
+                ) : errorHolders ? (
                     <div className="p-8">
-                        <div className="error-message">{error}</div>
+                        <div className="error-message">{errorHolders}</div>
                     </div>
                 ) : (
                     /* Scrollable table container */
@@ -208,6 +208,8 @@ const Social = () => {
                     </div>
                 )}
             </div>
+
+            {/* Updated CharacterStats Component */}
             <CharacterStats
                 characterStats={characterStats}
                 isLoading={isLoading}

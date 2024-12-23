@@ -3,10 +3,6 @@
 /* Import Poppins Font */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
-/* Tailwind CSS Directives */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
 
 /* CSS Variables for Light and Dark Themes */
 :root {
@@ -172,7 +168,7 @@ html {
 
 /* Navbar Title */
 .navbar h1 {
-    font-size: 1.5rem;
+    font-size: 1.25rem;
     font-weight: 700;
     color: var(--navbar-text);
 }
@@ -285,49 +281,32 @@ html {
     border-radius: 12px;
     padding: 20px;
     width: 220px;
-    height: 300px;
+    height: 400px;
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
 }
 
-/* Updated Selected-Card styling with new purple values */
 .character-card.selected-card {
-    /* Old: rgba(128, 0, 128, 0.1) => new: rgba(147, 51, 234, 0.1) */
-    background: rgba(147, 51, 234, 0.1);
-    /* Old: rgba(128, 0, 128, 0.3) => new: rgba(147, 51, 234, 0.3) */
-    border: 2px solid rgba(147, 51, 234, 0.3);
-    /* Old: rgba(128, 0, 128, 0.2) => new: rgba(147, 51, 234, 0.2) */
-    box-shadow: 0 0 20px rgba(147, 51, 234, 0.2);
-    backdrop-filter: blur(10px);
+    background:
+        linear-gradient(45deg, rgba(147, 51, 234, 0.1) 50%, rgba(217, 70, 239, 0.1) 100%),
+        var(--card-bg-color);
+    border: 10px solid rgba(147, 51, 234, 0.3);
+    box-shadow: 0 0 10px rgba(147, 51, 234, 0.2);
+    backdrop-filter: blur(5);
+    border-radius: 12px;
+    opacity: 1;
+    background-blend-mode: overlay;
 }
 
-.character-card.selected-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    border-radius: 12px;
-    /* Old: linear-gradient(45deg, rgba(128, 0, 128, 0.1), rgba(153, 50, 204, 0.1)) */
-    background: linear-gradient(45deg,
-            rgba(147, 51, 234, 0.1) 0%,
-            rgba(217, 70, 239, 0.1) 100%);
-    z-index: 0;
-}
 
 .character-card.selected-card .avatar {
-    /* Old: rgba(128, 0, 128, 0.5) => new: rgba(147, 51, 234, 0.5) */
     border-color: rgba(147, 51, 234, 0.5);
-    /* Old: rgba(128, 0, 128, 0.3) => new: rgba(147, 51, 234, 0.3) */
     box-shadow: 0 0 15px rgba(147, 51, 234, 0.3);
 }
 
-/* Old color #9932CC => new uses your active pinkish-purple or a near variant */
 .character-card.selected-card .character-name {
     color: var(--swiper-pagination-active-color);
-    /* text-shadow with #9932CC => switch to #D946EF or a near RGBA */
     text-shadow: 0 0 10px rgba(217, 70, 239, 0.3);
 }
 
@@ -342,7 +321,6 @@ html {
     font-size: 1rem;
     font-weight: 700;
     cursor: default;
-    /* Replaced old shadow with new purple RGBA */
     box-shadow: 0 4px 15px rgba(147, 51, 234, 0.3);
     transition: all 0.3s ease;
 }
@@ -970,4 +948,46 @@ button,
 /* Ensure the microphone button has a smooth transition */
 .message-input-container button {
     transition: color 0.3s ease;
+}
+
+.language-dropdown {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-top: 1rem;
+}
+
+.language-dropdown label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-color);
+    margin-bottom: 0.25rem;
+    opacity: 0.85;
+}
+
+.dropdown {
+    background: var(--card-bg-color);
+    color: var(--text-color);
+    border: 1px solid var(--card-border);
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition:
+        border-color 0.3s ease,
+        box-shadow 0.3s ease,
+        background-color 0.3s ease;
+}
+
+.dropdown:focus {
+    outline: none;
+    border-color: var(--swiper-pagination-active-color);
+    box-shadow: 0 0 8px rgba(147, 51, 234, 0.5);
+}
+
+/* Disabled styling so users see it's not selectable right now */
+.dropdown:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
 }
