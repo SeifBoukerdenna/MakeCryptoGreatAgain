@@ -8,3 +8,5 @@ export const MCGA_TOKEN_MINT = new PublicKey(
 export const TOKEN_PROGRAM_ID = new PublicKey(
   "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
 );
+
+export const BASE_MULTIPLIER = 10_000;

@@ -7,7 +7,7 @@ import useBalanceStore from '../hooks/useBalanceStore';
 import { formatToK } from '../utils/numberFormat';
 import Switch from 'react-switch';
 import { Eye, Lock } from 'lucide-react';
-import useModeStore from '../stores/useModeStore'; // Ensure the correct path
+import useModeStore from '../stores/useModeStore';
 import { CharacterConfig } from '../configs/characters.config';
 
 
