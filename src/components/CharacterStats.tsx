@@ -2,17 +2,27 @@
 
 import React from 'react';
 import { formatDistanceToNow } from 'date-fns';
-import { Loader2, Copy, Check } from 'lucide-react';
+import { Copy, Check } from 'lucide-react';
 import { useState } from 'react';
+import { formatToK } from '../utils/numberFormat';
 
 interface CharacterStatsProps {
-    characterStats: any[];
+    characterStats: AggregatedCharacterStats[];
     isLoading: boolean;
     error: string | null;
 }
 
 interface CopiedState {
     [key: string]: boolean;
+}
+
+interface AggregatedCharacterStats {
+    character_id: string;
+    total_message_count: number;
+    last_used: string;
+    last_wallet_address: string;
+    name: string;
+    avatar: string;
 }
 
 const CharacterStats: React.FC<CharacterStatsProps> = ({
@@ -34,26 +44,24 @@ const CharacterStats: React.FC<CharacterStatsProps> = ({
         }
     };
 
-    if (isLoading) {
-        return (
-            <div className="token-holder-card loading-container">
-                <Loader2 className="loading-icon" />
-            </div>
-        );
-    }
+    const truncateAddress = (address: string) =>
+        `${address.slice(0, 4)}...${address.slice(-4)}`;
 
-    if (error) {
-        return (
-            <div className="token-holder-card">
-                <div className="error-loading-stats">
-                    Error loading character stats: {error}
-                </div>
-            </div>
-        );
-    }
+    const getRankBadge = (index: number) => {
+        switch (index) {
+            case 0:
+                return <span className="rank-badge gold">🥇 #1</span>;
+            case 1:
+                return <span className="rank-badge silver">🥈 #2</span>;
+            case 2:
+                return <span className="rank-badge bronze">🥉 #3</span>;
+            default:
+                return `#${index + 1}`;
+        }
+    };
 
     const totalMessages = characterStats.reduce(
-        (sum, char) => sum + char.message_count,
+        (sum, char) => sum + char.total_message_count,
         0
     );
 
@@ -74,79 +82,82 @@ const CharacterStats: React.FC<CharacterStatsProps> = ({
                 </div>
             </div>
 
-            <table className="character-stats-table">
-                <thead>
-                    <tr>
-                        <th>Rank</th>
-                        <th>Character</th>
-                        <th className="stats-center">Messages Sent</th>
-                        <th>Last Used</th>
-                        <th>Wallet Address</th> {/* New Column */}
-                    </tr>
-                </thead>
-                <tbody>
-                    {characterStats.map((character, index) => (
-                        <tr key={character.id} className="character-row">
-                            <td className="rank-cell">
-                                <span
-                                    className={`rank-badge ${index < 3
-                                        ? ['gold', 'silver', 'bronze'][index]
-                                        : ''
-                                        }`}
-                                >
-                                    #{index + 1}
-                                </span>
-                            </td>
-                            <td className="character-cell">
-                                <div className="character-content">
-                                    <div className="avatar-wrapper">
-                                        <img
-                                            src={character.avatar}
-                                            alt={character.name}
-                                            className="avatar"
-                                        />
-                                    </div>
-                                    <span className="character-name">{character.name}</span>
-                                </div>
-                            </td>
-                            <td className="stats-center mcga-balance">
-                                {character.message_count}
-                            </td>
-                            <td className="character-time">
-                                {formatDistanceToNow(new Date(character.last_used), {
-                                    addSuffix: true
-                                })}
-                            </td>
-                            <td className="wallet-address-cell">
-                                <button
-                                    onClick={() => handleCopy(character.wallet_address)}
-                                    className="copy-address-button"
-                                    title="Click to copy wallet address"
-                                >
-                                    <span>{truncateAddress(character.wallet_address)}</span>
-                                    {copiedStates[character.wallet_address] ? (
-                                        <Check className="copy-icon" size={16} />
-                                    ) : (
-                                        <Copy className="copy-icon" size={16} />
-                                    )}
-                                </button>
-                            </td>
-                        </tr>
-                    ))}
-                    {characterStats.length === 0 && (
-                        <tr>
-                            <td colSpan={5} className="no-data">
-                                No character usage data yet
-                            </td>
-                        </tr>
-                    )}
-                </tbody>
-            </table>
+            {isLoading ? (
+                <div className="flex justify-center items-center py-16">
+                    <div className="loading-spinner"></div>
+                </div>
+            ) : error ? (
+                <div className="p-8">
+                    <div className="error-message">Error loading character stats: {error}</div>
+                </div>
+            ) : (
+                /* Scrollable table container */
+                <div className="table-responsive">
+                    <table className="character-stats-table">
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>Character</th>
+                                <th className="stats-center">Total Messages</th>
+                                <th>Last Used</th>
+                                <th>Last Wallet</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {characterStats.map((character, index) => (
+                                <tr key={character.character_id} className="character-row">
+                                    <td className="rank-cell">
+                                        {getRankBadge(index)}
+                                    </td>
+                                    <td className="character-cell">
+                                        <div className="character-content">
+                                            <div className="avatar-wrapper">
+                                                <img
+                                                    src={character.avatar}
+                                                    alt={character.name}
+                                                    className="avatar"
+                                                />
+                                            </div>
+                                            <span className="character-name">{character.name}</span>
+                                        </div>
+                                    </td>
+                                    <td className="stats-center mcga-balance">
+                                        {formatToK(character.total_message_count)}
+                                    </td>
+                                    <td className="character-time">
+                                        {formatDistanceToNow(new Date(character.last_used), {
+                                            addSuffix: true
+                                        })}
+                                    </td>
+                                    <td className="wallet-address-cell">
+                                        <button
+                                            onClick={() => handleCopy(character.last_wallet_address)}
+                                            className="copy-address-button"
+                                            title="Click to copy wallet address"
+                                        >
+                                            <span>{truncateAddress(character.last_wallet_address)}</span>
+                                            {copiedStates[character.last_wallet_address] ? (
+                                                <Check className="copy-icon" size={16} />
+                                            ) : (
+                                                <Copy className="copy-icon" size={16} />
+                                            )}
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))}
+                            {characterStats.length === 0 && (
+                                <tr>
+                                    <td colSpan={5} className="no-data">
+                                        No character usage data yet
+                                    </td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
+                </div>
+            )}
         </div>
     );
 };
-
-const truncateAddress = (address: string) =>
-    `${address.slice(0, 4)}...${address.slice(-4)}`;
 
 export default CharacterStats;
