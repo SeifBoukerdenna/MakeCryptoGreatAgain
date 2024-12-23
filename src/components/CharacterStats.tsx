@@ -5,6 +5,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { Copy, Check } from 'lucide-react';
 import { useState } from 'react';
 import { formatToK } from '../utils/numberFormat';
+import { truncateAddress } from '../utils/adress';
 
 interface CharacterStatsProps {
     characterStats: AggregatedCharacterStats[];
@@ -44,8 +45,6 @@ const CharacterStats: React.FC<CharacterStatsProps> = ({
         }
     };
 
-    const truncateAddress = (address: string) =>
-        `${address.slice(0, 4)}...${address.slice(-4)}`;
 
     const getRankBadge = (index: number) => {
         switch (index) {

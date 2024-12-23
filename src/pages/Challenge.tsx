@@ -1,13 +1,33 @@
 // src/pages/Challenge.tsx
+
 import { useEffect, useState } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { supabase } from '../lib/supabase';
-import { Lock, Unlock, RefreshCw, Check, X, Timer, Wallet } from 'lucide-react';
+import {
+    Lock,
+    Unlock,
+    RefreshCw,
+    Check,
+    X,
+    Timer,
+    Wallet,
+    Copy
+} from 'lucide-react';
 import { charactersConfig } from '../configs/characters.config';
 import '../styles/challenge.css';
+import { truncateAddress } from '../utils/adress';
 
-// Adjusted cooldown duration for testing (e.g., 6 seconds). Change to 5 * 60 * 1000 for 5 minutes.
+// Adjusted cooldown duration for testing (e.g., 6 seconds).
+// Change to 5 * 60 * 1000 for 5 minutes.
 const COOLDOWN_DURATION = 0.1 * 60 * 1000; // 6 seconds in milliseconds
+
+interface CharacterChallenge {
+    character_id: string;
+    wallet_address: string;
+    success: boolean;
+    last_attempt: string | null; // Updated to match upsert logic
+    attempts: number;
+}
 
 const ChallengePage = () => {
     const { connected, publicKey } = useWallet();
@@ -16,13 +36,15 @@ const ChallengePage = () => {
     const [results, setResults] = useState<Record<string, boolean>>({});
     const [isLoading, setIsLoading] = useState(false);
     const [submittingId, setSubmittingId] = useState<string | null>(null);
-    const [totalAttempts, setTotalAttempts] = useState<number>(0); // NEW
-    const [, forceUpdate] = useState({});
+    const [totalAttempts, setTotalAttempts] = useState<number>(0);
+    const [winners, setWinners] = useState<Record<string, string>>({});
+    const [copiedStates, setCopiedStates] = useState<Record<string, boolean>>({});
 
     // Update timer every second to refresh cooldowns
     useEffect(() => {
         const timer = setInterval(() => {
-            forceUpdate({});
+            // Force update by updating a dummy state
+            setCooldowns((prev) => ({ ...prev }));
         }, 1000);
         return () => clearInterval(timer);
     }, []);
@@ -73,6 +95,43 @@ const ChallengePage = () => {
     // Fetch total attempts on page load and whenever there's a guess submission
     useEffect(() => {
         fetchTotalAttempts();
+    }, [submittingId]);
+
+    // Fetch winners on page load and set up realtime subscription
+    useEffect(() => {
+        fetchWinners();
+
+        const subscription = supabase
+            .channel('character_challenges')
+            .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'character_challenges' }, payload => {
+                console.log('INSERT payload:', payload);
+                const newRecord = payload.new as CharacterChallenge;
+                if (newRecord.success) {
+                    setWinners(prev => ({
+                        ...prev,
+                        [newRecord.character_id]: newRecord.wallet_address,
+                    }));
+                }
+            })
+            .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'character_challenges' }, payload => {
+                console.log('UPDATE payload:', payload);
+                const updatedRecord = payload.new as CharacterChallenge;
+                if (updatedRecord.success) {
+                    setWinners(prev => ({
+                        ...prev,
+                        [updatedRecord.character_id]: updatedRecord.wallet_address,
+                    }));
+                }
+            })
+            .subscribe();
+
+        // Polling as a fallback
+        const interval = setInterval(fetchWinners, 60000); // Fetch winners every 60 seconds
+
+        return () => {
+            subscription.unsubscribe();
+            clearInterval(interval);
+        };
     }, []);
 
     // Function to fetch user's cooldowns
@@ -91,7 +150,7 @@ const ChallengePage = () => {
 
         if (data) {
             const newCooldowns: Record<string, Date> = {};
-            data.forEach((record) => {
+            data.forEach((record: any) => {
                 if (record.last_attempt) {
                     const attemptDate = new Date(record.last_attempt);
                     newCooldowns[record.character_id] = attemptDate;
@@ -101,7 +160,7 @@ const ChallengePage = () => {
         }
     };
 
-    // NEW: Function to fetch the total number of attempts (across all users/characters)
+    // Function to fetch the total number of attempts (across all users/characters)
     const fetchTotalAttempts = async () => {
         const { data, error } = await supabase.from('character_challenges').select('attempts');
 
@@ -112,14 +171,48 @@ const ChallengePage = () => {
 
         if (data && Array.isArray(data)) {
             // Sum up all attempts from each row
-            const total = data.reduce((acc, row) => acc + (row.attempts || 0), 0);
+            const total = data.reduce((acc: number, row: any) => acc + (row.attempts || 0), 0);
             setTotalAttempts(total);
+        }
+    };
+
+    // Function to fetch winners
+    const fetchWinners = async () => {
+        try {
+            const { data, error } = await supabase
+                .from('character_challenges')
+                .select('*')
+                .eq('success', true)
+                .order('last_attempt', { ascending: false });
+
+            if (error) {
+                throw error;
+            }
+
+            if (data) {
+                const winnersMap: Record<string, string> = {};
+                data.forEach((record: CharacterChallenge) => {
+                    const { character_id, wallet_address } = record;
+                    // If character_id is not yet in the map, add it
+                    if (!winnersMap[character_id]) {
+                        winnersMap[character_id] = wallet_address;
+                    }
+                });
+                setWinners(winnersMap);
+            }
+        } catch (error) {
+            console.error('Error fetching winners:', error);
         }
     };
 
     // Function to handle guess submissions
     const handleGuess = async (characterId: string) => {
         if (!publicKey || !connected) return;
+
+        // If character is already solved, don't allow guess
+        if (winners[characterId]) {
+            return;
+        }
 
         // If user is on cooldown, don't allow guess
         const lastAttempt = cooldowns[characterId];
@@ -142,8 +235,10 @@ const ChallengePage = () => {
             }
 
             if (secretData) {
-                const isCorrect =
-                    guesses[characterId]?.toLowerCase() === secretData.secret.toLowerCase();
+                const userGuess = guesses[characterId]?.trim().toLowerCase();
+                const correctAnswer = secretData.secret.trim().toLowerCase();
+                const isCorrect = userGuess === correctAnswer;
+
                 setResults((prev) => ({ ...prev, [characterId]: isCorrect }));
 
                 // Fetch the existing row to increment attempts
@@ -165,15 +260,8 @@ const ChallengePage = () => {
                     character_id: characterId,
                     success: isCorrect,
                     attempts: currentAttempts + 1,
+                    last_attempt: new Date().toISOString(), // Always set last_attempt
                 };
-
-                if (!isCorrect) {
-                    // Set the cooldown only on incorrect guesses
-                    upsertData.last_attempt = new Date().toISOString();
-                } else {
-                    // If correct, remove the cooldown (set last_attempt to null)
-                    upsertData.last_attempt = null;
-                }
 
                 // Upsert the updated attempts or cooldown
                 const { error: upsertError } = await supabase
@@ -203,6 +291,9 @@ const ChallengePage = () => {
                         const { [characterId]: _, ...rest } = prev;
                         return rest;
                     });
+
+                    // Update winners since a correct guess was made
+                    // This is handled by the subscription
                 }
 
                 // Finally, re-fetch the total attempts
@@ -232,6 +323,19 @@ const ChallengePage = () => {
         return Math.max(COOLDOWN_DURATION - timePassed, 0);
     };
 
+    // Function to handle copying addresses
+    const handleCopy = async (address: string) => {
+        try {
+            await navigator.clipboard.writeText(address);
+            setCopiedStates((prev) => ({ ...prev, [address]: true }));
+            setTimeout(() => {
+                setCopiedStates((prev) => ({ ...prev, [address]: false }));
+            }, 2000);
+        } catch (err) {
+            console.error('Failed to copy address:', err);
+        }
+    };
+
     return (
         <div className="container mx-auto px-4 py-8">
             <h1 className="text-3xl font-bold mb-8 text-center bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
@@ -246,7 +350,7 @@ const ChallengePage = () => {
                         <div className="stat-value">{charactersConfig.length}</div>
                     </div>
 
-                    {/* NEW: Display total attempts here */}
+                    {/* Display total attempts here */}
                     <div className="stat-item">
                         <div className="stat-label">Total Attempts</div>
                         <div className="stat-value">{totalAttempts}</div>
@@ -259,11 +363,12 @@ const ChallengePage = () => {
                         const hasResult = results[character.id] !== undefined;
                         const isCorrect = results[character.id];
                         const isCooldown = cooldownMs > 0;
+                        const isSolved = winners[character.id] ? true : false;
 
                         return (
                             <div
                                 key={character.id}
-                                className={`challenge-card ${hasResult ? (isCorrect ? 'success' : 'error') : ''
+                                className={`challenge-card ${isSolved ? 'solved' : hasResult ? (isCorrect ? 'success' : 'error') : ''
                                     }`}
                             >
                                 <div className="header">
@@ -277,9 +382,11 @@ const ChallengePage = () => {
                                         placeholder={
                                             !connected
                                                 ? 'Connect wallet first'
-                                                : isCooldown
-                                                    ? 'Waiting for cooldown...'
-                                                    : 'Enter the secret phrase...'
+                                                : isSolved
+                                                    ? 'Solved'
+                                                    : isCooldown
+                                                        ? 'Waiting for cooldown...'
+                                                        : 'Enter the secret phrase...'
                                         }
                                         value={guesses[character.id] || ''}
                                         onChange={(e) =>
@@ -288,45 +395,51 @@ const ChallengePage = () => {
                                                 [character.id]: e.target.value,
                                             })
                                         }
-                                        disabled={isCooldown || !connected}
+                                        disabled={isCooldown || !connected || isSolved}
                                     />
 
                                     <div className="status">
                                         <div className="status-indicator">
-                                            {!connected ? (
-                                                <>
+                                            <div className="status-icon">
+                                                {!connected ? (
                                                     <Lock />
-                                                    <span>Wallet not connected</span>
-                                                </>
-                                            ) : hasResult ? (
-                                                isCorrect ? (
-                                                    <>
-                                                        <Check />
-                                                        <span>Correct!</span>
-                                                    </>
+                                                ) : isSolved ? (
+                                                    <Check color="#10B981" />
+                                                ) : hasResult ? (
+                                                    isCorrect ? (
+                                                        <Check color="#10B981" />
+                                                    ) : (
+                                                        <X color="#EF4444" />
+                                                    )
+                                                ) : isCooldown ? (
+                                                    <Lock />
                                                 ) : (
-                                                    <>
-                                                        <X />
-                                                        <span>Wrong answer</span>
-                                                    </>
-                                                )
-                                            ) : isCooldown ? (
-                                                <>
-                                                    <Lock />
-                                                    <span>Cooldown active</span>
-                                                </>
-                                            ) : (
-                                                <>
                                                     <Unlock />
-                                                    <span>Ready to guess</span>
-                                                </>
-                                            )}
+                                                )}
+                                            </div>
+                                            <div className="status-text">
+                                                {!connected ? (
+                                                    'Wallet not connected'
+                                                ) : isSolved ? (
+                                                    'Solved'
+                                                ) : hasResult ? (
+                                                    isCorrect ? (
+                                                        'Correct!'
+                                                    ) : (
+                                                        'Wrong answer'
+                                                    )
+                                                ) : isCooldown ? (
+                                                    'Cooldown active'
+                                                ) : (
+                                                    'Ready to guess'
+                                                )}
+                                            </div>
                                         </div>
 
                                         <button
                                             onClick={() => handleGuess(character.id)}
-                                            disabled={isCooldown || !connected || isLoading}
-                                            className={`challenge-button ${isCooldown ? 'cooldown' : 'ready'
+                                            disabled={isCooldown || !connected || isLoading || isSolved}
+                                            className={`challenge-button ${isCooldown || isSolved ? 'cooldown' : 'ready'
                                                 }`}
                                         >
                                             {!connected ? (
@@ -339,6 +452,8 @@ const ChallengePage = () => {
                                                     <RefreshCw className="animate-spin" />
                                                     Checking...
                                                 </>
+                                            ) : isSolved ? (
+                                                'Solved'
                                             ) : isCooldown ? (
                                                 <>
                                                     <Timer />
@@ -350,6 +465,7 @@ const ChallengePage = () => {
                                         </button>
                                     </div>
 
+                                    {/* Overlays */}
                                     {isCooldown && (
                                         <div className="cooldown-overlay">
                                             <div className="cooldown-timer">
@@ -359,7 +475,7 @@ const ChallengePage = () => {
                                         </div>
                                     )}
 
-                                    {!connected && !isCooldown && (
+                                    {!connected && !isCooldown && !isSolved && (
                                         <div className="connect-wallet-overlay">
                                             <div className="connect-wallet-message">
                                                 <Wallet />
@@ -373,8 +489,41 @@ const ChallengePage = () => {
                     })}
                 </div>
             </div>
+
+            {/* Winner Section */}
+            <div className="winner-section">
+                <h2 className="text-2xl font-bold mb-4 text-center">Winners</h2>
+                <div className="winner-grid">
+                    {charactersConfig.map((character) => (
+                        <div key={character.id} className="winner-card">
+                            <img src={character.avatar} alt={character.name} className="winner-avatar" />
+                            <h3 className="winner-name">{character.name}</h3>
+                            {winners[character.id] ? (
+                                <div className="winner-address">
+                                    <span>Winner:</span>
+                                    <button
+                                        onClick={() => handleCopy(winners[character.id])}
+                                        className="copy-address-button"
+                                        title="Click to copy wallet address"
+                                    >
+                                        <span>{truncateAddress(winners[character.id])}</span>
+                                        {copiedStates[winners[character.id]] ? (
+                                            <Check className="copy-icon" size={16} />
+                                        ) : (
+                                            <Copy className="copy-icon" size={16} />
+                                        )}
+                                    </button>
+                                </div>
+                            ) : (
+                                <div className="no-winner">No winners yet</div>
+                            )}
+                        </div>
+                    ))}
+                </div>
+            </div>
         </div>
     );
+
 };
 
 export default ChallengePage;
