@@ -5,6 +5,7 @@ import { useWallet } from '@solana/wallet-adapter-react';
 import { supabase } from '../lib/supabase';
 import { Loader2, Plus, Trash2, AlertCircle, Calendar, Clock, Users } from 'lucide-react';
 import '../styles/admin.css';
+import AdminSecrets from '../components/AdminSecrets';
 
 // List of admin wallet addresses
 const ADMIN_WALLETS = [
@@ -341,6 +342,10 @@ const AdminPage = () => {
                             Update Voting Period
                         </button>
                     </form>
+                </section>
+
+                <section className='admin-section'>
+                    <AdminSecrets />
                 </section>
             </div>
         </div>

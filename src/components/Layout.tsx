@@ -81,6 +81,12 @@ const Layout: React.FC<LayoutProps> = ({ toggleTheme, theme }) => {
                         Social
                     </NavLink>
                     <NavLink
+                        to="/social"
+                        className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
+                    >
+                        Challenge
+                    </NavLink>
+                    <NavLink
                         to="/roadmap"
                         className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
                     >
