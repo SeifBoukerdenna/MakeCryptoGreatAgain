@@ -1,5 +1,3 @@
-// src/components/Layout.tsx
-
 import React, { useEffect } from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
 import { useWallet, useConnection } from '@solana/wallet-adapter-react';
@@ -9,6 +7,7 @@ import { MCGA_TOKEN_MINT } from '../constants/tokens';
 import { formatToK } from '../utils/numberFormat';
 import BalanceDisplay from './BalanceDisplay';
 import useBalanceStore from '../hooks/useBalanceStore';
+import { TEST_MODE } from '../configs/test.config';
 
 interface LayoutProps {
     toggleTheme: () => void;
@@ -98,6 +97,14 @@ const Layout: React.FC<LayoutProps> = ({ toggleTheme, theme }) => {
                     >
                         About
                     </NavLink>
+                    {TEST_MODE && (
+                        <NavLink
+                            to="/admin"
+                            className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
+                        >
+                            Admin
+                        </NavLink>
+                    )}
                 </div>
 
                 {/* Balance and Wallet Section */}

@@ -8,8 +8,10 @@ import { formatToK } from '../utils/numberFormat';
 import Switch from 'react-switch';
 import { Eye, Lock } from 'lucide-react';
 import useModeStore from '../stores/useModeStore';
-import { CharacterConfig } from '../configs/characters.config';
 
+// UPDATED: Import the new store structure
+import useLanguageStore, { Language } from '../stores/useLanguageStore';
+import { CharacterConfig } from '../configs/characters.config';
 
 interface CharacterCardProps extends Partial<CharacterConfig> {
     id: string;
@@ -38,16 +40,34 @@ const CharacterCard: React.FC<CharacterCardProps> = ({
     const { connected } = useWallet();
     const { mcgaBalance } = useBalanceStore();
 
-    // Access mode and toggle function from the Zustand store
+    // Grab the current mode & toggler from Zustand
     const mode = useModeStore((state) => state.modes[id] || 'normal');
     const toggleMode = useModeStore((state) => state.toggleMode);
 
-    // Fetch switch colors from CSS variables for theme consistency
+    // Grab language & allowedLanguages from Zustand
+    const { languages, allowedLanguages, setLanguage } = useLanguageStore();
+
+    // Figure out which language this character is currently set to
+    const characterLanguage = languages[id] || 'english';
+
+    // If we haven't explicitly listed the character in allowedLanguages,
+    // just default them to a single choice: ['english']
+    const characterAllowedLanguages = allowedLanguages[id] || ['english'];
+
+    // Switch colors from CSS variables
     const switchColors: SwitchColors = {
-        offColor: getComputedStyle(document.documentElement).getPropertyValue('--toggle-bg-light').trim() || '#888888',
-        onColor: getComputedStyle(document.documentElement).getPropertyValue('--toggle-bg-dark').trim() || '#6366F1', // Tailwind's indigo-500
-        offHandleColor: getComputedStyle(document.documentElement).getPropertyValue('--toggle-handle-light').trim() || '#ffffff',
-        onHandleColor: getComputedStyle(document.documentElement).getPropertyValue('--toggle-handle-dark').trim() || '#ffffff',
+        offColor: getComputedStyle(document.documentElement)
+            .getPropertyValue('--toggle-bg-light')
+            .trim() || '#888888',
+        onColor: getComputedStyle(document.documentElement)
+            .getPropertyValue('--toggle-bg-dark')
+            .trim() || '#6366F1',
+        offHandleColor: getComputedStyle(document.documentElement)
+            .getPropertyValue('--toggle-handle-light')
+            .trim() || '#ffffff',
+        onHandleColor: getComputedStyle(document.documentElement)
+            .getPropertyValue('--toggle-handle-dark')
+            .trim() || '#ffffff',
     };
 
     const isAvailable =
@@ -59,7 +79,8 @@ const CharacterCard: React.FC<CharacterCardProps> = ({
     return (
         <div
             key={id}
-            className={`character-card ${isSelected ? 'selected-card' : ''} ${!isAvailable && !isSelected ? 'unavailable' : ''}`}
+            className={`character-card ${isSelected ? 'selected-card' : ''
+                } ${!isAvailable && !isSelected ? 'unavailable' : ''}`}
             aria-disabled={isSelected || !isAvailable}
         >
             <img
@@ -69,12 +90,32 @@ const CharacterCard: React.FC<CharacterCardProps> = ({
             />
             <div className="character-details">
                 <div className="character-name">{name}</div>
+
+                {/* Normal or secondary description based on mode */}
                 <div className="character-description">
                     {mode === 'normal' ? description : description_secondary}
                 </div>
 
-                {/* Mode Selector: Toggle Switch */}
-                <div className="flex items-center">
+                {/* Language Dropdown */}
+                <div className="language-dropdown">
+                    <select
+                        id={`language-selector-${id}`}
+                        value={characterLanguage}
+                        onChange={(e) =>
+                            setLanguage(id, e.target.value as Language)
+                        }
+                        className="dropdown"
+                    >
+                        {characterAllowedLanguages.map((lang) => (
+                            <option key={lang} value={lang}>
+                                {lang.charAt(0).toUpperCase() + lang.slice(1)}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+
+                {/* Mode Toggle Switch */}
+                <div className="flex items-center" style={{ marginTop: '1rem' }}>
                     <Switch
                         onChange={() => toggleMode(id)}
                         checked={mode === 'secret'}
@@ -115,21 +156,27 @@ const CharacterCard: React.FC<CharacterCardProps> = ({
                         height={24}
                         width={48}
                         handleDiameter={20}
-                        aria-label={`Switch to ${mode === 'normal' ? 'secret' : 'normal'} mode`}
+                        aria-label={`Switch to ${mode === 'normal' ? 'secret' : 'normal'
+                            } mode`}
                         className="react-switch"
                     />
-
                 </div>
 
                 {showPrice && (
-                    <div className={`character-price ${isAvailable ? 'text-green-500' : 'text-red-500'}`}>
+                    <div
+                        className={`character-price ${isAvailable ? 'text-green-500' : 'text-red-500'
+                            }`}
+                    >
                         {formatToK(price)} MCGA
                     </div>
                 )}
                 {TEST_MODE && id === FREE_CHARACTER_ID && (
-                    <div className="text-xs text-purple-500 mt-1">Free in Test Mode</div>
+                    <div className="text-xs text-purple-500 mt-1">
+                        Free in Test Mode
+                    </div>
                 )}
             </div>
+
             <button
                 className={`
           ${isSelected ? 'selected-select-button' : 'select-button'}
@@ -145,8 +192,7 @@ const CharacterCard: React.FC<CharacterCardProps> = ({
                         ? 'Connect Wallet'
                         : !isAvailable
                             ? 'Insufficient MCGA'
-                            : 'Select'
-                }
+                            : 'Select'}
             </button>
         </div>
     );
