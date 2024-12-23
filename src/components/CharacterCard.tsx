@@ -9,7 +9,6 @@ import Switch from 'react-switch';
 import { Eye, Lock } from 'lucide-react';
 import useModeStore from '../stores/useModeStore';
 
-// UPDATED: Import the new store structure
 import useLanguageStore, { Language } from '../stores/useLanguageStore';
 import { CharacterConfig } from '../configs/characters.config';
 

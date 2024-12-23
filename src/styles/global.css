@@ -287,27 +287,18 @@ html {
     overflow: hidden;
 }
 
-/* Updated Selected-Card styling with new purple values */
 .character-card.selected-card {
-    background: rgba(147, 51, 234, 0.1);
-    border: 2px solid rgba(147, 51, 234, 0.3);
-    box-shadow: 0 0 20px rgba(147, 51, 234, 0.2);
-    backdrop-filter: blur(20px);
+    background:
+        linear-gradient(45deg, rgba(147, 51, 234, 0.1) 50%, rgba(217, 70, 239, 0.1) 100%),
+        var(--card-bg-color);
+    border: 10px solid rgba(147, 51, 234, 0.3);
+    box-shadow: 0 0 10px rgba(147, 51, 234, 0.2);
+    backdrop-filter: blur(5);
+    border-radius: 12px;
+    opacity: 1;
+    background-blend-mode: overlay;
 }
 
-.character-card.selected-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    border-radius: 12px;
-    background: linear-gradient(45deg,
-            rgba(147, 51, 234, 0.1) 0%,
-            rgba(217, 70, 239, 0.1) 100%);
-    z-index: 0;
-}
 
 .character-card.selected-card .avatar {
     border-color: rgba(147, 51, 234, 0.5);
