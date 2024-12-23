@@ -117,7 +117,10 @@ const About = () => {
                         <button className="cta-button-primary">
                             Get MCGA Tokens
                         </button>
-                        <button className="cta-button-secondary">
+                        <button
+                            className="cta-button-secondary"
+                            onClick={() => window.location.href = '/'}
+                        >
                             View Characters
                         </button>
                     </div>
