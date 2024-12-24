@@ -4,13 +4,14 @@ import React, { useEffect } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination } from 'swiper/modules';
-import 'swiper/css'; // Ensure Swiper styles are imported
+import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
+
 import CharacterCard from '../components/CharacterCard';
 import PromptInput from '../components/PromptInput';
 import Waveform from '../components/WaveForm';
-import VideoPreviewOverlay from '../components/VideoPreviewOverlay'; // Ensure this component exists
+
 import { useMessages } from '../hooks/useMessages';
 import { useCharacterSelection } from '../hooks/useCharacterSelection';
 import { TEST_MODE, FREE_CHARACTER_ID } from '../configs/test.config';
@@ -25,7 +26,9 @@ const Home: React.FC = () => {
     ttsError,
     messagesEndRef,
     handleSend,
-    audioRef, // Receive audioRef from useMessages
+    audioRef,
+    videoBlob,
+    clearVideoBlob,
   } = useMessages();
 
   const {
@@ -43,7 +46,8 @@ const Home: React.FC = () => {
 
   const renderChatArea = () => {
     // In test mode, allow chat if Trump is selected
-    const isTrumpSelectedInTestMode = TEST_MODE &&
+    const isTrumpSelectedInTestMode =
+      TEST_MODE &&
       selectedCharacter === charactersConfig.find(char => char.id === FREE_CHARACTER_ID)?.name;
 
     if (!connected && !isTrumpSelectedInTestMode) {
@@ -83,7 +87,6 @@ const Home: React.FC = () => {
             {isPlaying && (
               <div className="waveform-under-avatar absolute inset-0 flex items-center justify-center">
                 <Waveform />
-                {/* Green Circle Overlay */}
                 <span className="absolute top-0 left-0 w-full h-full rounded-full border-4 border-green-500 animate-pulse"></span>
               </div>
             )}
@@ -103,7 +106,12 @@ const Home: React.FC = () => {
           <div ref={messagesEndRef} />
         </div>
 
-        <PromptInput onSubmit={handleSend} audioRef={audioRef} />
+        <PromptInput
+          onSubmit={handleSend}
+          audioRef={audioRef}
+          videoBlob={videoBlob}
+          clearVideoBlob={clearVideoBlob}
+        />
         {ttsError && <p className="text-red-500 mt-2">{ttsError}</p>}
         {loadingResponse && <p className="text-gray-400 mt-2">Loading response...</p>}
       </>
@@ -119,17 +127,9 @@ const Home: React.FC = () => {
             <Swiper
               modules={[Navigation, Pagination]}
               spaceBetween={20}
-              // Remove the static slidesPerView
-              // slidesPerView={4}
               breakpoints={{
-                // when window width is >= 0px
-                0: {
-                  slidesPerView: 2,
-                },
-                // when window width is >= 640px
-                640: {
-                  slidesPerView: 4,
-                },
+                0: { slidesPerView: 2 },
+                640: { slidesPerView: 4 },
               }}
               centeredSlides={false}
               navigation
@@ -165,10 +165,6 @@ const Home: React.FC = () => {
           {renderChatArea()}
         </section>
       </div>
-
-      {/* Video Preview Overlay */}
-      {/* Ensure this is outside the container to overlay correctly */}
-      {/* The VideoPreviewOverlay is handled within PromptInput */}
     </div>
   );
 };

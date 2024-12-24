@@ -7,7 +7,10 @@ interface VideoPreviewOverlayProps {
     onClose: () => void;
 }
 
-const VideoPreviewOverlay: React.FC<VideoPreviewOverlayProps> = ({ videoBlob, onClose }) => {
+const VideoPreviewOverlay: React.FC<VideoPreviewOverlayProps> = ({
+    videoBlob,
+    onClose
+}) => {
     const videoURL = URL.createObjectURL(videoBlob);
 
     const handleDownload = () => {
