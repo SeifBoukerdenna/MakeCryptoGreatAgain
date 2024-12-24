@@ -6,14 +6,12 @@ import VideoPreviewOverlay from './VideoPreviewOverlay';
 
 interface PromptInputProps {
     onSubmit: (prompt: string) => void;
-    audioRef: React.RefObject<HTMLAudioElement>;
     videoBlob: Blob | null;
     clearVideoBlob: () => void;
 }
 
 const PromptInput: React.FC<PromptInputProps> = ({
     onSubmit,
-    audioRef,
     videoBlob,
     clearVideoBlob
 }) => {

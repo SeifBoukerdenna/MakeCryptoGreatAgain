@@ -14,7 +14,6 @@ export const useMessages = () => {
   const [loadingResponse, setLoadingResponse] = useState(false);
   const { systemPrompt, voiceId, voiceEngine, config } = useCharacterConfig();
 
-  // Here we grab everything from useTTS, including video
   const {
     isPlaying,
     error: ttsError,

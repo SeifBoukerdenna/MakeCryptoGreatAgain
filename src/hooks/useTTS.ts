@@ -95,8 +95,8 @@ export function useTTS(): UseTTSResult {
       });
 
       // Prepare to draw each frame
-      const avatarWidth = 300;
-      const avatarHeight = 300;
+      const avatarWidth = 400; // Increased size
+      const avatarHeight = 400; // Increased size
 
       // Set up the canvas stream at 30 FPS
       const canvasStream = canvas.captureStream(30);
@@ -143,29 +143,51 @@ export function useTTS(): UseTTSResult {
 
       // Simple pulsing animation around avatar
       const animate = () => {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        // Create a gradient background
+        const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+        gradient.addColorStop(0, "#F9FAFB"); // Light pink
+        gradient.addColorStop(1, "#D946EF"); // Light peach
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // Draw the avatar
-        ctx.drawImage(
-          avatarImg,
-          (canvas.width - avatarWidth) / 2,
-          200,
-          avatarWidth,
-          avatarHeight
+        // Draw border around the canvas
+        ctx.strokeStyle = "#ffffff"; // White border
+        ctx.lineWidth = 10;
+        ctx.strokeRect(0, 0, canvas.width, canvas.height);
+
+        // Define avatar position
+        const avatarX = (canvas.width - avatarWidth) / 2;
+        const avatarY = 600; // Lowered position
+
+        // Create a circular clipping path
+        ctx.save(); // Save the current state
+        ctx.beginPath();
+        ctx.arc(
+          avatarX + avatarWidth / 2,
+          avatarY + avatarHeight / 2,
+          avatarWidth / 2,
+          0,
+          2 * Math.PI
         );
+        ctx.clip(); // Clip to the circular path
+
+        // Draw the avatar image within the clipping path
+        ctx.drawImage(avatarImg, avatarX, avatarY, avatarWidth, avatarHeight);
+
+        ctx.restore(); // Restore the state to remove clipping
 
         // Pulse effect
-        const pulse = Math.abs(Math.sin(Date.now() / 200)) * 10 + 10;
+        const pulse = Math.abs(Math.sin(Date.now() / 200)) * 20 + 20; // Increased pulse
         ctx.beginPath();
         ctx.arc(
           canvas.width / 2,
-          200 + avatarHeight / 2,
+          avatarY + avatarHeight / 2,
           Math.max(avatarWidth, avatarHeight) / 2 + pulse,
           0,
           2 * Math.PI
         );
         ctx.strokeStyle = "green";
-        ctx.lineWidth = 5;
+        ctx.lineWidth = 10; // Increased line width for better visibility
         ctx.stroke();
 
         if (mediaRecorderRef.current?.state === "recording") {

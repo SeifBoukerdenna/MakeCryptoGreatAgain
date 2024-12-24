@@ -26,7 +26,6 @@ const Home: React.FC = () => {
     ttsError,
     messagesEndRef,
     handleSend,
-    audioRef,
     videoBlob,
     clearVideoBlob,
   } = useMessages();
@@ -112,7 +111,6 @@ const Home: React.FC = () => {
 
         <PromptInput
           onSubmit={handleSend}
-          audioRef={audioRef}
           videoBlob={videoBlob}
           clearVideoBlob={clearVideoBlob}
         />
