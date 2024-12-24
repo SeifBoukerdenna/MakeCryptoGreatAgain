@@ -555,7 +555,6 @@ html {
 }
 
 .send-button:disabled {
-    opacity: 0.6;
     cursor: not-allowed;
 }
 
@@ -1134,4 +1133,125 @@ button,
 .popup-video,
 .download-button {
     transition: all 0.3s ease;
+}
+
+/* Camera Button Styles */
+.camera-button {
+    border: 1px solid var(--swiper-pagination-active-color);
+    border-radius: 0.25rem;
+    background: var(--input-bg);
+    color: var(--input-placeholder);
+    margin-right: 0.5rem;
+    transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
+}
+
+.camera-button:hover:not(:disabled) {
+    background: var(--button-hover-bg);
+    color: #FFFFFF;
+    transform: scale(1.05);
+}
+
+.camera-button:hover {
+    background: var(--button-hover-bg);
+    color: #FFFFFF;
+    transform: scale(1.05);
+}
+
+.camera-button.active {
+    background: var(--button-hover-bg);
+    color: #FFFFFF;
+}
+
+.camera-button.active {
+    background: var(--button-hover-bg);
+    color: #FFFFFF;
+}
+
+.camera-button.disabled,
+.camera-button:disabled {
+    background: var(--input-bg);
+    color: var(--input-placeholder);
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Microphone Button Styles */
+.mic-button {
+    border: 1px solid var(--swiper-pagination-active-color);
+    border-radius: 0.25rem;
+    background: var(--input-bg);
+    color: var(--input-placeholder);
+    transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
+}
+
+.mic-button:hover {
+    background: var(--button-hover-bg);
+    color: #FFFFFF;
+    transform: scale(1.05);
+}
+
+.mic-button.active {
+    background: var(--button-hover-bg);
+    color: #FFFFFF;
+}
+
+/* Adjust input field to accommodate the microphone button */
+.message-input-container {
+    position: relative;
+}
+
+.message-input {
+    padding-right: 3rem;
+    /* Increased padding to avoid overlap with send button */
+}
+
+/* Optional: Add some spacing between camera and input */
+.camera-button {
+    margin-left: 0;
+}
+
+.tooltip-container {
+    position: relative;
+    display: inline-block;
+    /* Ensure the container fits the wrapped element */
+}
+
+/* Tooltip Text */
+.tooltip-container .tooltiptext {
+    visibility: hidden;
+    width: max-content;
+    background-color: var(--text-color);
+    color: var(--bg-color);
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 10px;
+    font-size: 0.875rem;
+    white-space: nowrap;
+    position: absolute;
+    z-index: 100;
+    bottom: 125%;
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+/* Tooltip Arrow */
+.tooltip-container .tooltiptext::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    /* Arrow at the bottom of the tooltip */
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 5px;
+    border-style: solid;
+    border-color: var(--text-color) transparent transparent transparent;
+}
+
+/* Show Tooltip on Hover */
+.tooltip-container:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
 }

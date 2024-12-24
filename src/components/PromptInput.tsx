@@ -4,6 +4,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Mic, MicOff, Video, VideoOff } from 'lucide-react';
 import VideoPreviewOverlay from './VideoPreviewOverlay';
 import useShouldRecordStore from '../stores/useShouldRecordStore';
+import Tooltip from './Tooltip';
+import useBalanceStore from '../hooks/useBalanceStore';
 
 interface PromptInputProps {
     onSubmit: (prompt: string) => void;
@@ -22,10 +24,16 @@ const PromptInput: React.FC<PromptInputProps> = ({
 
     const { shouldRecord, toggleShouldRecord } = useShouldRecordStore();
 
+    // Access mcgaBalance from the balance store
+    const mcgaBalance = useBalanceStore((state) => state.mcgaBalance);
+
+    // Determine if the user has at least 50,000 MCGA
+    const hasSufficientTokens = mcgaBalance !== null && mcgaBalance >= 50000;
+
     useEffect(() => {
         // Initialize Speech Recognition
         const SpeechRecognitionConstructor =
-            window.SpeechRecognition || (window as any).webkitSpeechRecognition;
+            (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
         if (SpeechRecognitionConstructor) {
             recognitionRef.current = new SpeechRecognitionConstructor();
             if (recognitionRef.current) {
@@ -77,43 +85,47 @@ const PromptInput: React.FC<PromptInputProps> = ({
         }
     };
 
+    const cameraButtonDisabled = !hasSufficientTokens;
+
     return (
         <>
             <div className="message-input-container flex items-center relative">
+                {/* Input Field */}
                 <input
                     type="text"
                     placeholder="Ask your question..."
                     value={value}
                     onChange={(e) => setValue(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
-                    className="message-input placeholder-gray-400 flex-1 p-3 pr-24 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors duration-300"
+                    className="message-input placeholder-gray-400 flex-1 p-3 pr-20 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors duration-300"
                 />
 
-                <button
-                    type="button"
-                    onClick={toggleShouldRecord}
-                    className="absolute right-16 top-1/2 transform -translate-y-1/2 p-2 rounded-full bg-transparent focus:outline-none"
-                    aria-label="Toggle video"
-                    style={{
-                        color: shouldRecord ? 'var(--button-hover-bg)' : 'var(--input-placeholder)',
-                    }}
-                >
-                    {shouldRecord ? (
-                        <VideoOff className="w-5 h-5" />
-                    ) : (
-                        <Video className="w-5 h-5" />
-                    )}
-                </button>
+                {/* Camera Button with Tooltip */}
+                <Tooltip message="You need at least 50,000 MCGA tokens to use this feature.">
+                    <button
+                        type="button"
+                        onClick={toggleShouldRecord}
+                        className={`camera-button p-2 rounded-full focus:outline-none transition-transform ${shouldRecord ? 'active' : ''
+                            } ${cameraButtonDisabled ? 'disabled' : ''}`}
+                        aria-label="Toggle video"
+                        disabled={cameraButtonDisabled}
+                        aria-disabled={cameraButtonDisabled}
+                    >
+                        {shouldRecord ? (
+                            <VideoOff className="w-5 h-5" />
+                        ) : (
+                            <Video className="w-5 h-5" />
+                        )}
+                    </button>
+                </Tooltip>
 
-                {/* Microphone Icon Inside Input */}
+                {/* Microphone Icon */}
                 <button
                     type="button"
                     onClick={toggleListening}
-                    className="absolute right-16 top-1/2 transform -translate-y-1/2 p-2 rounded-full bg-transparent focus:outline-none"
+                    className={`mic-button p-2 rounded-full focus:outline-none transition-transform ${isListening ? 'active' : ''
+                        }`}
                     aria-label="Toggle microphone"
-                    style={{
-                        color: isListening ? 'var(--button-hover-bg)' : 'var(--input-placeholder)',
-                    }}
                 >
                     {isListening ? (
                         <MicOff className="w-5 h-5" />
