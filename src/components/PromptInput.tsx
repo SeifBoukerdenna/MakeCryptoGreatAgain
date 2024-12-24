@@ -6,6 +6,7 @@ import VideoPreviewOverlay from './VideoPreviewOverlay';
 import useShouldRecordStore from '../stores/useShouldRecordStore';
 import Tooltip from './Tooltip';
 import useBalanceStore from '../hooks/useBalanceStore';
+import { Price } from '../constants/price';
 
 interface PromptInputProps {
     onSubmit: (prompt: string) => void;
@@ -28,7 +29,7 @@ const PromptInput: React.FC<PromptInputProps> = ({
     const mcgaBalance = useBalanceStore((state) => state.mcgaBalance);
 
     // Determine if the user has at least 50,000 MCGA
-    const hasSufficientTokens = mcgaBalance !== null && mcgaBalance >= 50000;
+    const hasSufficientTokens = mcgaBalance !== null && mcgaBalance >= Price.exportVideo;
 
     useEffect(() => {
         // Initialize Speech Recognition
