@@ -8,18 +8,26 @@ import { useCharacterConfig } from "./useCharacterConfig";
 import { useMessageStats } from "./useMessageStats";
 import { supabase } from "../lib/supabase";
 import { useWallet } from "@solana/wallet-adapter-react";
-
 import useLanguageStore from "../stores/useLanguageStore";
 
 export const useMessages = () => {
   const [loadingResponse, setLoadingResponse] = useState(false);
   const { systemPrompt, voiceId, voiceEngine, config } = useCharacterConfig();
-  const { isPlaying, error: ttsError, sendTTSRequest } = useTTS();
+
+  const {
+    isPlaying,
+    error: ttsError,
+    sendTTSRequest,
+    audioRef,
+    videoBlob,
+    clearVideoBlob,
+  } = useTTS();
+
   const fullResponseRef = useRef<string>("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
   const { incrementMessageCount } = useMessageStats();
   const { publicKey } = useWallet();
-
   const { messages, addMessage, updateLastMessage } = useConversationStore();
 
   const { languages } = useLanguageStore();
@@ -36,13 +44,10 @@ export const useMessages = () => {
     setLoadingResponse(true);
     fullResponseRef.current = "";
 
-    // 3) Build a dynamic prompt specifying the desired language
-    //    so ChatGPT knows how to respond.
-    //    You might tweak the phrasing as you wish.
+    // Build a dynamic prompt specifying the desired language
     const languageRequirement = `\n(Please respond strictly in ${characterLanguage}.)`;
 
-    // 4) For the final system prompt we send to GPT,
-    //    we can combine systemPrompt + languageRequirement
+    // Combine systemPrompt + languageRequirement
     const finalSystemPrompt = systemPrompt + languageRequirement;
 
     // Insert a "loading" placeholder for the AI's upcoming response
@@ -50,7 +55,6 @@ export const useMessages = () => {
 
     try {
       await new Promise<void>((resolve, reject) => {
-        // 5) Pass finalSystemPrompt to the streamGPTResponse
         streamGPTResponse(userText, finalSystemPrompt, (token: string) => {
           if (!token) return;
 
@@ -84,12 +88,12 @@ export const useMessages = () => {
           walletAddress: publicKey?.toString(),
         });
 
-        // Direct database update for debugging
+        // Direct database update
         if (publicKey) {
           try {
             const walletAddress = publicKey.toString();
 
-            // First try to get existing record
+            // Try to get existing record
             const { data: existingRecord } = await supabase
               .from("message_stats")
               .select("*")
@@ -150,5 +154,9 @@ export const useMessages = () => {
     ttsError,
     messagesEndRef,
     handleSend,
+    audioRef,
+    // Expose the video-related data
+    videoBlob,
+    clearVideoBlob,
   };
 };

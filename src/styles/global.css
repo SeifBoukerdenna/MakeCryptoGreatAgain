@@ -555,7 +555,6 @@ html {
 }
 
 .send-button:disabled {
-    opacity: 0.6;
     cursor: not-allowed;
 }
 
@@ -990,4 +989,269 @@ button,
 .dropdown:disabled {
     opacity: 0.6;
     cursor: not-allowed;
+}
+
+.video-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    animation: fadeIn 0.3s ease;
+    padding: 1rem;
+    /* Ensure some padding on smaller screens */
+}
+
+.video-popup {
+    background: var(--card-bg-color);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    padding: 2rem;
+    max-width: 90%;
+    width: 500px;
+    max-height: 90vh;
+    /* Prevents popup from exceeding viewport height */
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    position: relative;
+    animation: slideDown 0.3s ease;
+    color: var(--text-color);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.close-button {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: transparent;
+    border: none;
+    font-size: 2rem;
+    color: var(--text-color);
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.close-button:hover {
+    color: var(--swiper-pagination-active-color);
+}
+
+.popup-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 1.5rem;
+    color: var(--text-color);
+}
+
+.popup-video {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    max-height: 60vh;
+    /* Ensures the video doesn't exceed available space */
+    object-fit: contain;
+    /* Maintains aspect ratio */
+}
+
+.download-button {
+    width: 100%;
+    padding: 0.75rem 1.5rem;
+    background: var(--button-bg);
+    color: #FFFFFF;
+    border: none;
+    border-radius: 30px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.download-button:hover {
+    background: var(--button-hover-bg);
+    transform: translateY(-2px);
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-20px);
+    }
+
+    to {
+        transform: translateY(0);
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+    .video-popup {
+        padding: 1.5rem;
+        width: 100%;
+        max-width: 100%;
+        max-height: 95vh;
+        /* Allow more height on smaller screens */
+    }
+
+    .popup-title {
+        font-size: 1.25rem;
+    }
+
+    .download-button {
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+    }
+
+    .popup-video {
+        max-height: 50vh;
+        /* Adjust video size for smaller screens */
+    }
+}
+
+/* Smooth Transitions for All Elements */
+.video-overlay,
+.video-popup,
+.close-button,
+.popup-title,
+.popup-video,
+.download-button {
+    transition: all 0.3s ease;
+}
+
+/* Camera Button Styles */
+.camera-button {
+    border: 1px solid var(--swiper-pagination-active-color);
+    border-radius: 0.25rem;
+    background: var(--input-bg);
+    color: var(--input-placeholder);
+    margin-right: 0.5rem;
+    transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
+}
+
+.camera-button:hover:not(:disabled) {
+    background: var(--button-hover-bg);
+    color: #FFFFFF;
+    transform: scale(1.05);
+}
+
+.camera-button:hover {
+    background: var(--button-hover-bg);
+    color: #FFFFFF;
+    transform: scale(1.05);
+}
+
+.camera-button.active {
+    background: var(--button-hover-bg);
+    color: #FFFFFF;
+}
+
+.camera-button.active {
+    background: var(--button-hover-bg);
+    color: #FFFFFF;
+}
+
+.camera-button.disabled,
+.camera-button:disabled {
+    background: var(--input-bg);
+    color: var(--input-placeholder);
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Microphone Button Styles */
+.mic-button {
+    border: 1px solid var(--swiper-pagination-active-color);
+    border-radius: 0.25rem;
+    background: var(--input-bg);
+    color: var(--input-placeholder);
+    transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
+}
+
+.mic-button:hover {
+    background: var(--button-hover-bg);
+    color: #FFFFFF;
+    transform: scale(1.05);
+}
+
+.mic-button.active {
+    background: var(--button-hover-bg);
+    color: #FFFFFF;
+}
+
+/* Adjust input field to accommodate the microphone button */
+.message-input-container {
+    position: relative;
+}
+
+.message-input {
+    padding-right: 3rem;
+    /* Increased padding to avoid overlap with send button */
+}
+
+/* Optional: Add some spacing between camera and input */
+.camera-button {
+    margin-left: 0;
+}
+
+.tooltip-container {
+    position: relative;
+    display: inline-block;
+    /* Ensure the container fits the wrapped element */
+}
+
+/* Tooltip Text */
+.tooltip-container .tooltiptext {
+    visibility: hidden;
+    width: max-content;
+    background-color: var(--text-color);
+    color: var(--bg-color);
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 10px;
+    font-size: 0.875rem;
+    white-space: nowrap;
+    position: absolute;
+    z-index: 100;
+    bottom: 125%;
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+/* Tooltip Arrow */
+.tooltip-container .tooltiptext::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    /* Arrow at the bottom of the tooltip */
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 5px;
+    border-style: solid;
+    border-color: var(--text-color) transparent transparent transparent;
+}
+
+/* Show Tooltip on Hover */
+.tooltip-container:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
 }
