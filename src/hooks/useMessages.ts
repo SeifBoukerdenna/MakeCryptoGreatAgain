@@ -14,7 +14,8 @@ import useLanguageStore from "../stores/useLanguageStore";
 export const useMessages = () => {
   const [loadingResponse, setLoadingResponse] = useState(false);
   const { systemPrompt, voiceId, voiceEngine, config } = useCharacterConfig();
-  const { isPlaying, error: ttsError, sendTTSRequest } = useTTS();
+  const { isPlaying, error: ttsError, sendTTSRequest, audioRef } = useTTS();
+
   const fullResponseRef = useRef<string>("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { incrementMessageCount } = useMessageStats();
@@ -150,5 +151,6 @@ export const useMessages = () => {
     ttsError,
     messagesEndRef,
     handleSend,
+    audioRef,
   };
 };

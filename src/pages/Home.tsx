@@ -10,6 +10,7 @@ import 'swiper/css/pagination';
 import CharacterCard from '../components/CharacterCard';
 import PromptInput from '../components/PromptInput';
 import Waveform from '../components/WaveForm';
+import VideoPreviewOverlay from '../components/VideoPreviewOverlay'; // Ensure this component exists
 import { useMessages } from '../hooks/useMessages';
 import { useCharacterSelection } from '../hooks/useCharacterSelection';
 import { TEST_MODE, FREE_CHARACTER_ID } from '../configs/test.config';
@@ -23,7 +24,8 @@ const Home: React.FC = () => {
     isPlaying,
     ttsError,
     messagesEndRef,
-    handleSend
+    handleSend,
+    audioRef, // Receive audioRef from useMessages
   } = useMessages();
 
   const {
@@ -72,15 +74,17 @@ const Home: React.FC = () => {
     return (
       <>
         {getSelectedCharacter() && (
-          <div className="selected-character-icon">
+          <div className="selected-character-icon relative">
             <img
               src={getSelectedCharacter()!.avatar}
               alt={`${getSelectedCharacter()!.name} Avatar`}
-              className={`selected-avatar ${isPlaying ? 'speaking' : ''}`}
+              className={`selected-avatar ${isPlaying ? 'speaking' : ''} w-24 h-24`}
             />
             {isPlaying && (
-              <div className="waveform-under-avatar">
+              <div className="waveform-under-avatar absolute inset-0 flex items-center justify-center">
                 <Waveform />
+                {/* Green Circle Overlay */}
+                <span className="absolute top-0 left-0 w-full h-full rounded-full border-4 border-green-500 animate-pulse"></span>
               </div>
             )}
           </div>
@@ -99,7 +103,7 @@ const Home: React.FC = () => {
           <div ref={messagesEndRef} />
         </div>
 
-        <PromptInput onSubmit={handleSend} />
+        <PromptInput onSubmit={handleSend} audioRef={audioRef} />
         {ttsError && <p className="text-red-500 mt-2">{ttsError}</p>}
         {loadingResponse && <p className="text-gray-400 mt-2">Loading response...</p>}
       </>
@@ -161,6 +165,10 @@ const Home: React.FC = () => {
           {renderChatArea()}
         </section>
       </div>
+
+      {/* Video Preview Overlay */}
+      {/* Ensure this is outside the container to overlay correctly */}
+      {/* The VideoPreviewOverlay is handled within PromptInput */}
     </div>
   );
 };

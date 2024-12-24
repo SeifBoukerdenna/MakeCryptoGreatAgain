@@ -16,6 +16,7 @@ interface UseTTSResult {
     voiceConfig: VoiceConfig,
     onStart?: () => void
   ) => void;
+  audioRef: React.RefObject<HTMLAudioElement>;
 }
 
 export function useTTS(): UseTTSResult {
@@ -86,5 +87,5 @@ export function useTTS(): UseTTSResult {
     []
   );
 
-  return { isLoading, isPlaying, error, sendTTSRequest };
+  return { isLoading, isPlaying, error, sendTTSRequest, audioRef };
 }
