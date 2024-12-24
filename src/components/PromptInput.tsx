@@ -1,8 +1,9 @@
 // src/components/PromptInput.tsx
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Mic, MicOff } from 'lucide-react';
+import { Mic, MicOff, Video, VideoOff } from 'lucide-react';
 import VideoPreviewOverlay from './VideoPreviewOverlay';
+import useShouldRecordStore from '../stores/useShouldRecordStore';
 
 interface PromptInputProps {
     onSubmit: (prompt: string) => void;
@@ -18,6 +19,8 @@ const PromptInput: React.FC<PromptInputProps> = ({
     const [value, setValue] = useState('');
     const [isListening, setIsListening] = useState(false);
     const recognitionRef = useRef<SpeechRecognition | null>(null);
+
+    const { shouldRecord, toggleShouldRecord } = useShouldRecordStore();
 
     useEffect(() => {
         // Initialize Speech Recognition
@@ -86,6 +89,22 @@ const PromptInput: React.FC<PromptInputProps> = ({
                     className="message-input placeholder-gray-400 flex-1 p-3 pr-24 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors duration-300"
                 />
 
+                <button
+                    type="button"
+                    onClick={toggleShouldRecord}
+                    className="absolute right-16 top-1/2 transform -translate-y-1/2 p-2 rounded-full bg-transparent focus:outline-none"
+                    aria-label="Toggle video"
+                    style={{
+                        color: shouldRecord ? 'var(--button-hover-bg)' : 'var(--input-placeholder)',
+                    }}
+                >
+                    {shouldRecord ? (
+                        <VideoOff className="w-5 h-5" />
+                    ) : (
+                        <Video className="w-5 h-5" />
+                    )}
+                </button>
+
                 {/* Microphone Icon Inside Input */}
                 <button
                     type="button"
@@ -115,7 +134,7 @@ const PromptInput: React.FC<PromptInputProps> = ({
             </div>
 
             {/* Video Preview Overlay */}
-            {videoBlob && (
+            {videoBlob && shouldRecord && (
                 <VideoPreviewOverlay
                     videoBlob={videoBlob}
                     onClose={clearVideoBlob}
