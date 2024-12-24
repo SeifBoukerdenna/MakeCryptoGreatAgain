@@ -100,7 +100,11 @@ const Home: React.FC = () => {
               className={`message ${m.sender} ${m.status} ${m.sender === 'user' ? 'user' : 'character'
                 }`}
             >
-              {m.sender === 'user' ? m.text : m.status === 'loading' ? 'Thinking...' : m.text}
+              {m.sender === 'user'
+                ? m.text
+                : m.status === 'loading'
+                  ? 'Thinking...'
+                  : m.text}
             </div>
           ))}
           <div ref={messagesEndRef} />
