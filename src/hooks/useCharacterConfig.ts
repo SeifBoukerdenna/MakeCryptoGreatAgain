@@ -1,26 +1,29 @@
-// src/hooks/useCharacterConfig.ts
-
 import { useMemo } from "react";
 import { charactersConfig } from "../configs/characters.config";
 import useCharacterStore from "../stores/useCharacterStore";
+import useModeStore from "../stores/useModeStore";
 
 export const useCharacterConfig = () => {
   const selectedCharacter = useCharacterStore(
     (state) => state.selectedCharacter
   );
+  const modes = useModeStore((state) => state.modes);
 
   const currentConfig = useMemo(() => {
-    // Find the character configuration that matches the selected character name exactly
     const config = charactersConfig.find(
       (char) => char.name === selectedCharacter
     );
-
-    // Fall back to the first character (Trump) if no match is found
     return config || charactersConfig[0];
   }, [selectedCharacter]);
 
+  const mode = modes[currentConfig.id] || "normal";
+  const systemPrompt =
+    mode === "secret"
+      ? currentConfig.secondarySystemPrompt
+      : currentConfig.systemPrompt;
+
   return {
-    systemPrompt: currentConfig.systemPrompt,
+    systemPrompt,
     voiceId: currentConfig.voice.id,
     voiceEngine: currentConfig.voice.engine,
     config: currentConfig,

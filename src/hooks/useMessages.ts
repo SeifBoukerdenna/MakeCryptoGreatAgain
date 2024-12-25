@@ -1,4 +1,5 @@
 // src/hooks/useMessages.ts
+
 import { useState, useRef } from "react";
 import { streamGPTResponse } from "../utils/openai";
 import { useTTS } from "./useTTS";
@@ -7,17 +8,30 @@ import { useCharacterConfig } from "./useCharacterConfig";
 import { useMessageStats } from "./useMessageStats";
 import { supabase } from "../lib/supabase";
 import { useWallet } from "@solana/wallet-adapter-react";
+import useLanguageStore from "../stores/useLanguageStore";
 
 export const useMessages = () => {
   const [loadingResponse, setLoadingResponse] = useState(false);
   const { systemPrompt, voiceId, voiceEngine, config } = useCharacterConfig();
-  const { isPlaying, error: ttsError, sendTTSRequest } = useTTS();
+
+  const {
+    isPlaying,
+    error: ttsError,
+    sendTTSRequest,
+    audioRef,
+    videoBlob,
+    clearVideoBlob,
+  } = useTTS();
+
   const fullResponseRef = useRef<string>("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
   const { incrementMessageCount } = useMessageStats();
   const { publicKey } = useWallet();
-
   const { messages, addMessage, updateLastMessage } = useConversationStore();
+
+  const { languages } = useLanguageStore();
+  const characterLanguage = languages[config.id] || "english";
 
   const handleSend = async (userText: string) => {
     const userMessage: Message = {
@@ -30,11 +44,18 @@ export const useMessages = () => {
     setLoadingResponse(true);
     fullResponseRef.current = "";
 
+    // Build a dynamic prompt specifying the desired language
+    const languageRequirement = `\n(Please respond strictly in ${characterLanguage}.)`;
+
+    // Combine systemPrompt + languageRequirement
+    const finalSystemPrompt = systemPrompt + languageRequirement;
+
+    // Insert a "loading" placeholder for the AI's upcoming response
     addMessage({ sender: "character", text: "", status: "loading" });
 
     try {
       await new Promise<void>((resolve, reject) => {
-        streamGPTResponse(userText, systemPrompt, (token: string) => {
+        streamGPTResponse(userText, finalSystemPrompt, (token: string) => {
           if (!token) return;
 
           const needsSpace =
@@ -52,6 +73,7 @@ export const useMessages = () => {
 
       if (fullResponseRef.current) {
         updateLastMessage("", "loading");
+        console.log("Full response:", fullResponseRef.current);
         await sendTTSRequest(
           fullResponseRef.current,
           { voiceId, engine: voiceEngine },
@@ -66,12 +88,12 @@ export const useMessages = () => {
           walletAddress: publicKey?.toString(),
         });
 
-        // Direct database update for debugging
+        // Direct database update
         if (publicKey) {
           try {
             const walletAddress = publicKey.toString();
 
-            // First try to get existing record
+            // Try to get existing record
             const { data: existingRecord } = await supabase
               .from("message_stats")
               .select("*")
@@ -108,7 +130,7 @@ export const useMessages = () => {
           }
         }
 
-        // Call the hook method as well
+        // Also call the local hook method
         await incrementMessageCount(config.id);
       }
     } catch (error) {
@@ -132,5 +154,9 @@ export const useMessages = () => {
     ttsError,
     messagesEndRef,
     handleSend,
+    audioRef,
+    // Expose the video-related data
+    videoBlob,
+    clearVideoBlob,
   };
 };

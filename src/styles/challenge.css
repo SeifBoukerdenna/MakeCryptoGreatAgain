@@ -1,0 +1,521 @@
+.character-challenges {
+    margin-top: 3rem;
+}
+
+.challenge-card {
+    background: var(--card-bg);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--card-border);
+    border-radius: 1rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.holder-stats {
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    padding: 1rem;
+    border-bottom: 1px solid var(--card-border);
+    background: var(--stats-bg);
+    border-radius: 0 0 1rem 1rem;
+}
+
+/* Header Styles */
+.challenge-card .header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem;
+    border-bottom: 1px solid var(--card-border);
+    background: var(--stats-bg);
+    border-radius: 1rem 1rem 0 0;
+}
+
+.challenge-card img {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    border: 1px solid var(--card-border);
+}
+
+.challenge-card h3 {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+/* Content Area */
+.challenge-card .content {
+    width: 50%;
+    margin: 0 auto;
+    /* position: relative; */
+}
+
+/* Input States */
+.challenge-card input {
+    width: 100%;
+    padding: .75rem 1rem;
+    margin: .75rem 0;
+    font-size: 0.875rem;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 0.5rem;
+    color: var(--text-primary);
+    transition: all 0.2s ease;
+    text-align: center;
+}
+
+.challenge-card input::placeholder {
+    text-align: center;
+}
+
+.challenge-card input:focus:not(:disabled) {
+    border-color: rgba(147, 51, 234, 0.5);
+    box-shadow: 0 0 0 2px rgba(147, 51, 234, 0.2);
+    outline: none;
+}
+
+.challenge-card input:disabled {
+    background: rgba(0, 0, 0, 0.1);
+    cursor: not-allowed;
+    color: var(--text-secondary);
+}
+
+/* Status Bar */
+.challenge-card .status {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.status-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.status-indicator svg {
+    width: 1rem;
+    height: 1rem;
+}
+
+/* Button States */
+.challenge-button {
+    padding: 0.5rem 1rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border-radius: 0.5rem;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.connect-wallet-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.05);
+    backdrop-filter: blur(2px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    z-index: 10;
+}
+
+.connect-wallet-message {
+    background: rgba(0, 0, 0, 0.2);
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: var(--text-primary);
+}
+
+.dark .connect-wallet-message {
+    background: rgba(0, 0, 0, 0.4);
+}
+
+/* Ready state */
+.challenge-button.ready {
+    background: linear-gradient(135deg, #6366F1 0%, #D946EF 100%);
+    color: white;
+    border: none;
+}
+
+.challenge-button.ready:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(147, 51, 234, 0.2);
+}
+
+/* Cooldown state */
+.challenge-button.cooldown {
+    background: rgba(0, 0, 0, 0.1);
+    color: var(--text-secondary);
+    cursor: not-allowed;
+}
+
+/* Success/Error States */
+.challenge-card.success {
+    border-color: rgba(16, 185, 129, 0.5);
+}
+
+.challenge-card.success .header {
+    background: rgba(16, 185, 129, 0.1);
+}
+
+.challenge-card.success .status-indicator {
+    color: #10B981;
+}
+
+.challenge-card.error {
+    border-color: rgba(239, 68, 68, 0.5);
+}
+
+.challenge-card.error .header {
+    background: rgba(239, 68, 68, 0.1);
+}
+
+.challenge-card.error .status-indicator {
+    color: #EF4444;
+}
+
+/* Cooldown Overlay */
+.cooldown-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.05);
+    backdrop-filter: blur(2px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.cooldown-timer {
+    background: rgba(0, 0, 0, 0.2);
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Grid Layout */
+.challenge-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    padding: 1.5rem;
+}
+
+/* Dark Mode Adjustments */
+.dark .challenge-card {
+    background: var(--card-bg);
+}
+
+.dark .challenge-card input:not(:disabled) {
+    background: rgba(0, 0, 0, 0.2);
+    color: var(--text-primary);
+}
+
+.dark .cooldown-overlay {
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.dark .cooldown-timer {
+    background: rgba(0, 0, 0, 0.4);
+    color: var(--text-primary);
+}
+
+.admin-secrets {
+    margin-top: 2rem;
+    background: var(--card-bg);
+    border-radius: 1rem;
+    border: 1px solid var(--card-border);
+}
+
+.admin-secrets h2 {
+    font-size: 1.5rem;
+    padding: 1.5rem;
+    margin: 0;
+    border-bottom: 1px solid var(--card-border);
+    background: var(--stats-bg);
+    border-radius: 1rem 1rem 0 0;
+    color: var(--text-primary);
+}
+
+.character-secret-card {
+    margin: 1rem;
+    padding: 1.5rem;
+    background: rgba(147, 51, 234, 0.05);
+    border-radius: 0.75rem;
+    border: 1px solid rgba(147, 51, 234, 0.2);
+    transition: all 0.2s ease;
+}
+
+.character-secret-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(147, 51, 234, 0.1);
+}
+
+.secret-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(147, 51, 234, 0.1);
+}
+
+.secret-header img {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    border: 2px solid rgba(147, 51, 234, 0.2);
+}
+
+.secret-header h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0;
+    color: var(--text-primary);
+}
+
+.secret-input {
+    margin-bottom: 1rem;
+}
+
+.secret-input label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: var(--text-secondary);
+}
+
+.secret-input input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(147, 51, 234, 0.2);
+    border-radius: 0.5rem;
+    color: var(--text-primary);
+    transition: all 0.2s ease;
+}
+
+.secret-input input:hover {
+    border-color: rgba(147, 51, 234, 0.3);
+}
+
+.secret-input input:focus {
+    border-color: rgba(147, 51, 234, 0.5);
+    box-shadow: 0 0 0 2px rgba(147, 51, 234, 0.2);
+    outline: none;
+}
+
+.secret-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+}
+
+.secret-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.secret-button.add {
+    background: linear-gradient(135deg, #6366F1 0%, #D946EF 100%);
+    color: white;
+    border: none;
+}
+
+.secret-button.update {
+    background: linear-gradient(135deg, #6366F1 0%, #D946EF 100%);
+    color: white;
+    border: none;
+}
+
+.secret-button.delete {
+    background: rgba(239, 68, 68, 0.1);
+    color: #EF4444;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.secret-button:hover {
+    transform: translateY(-1px);
+}
+
+.secret-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.dark .secret-input input {
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.dark .character-secret-card {
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.challenge-card.solved {
+    border-color: rgba(34, 197, 94, 0.5);
+    /* Green border */
+}
+
+.challenge-card.solved .header {
+    background: rgba(34, 197, 94, 0.1);
+    /* Light green background */
+}
+
+.challenge-card.solved .status-indicator {
+    color: #22C55E;
+    /* Green text */
+}
+
+.challenge-card.solved .challenge-button {
+    background: rgba(34, 197, 94, 0.1);
+    color: #22C55E;
+    cursor: not-allowed;
+}
+
+.challenge-card.solved .challenge-button:hover {
+    transform: none;
+    box-shadow: none;
+}
+
+/* Winner Section */
+.winner-section {
+    margin-top: 3rem;
+    padding: 1.5rem;
+    background: var(--card-bg);
+    border-radius: 1rem;
+    border: 1px solid var(--card-border);
+}
+
+.winner-section h2 {
+    text-align: center;
+    font-size: 1.75rem;
+    margin-bottom: 1.5rem;
+    color: var(--text-primary);
+}
+
+.winner-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 1.5rem;
+}
+
+@media (max-width: 1200px) {
+    .winner-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+@media (max-width: 992px) {
+    .winner-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .winner-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 576px) {
+    .winner-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.winner-card {
+    background: var(--card-bg);
+    padding: 1rem;
+    border-radius: 0.75rem;
+    border: 1px solid var(--card-border);
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.winner-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(147, 51, 234, 0.1);
+}
+
+.winner-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 0.5rem;
+}
+
+.winner-name {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+}
+
+.winner-address {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+}
+
+.winner-address button {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+}
+
+.winner-address button .copy-icon {
+    transition: color 0.3s ease;
+}
+
+.winner-address button:hover .copy-icon {
+    color: var(--swiper-pagination-active-color);
+}
+
+.no-winner {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+}

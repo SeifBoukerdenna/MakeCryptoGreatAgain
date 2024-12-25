@@ -3,10 +3,6 @@
 /* Import Poppins Font */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
-/* Tailwind CSS Directives */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
 
 /* CSS Variables for Light and Dark Themes */
 :root {
@@ -172,7 +168,7 @@ html {
 
 /* Navbar Title */
 .navbar h1 {
-    font-size: 1.5rem;
+    font-size: 1.25rem;
     font-weight: 700;
     color: var(--navbar-text);
 }
@@ -285,49 +281,32 @@ html {
     border-radius: 12px;
     padding: 20px;
     width: 220px;
-    height: 300px;
+    height: 400px;
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
 }
 
-/* Updated Selected-Card styling with new purple values */
 .character-card.selected-card {
-    /* Old: rgba(128, 0, 128, 0.1) => new: rgba(147, 51, 234, 0.1) */
-    background: rgba(147, 51, 234, 0.1);
-    /* Old: rgba(128, 0, 128, 0.3) => new: rgba(147, 51, 234, 0.3) */
-    border: 2px solid rgba(147, 51, 234, 0.3);
-    /* Old: rgba(128, 0, 128, 0.2) => new: rgba(147, 51, 234, 0.2) */
-    box-shadow: 0 0 20px rgba(147, 51, 234, 0.2);
-    backdrop-filter: blur(10px);
+    background:
+        linear-gradient(45deg, rgba(147, 51, 234, 0.1) 50%, rgba(217, 70, 239, 0.1) 100%),
+        var(--card-bg-color);
+    border: 10px solid rgba(147, 51, 234, 0.3);
+    box-shadow: 0 0 10px rgba(147, 51, 234, 0.2);
+    backdrop-filter: blur(5);
+    border-radius: 12px;
+    opacity: 1;
+    background-blend-mode: overlay;
 }
 
-.character-card.selected-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    border-radius: 12px;
-    /* Old: linear-gradient(45deg, rgba(128, 0, 128, 0.1), rgba(153, 50, 204, 0.1)) */
-    background: linear-gradient(45deg,
-            rgba(147, 51, 234, 0.1) 0%,
-            rgba(217, 70, 239, 0.1) 100%);
-    z-index: 0;
-}
 
 .character-card.selected-card .avatar {
-    /* Old: rgba(128, 0, 128, 0.5) => new: rgba(147, 51, 234, 0.5) */
     border-color: rgba(147, 51, 234, 0.5);
-    /* Old: rgba(128, 0, 128, 0.3) => new: rgba(147, 51, 234, 0.3) */
     box-shadow: 0 0 15px rgba(147, 51, 234, 0.3);
 }
 
-/* Old color #9932CC => new uses your active pinkish-purple or a near variant */
 .character-card.selected-card .character-name {
     color: var(--swiper-pagination-active-color);
-    /* text-shadow with #9932CC => switch to #D946EF or a near RGBA */
     text-shadow: 0 0 10px rgba(217, 70, 239, 0.3);
 }
 
@@ -342,7 +321,6 @@ html {
     font-size: 1rem;
     font-weight: 700;
     cursor: default;
-    /* Replaced old shadow with new purple RGBA */
     box-shadow: 0 4px 15px rgba(147, 51, 234, 0.3);
     transition: all 0.3s ease;
 }
@@ -569,6 +547,7 @@ html {
     font-size: 1rem;
     background: var(--button-bg);
     color: #FFFFFF;
+    z-index: 100;
     padding: 0.75rem 1.5rem;
     border: none;
     font-weight: 700;
@@ -609,7 +588,6 @@ html {
 }
 
 .send-button:disabled {
-    opacity: 0.6;
     cursor: not-allowed;
 }
 
@@ -1002,4 +980,311 @@ button,
 /* Ensure the microphone button has a smooth transition */
 .message-input-container button {
     transition: color 0.3s ease;
+}
+
+.language-dropdown {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-top: 1rem;
+}
+
+.language-dropdown label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-color);
+    margin-bottom: 0.25rem;
+    opacity: 0.85;
+}
+
+.dropdown {
+    background: var(--card-bg-color);
+    color: var(--text-color);
+    border: 1px solid var(--card-border);
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition:
+        border-color 0.3s ease,
+        box-shadow 0.3s ease,
+        background-color 0.3s ease;
+}
+
+.dropdown:focus {
+    outline: none;
+    border-color: var(--swiper-pagination-active-color);
+    box-shadow: 0 0 8px rgba(147, 51, 234, 0.5);
+}
+
+/* Disabled styling so users see it's not selectable right now */
+.dropdown:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.video-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    animation: fadeIn 0.3s ease;
+    padding: 1rem;
+    /* Ensure some padding on smaller screens */
+}
+
+.video-popup {
+    background: var(--card-bg-color);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    padding: 2rem;
+    max-width: 90%;
+    width: 500px;
+    max-height: 90vh;
+    /* Prevents popup from exceeding viewport height */
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    position: relative;
+    animation: slideDown 0.3s ease;
+    color: var(--text-color);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.close-button {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: transparent;
+    border: none;
+    font-size: 2rem;
+    color: var(--text-color);
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.close-button:hover {
+    color: var(--swiper-pagination-active-color);
+}
+
+.popup-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 1.5rem;
+    color: var(--text-color);
+}
+
+.popup-video {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    max-height: 60vh;
+    /* Ensures the video doesn't exceed available space */
+    object-fit: contain;
+    /* Maintains aspect ratio */
+}
+
+.download-button {
+    width: 100%;
+    padding: 0.75rem 1.5rem;
+    background: var(--button-bg);
+    color: #FFFFFF;
+    border: none;
+    border-radius: 30px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.download-button:hover {
+    background: var(--button-hover-bg);
+    transform: translateY(-2px);
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-20px);
+    }
+
+    to {
+        transform: translateY(0);
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+    .video-popup {
+        padding: 1.5rem;
+        width: 100%;
+        max-width: 100%;
+        max-height: 95vh;
+        /* Allow more height on smaller screens */
+    }
+
+    .popup-title {
+        font-size: 1.25rem;
+    }
+
+    .download-button {
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+    }
+
+    .popup-video {
+        max-height: 50vh;
+        /* Adjust video size for smaller screens */
+    }
+}
+
+/* Smooth Transitions for All Elements */
+.video-overlay,
+.video-popup,
+.close-button,
+.popup-title,
+.popup-video,
+.download-button {
+    transition: all 0.3s ease;
+}
+
+/* Camera Button Styles */
+.camera-button {
+    border: 1px solid var(--swiper-pagination-active-color);
+    border-radius: 0.25rem;
+    background: var(--input-bg);
+    color: var(--input-placeholder);
+    margin-right: 0.5rem;
+    transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
+}
+
+.camera-button:hover:not(:disabled) {
+    background: var(--button-hover-bg);
+    color: #FFFFFF;
+    transform: scale(1.05);
+}
+
+.camera-button:hover {
+    background: var(--button-hover-bg);
+    color: #FFFFFF;
+    transform: scale(1.05);
+}
+
+.camera-button.active {
+    background: var(--button-hover-bg);
+    color: #FFFFFF;
+}
+
+.camera-button.active {
+    background: var(--button-hover-bg);
+    color: #FFFFFF;
+}
+
+.camera-button.disabled,
+.camera-button:disabled {
+    background: var(--input-bg);
+    color: var(--input-placeholder);
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Microphone Button Styles */
+.mic-button {
+    border: 1px solid var(--swiper-pagination-active-color);
+    border-radius: 0.25rem;
+    background: var(--input-bg);
+    color: var(--input-placeholder);
+    transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
+}
+
+.mic-button:hover {
+    background: var(--button-hover-bg);
+    color: #FFFFFF;
+    transform: scale(1.05);
+}
+
+.mic-button.active {
+    background: var(--button-hover-bg);
+    color: #FFFFFF;
+}
+
+/* Adjust input field to accommodate the microphone button */
+.message-input-container {
+    position: relative;
+}
+
+.message-input {
+    padding-right: 3rem;
+    /* Increased padding to avoid overlap with send button */
+}
+
+/* Optional: Add some spacing between camera and input */
+.camera-button {
+    margin-left: 0;
+}
+
+.tooltip-container {
+    position: relative;
+    display: inline-block;
+    /* Ensure the container fits the wrapped element */
+}
+
+/* Tooltip Text */
+.tooltip-container .tooltiptext {
+    visibility: hidden;
+    width: max-content;
+    background-color: var(--text-color);
+    color: var(--bg-color);
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 10px;
+    font-size: 0.875rem;
+    white-space: nowrap;
+    position: absolute;
+    z-index: 100;
+    bottom: 125%;
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+/* Tooltip Arrow */
+.tooltip-container .tooltiptext::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    /* Arrow at the bottom of the tooltip */
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 5px;
+    border-style: solid;
+    border-color: var(--text-color) transparent transparent transparent;
+}
+
+/* Show Tooltip on Hover */
+.tooltip-container:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
 }
