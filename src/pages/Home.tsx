@@ -1,5 +1,3 @@
-// src/pages/Home.tsx
-
 import React, { useEffect } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -15,6 +13,7 @@ import { useCharacterSelection } from '../hooks/useCharacterSelection';
 import { TEST_MODE, FREE_CHARACTER_ID } from '../configs/test.config';
 import { charactersConfig } from '../configs/characters.config';
 import { thinkingMessages } from '../configs/thinkingMessages.ts';
+import useConversationStore from '../stores/useConversationStore';
 
 const Home: React.FC = () => {
   const { connected } = useWallet();
@@ -35,6 +34,12 @@ const Home: React.FC = () => {
     getSelectedCharacter,
     characters
   } = useCharacterSelection();
+
+  const setMessages = useConversationStore((state) => state.setMessages);
+
+  const handleClearChat = () => {
+    setMessages([]);
+  };
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -109,9 +114,9 @@ const Home: React.FC = () => {
         </div>
 
         <PromptInput onSubmit={handleSend} />
+
         {loadingResponse && (
-          <p className="message-response">
-          </p>
+          <p className="message-response" />
         )}
       </>
     );
@@ -164,7 +169,14 @@ const Home: React.FC = () => {
         </section>
 
         {/* Chat Area */}
-        <section className="chat-area p-6 rounded-lg shadow-lg flex flex-col h-96 pt-6 mt-4 mb-4">
+        <section className="chat-area p-6 rounded-lg shadow-lg flex flex-col h-96 pt-6 mt-4 mb-4 relative">
+          {/* Clear Chat Button */}
+          <button
+            onClick={handleClearChat}
+            className="clear-chat-button"
+          >
+            Clear Chat
+          </button>
           {renderChatArea()}
         </section>
       </div>
