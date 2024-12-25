@@ -90,7 +90,6 @@ const Home: React.FC = () => {
           {messages.map((m, i) => {
             let messageText = m.text;
             if (m.sender !== 'user' && m.status === 'loading') {
-              // Select a random message from the character's thinking messages
               const characterThinkingMessages = thinkingMessages[selectedCharacter] || [];
               messageText = characterThinkingMessages[Math.floor(Math.random() * characterThinkingMessages.length)] || 'Thinking...';
             }
