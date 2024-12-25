@@ -7,6 +7,8 @@ import useShouldRecordStore from '../stores/useShouldRecordStore';
 import Tooltip from './Tooltip';
 import useBalanceStore from '../hooks/useBalanceStore';
 import { Price } from '../constants/price';
+import useIsChromium from '../hooks/useIsChromium';
+import { formatToK } from '../utils/numberFormat';
 
 interface PromptInputProps {
     onSubmit: (prompt: string) => void;
@@ -24,6 +26,7 @@ const PromptInput: React.FC<PromptInputProps> = ({
     const recognitionRef = useRef<SpeechRecognition | null>(null);
 
     const { shouldRecord, toggleShouldRecord } = useShouldRecordStore();
+    const isChromium = useIsChromium();
 
     // Access mcgaBalance from the balance store
     const mcgaBalance = useBalanceStore((state) => state.mcgaBalance);
@@ -86,12 +89,21 @@ const PromptInput: React.FC<PromptInputProps> = ({
         }
     };
 
-    const cameraButtonDisabled = !hasSufficientTokens;
+    const getTooltipMessage = () => {
+        if (!hasSufficientTokens) {
+            return `You need at least ${formatToK(Price.exportVideo)} MCGA tokens to use this feature.`;
+        }
+        if (!isChromium) {
+            return "This feature is only supported in Chrome.";
+        }
+        return "Record a short format video of the answer";
+    };
+
+    const cameraButtonDisabled = !hasSufficientTokens || !isChromium;
 
     return (
         <>
             <div className="message-input-container flex items-center relative">
-                {/* Input Field */}
                 <input
                     type="text"
                     placeholder="Ask your question..."
@@ -102,7 +114,7 @@ const PromptInput: React.FC<PromptInputProps> = ({
                 />
 
                 {/* Camera Button with Tooltip */}
-                <Tooltip message="You need at least 50,000 MCGA tokens to use this feature.">
+                <Tooltip message={getTooltipMessage()}>
                     <button
                         type="button"
                         onClick={toggleShouldRecord}
