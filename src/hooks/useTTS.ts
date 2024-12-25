@@ -1,4 +1,5 @@
 // src/hooks/useTTS.ts
+
 import { useState, useRef, useCallback, useEffect } from "react";
 
 interface VoiceConfig {
@@ -31,8 +32,8 @@ interface UseTTSResult {
 }
 
 /**
- * DEBUG: Creates an array of { text, color }.
- * If the text is empty, logs a warning.
+ * Creates an array of { text, color }.
+ * If the text is empty, logs a warning and provides a fallback subtitle.
  */
 function createSubtitleSegments(
   text: string,
@@ -70,24 +71,24 @@ function createSubtitleSegments(
   return segments;
 }
 
-/** Just fill/stroke the text in the bottom center. */
+/** Draws the text with fill and stroke at the bottom center of the canvas. */
 function drawSubtitle(ctx: CanvasRenderingContext2D, segment: SubtitleSegment) {
   const { text, color } = segment;
   const fontSize = 40;
 
-  // If somehow text is undefined
-  console.log("[useTTS] drawSubtitle => text:", text, " color:", color);
+  // Log the segment being drawn
+  console.log("[useTTS] drawSubtitle => text:", text, "color:", color);
 
   ctx.save();
   ctx.font = `${fontSize}px Poppins, sans-serif`;
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
 
-  // Let's position near the bottom
+  // Position near the bottom center
   const xPos = ctx.canvas.width / 2;
   const yPos = ctx.canvas.height - 200;
 
-  // Fill
+  // Fill text
   ctx.fillStyle = color || "#FFFFFF";
   ctx.fillText(text || "MISSING TEXT", xPos, yPos);
 
@@ -113,11 +114,29 @@ export function useTTS(): UseTTSResult {
   const [subtitleSegments, setSubtitleSegments] = useState<SubtitleSegment[]>(
     []
   );
+  const subtitleSegmentsRef = useRef<SubtitleSegment[]>([]);
   const [currentSubtitleIndex, setCurrentSubtitleIndex] = useState(0);
+  const currentSubtitleIndexRef = useRef<number>(0);
 
   // Audio
   const [audioDuration, setAudioDuration] = useState(0);
+  const audioDurationRef = useRef<number>(0); // New ref for audioDuration
   const SUBTITLE_SEGMENTS_COUNT = 5;
+
+  // Sync subtitleSegments state to ref
+  useEffect(() => {
+    subtitleSegmentsRef.current = subtitleSegments;
+  }, [subtitleSegments]);
+
+  // Sync currentSubtitleIndex state to ref
+  useEffect(() => {
+    currentSubtitleIndexRef.current = currentSubtitleIndex;
+  }, [currentSubtitleIndex]);
+
+  // Sync audioDuration state to ref
+  useEffect(() => {
+    audioDurationRef.current = audioDuration;
+  }, [audioDuration]);
 
   /** Ensures audio truly starts. */
   const playAudio = (audio: HTMLAudioElement) =>
@@ -132,7 +151,7 @@ export function useTTS(): UseTTSResult {
       audio.play().catch((err) => reject(err));
     });
 
-  /** 1) Start video (canvas + audio). */
+  /** Starts video recording (canvas + audio). */
   const startVideoRecording = async () => {
     console.log("[useTTS] startVideoRecording triggered");
 
@@ -154,20 +173,22 @@ export function useTTS(): UseTTSResult {
       ) as HTMLImageElement | null;
       console.log("[useTTS] Found avatar:", avatarElement);
 
-      // If found, load
+      // If avatar is found, load it
       const avatarImg = new Image();
       if (avatarElement) {
         avatarImg.crossOrigin = "anonymous";
         avatarImg.src = avatarElement.src;
-        await new Promise<void>((resolve) => {
+        await new Promise<void>((resolve, reject) => {
           avatarImg.onload = () => resolve();
+          avatarImg.onerror = () =>
+            reject(new Error("[useTTS] Failed to load avatar image"));
         });
       }
 
       const canvasStream = canvas.captureStream(30);
       const audioStream = (audioRef.current as any)?.captureStream?.();
       if (!audioStream) {
-        console.warn("[useTTS] audioRef captureStream not found!");
+        console.warn("[useTTS] audioRef.captureStream not found!");
         return;
       }
 
@@ -224,7 +245,7 @@ export function useTTS(): UseTTSResult {
         ctx.strokeRect(0, 0, canvas.width, canvas.height);
 
         // *** 4) Avatar (if any)
-        if (avatarElement) {
+        if (avatarElement && avatarImg.complete) {
           const avatarX = (canvas.width - avatarWidth) / 2;
           const avatarY = 600;
 
@@ -256,23 +277,46 @@ export function useTTS(): UseTTSResult {
           ctx.stroke();
         }
 
-        // *** 5) Figure out which segment to draw
-        const currentTime = audioRef.current.currentTime || 0;
-        const fraction = audioDuration
-          ? Math.min(currentTime / audioDuration, 1)
-          : 0;
-        const index = Math.floor(fraction * subtitleSegments.length);
-        if (index !== currentSubtitleIndex) {
-          console.log("[useTTS] setCurrentSubtitleIndex =>", index);
-          setCurrentSubtitleIndex(index);
+        // *** 5) Determine which subtitle segment to draw
+        const audio = audioRef.current;
+        const currentTime = audio.currentTime || 0;
+        const duration = audioDurationRef.current;
+
+        // Prevent division by zero
+        const fraction = duration > 0 ? Math.min(currentTime / duration, 1) : 0;
+        const rawIndex = Math.floor(
+          fraction * subtitleSegmentsRef.current.length
+        );
+        const clampedIndex = Math.min(
+          rawIndex,
+          subtitleSegmentsRef.current.length - 1
+        );
+
+        console.log(
+          "[useTTS] animate => currentTime:",
+          currentTime,
+          "duration:",
+          duration,
+          "fraction:",
+          fraction,
+          "rawIndex:",
+          rawIndex,
+          "clampedIndex:",
+          clampedIndex
+        );
+
+        if (clampedIndex !== currentSubtitleIndexRef.current) {
+          console.log("[useTTS] setCurrentSubtitleIndex =>", clampedIndex);
+          setCurrentSubtitleIndex(clampedIndex);
         }
 
-        // *** 6) If we have a segment, draw it
-        const seg = subtitleSegments[index];
+        // *** 6) Draw the subtitle segment or fallback
+        const seg = subtitleSegmentsRef.current[clampedIndex];
         if (seg) {
+          console.log("[useTTS] Drawing segment:", seg.text);
           drawSubtitle(ctx, seg);
         } else {
-          // As a fallback, draw "No segment"
+          console.log("[useTTS] Fallback: index out of range =>", clampedIndex);
           ctx.save();
           ctx.fillStyle = "#FF0000";
           ctx.font = "40px sans-serif";
@@ -285,6 +329,7 @@ export function useTTS(): UseTTSResult {
           ctx.restore();
         }
 
+        // Continue the animation loop
         requestAnimationFrame(animate);
       };
       animate();
@@ -293,7 +338,7 @@ export function useTTS(): UseTTSResult {
     }
   };
 
-  /** 2) Stop recording */
+  /** Stops video recording */
   const stopVideoRecording = () => {
     console.log("[useTTS] stopVideoRecording called");
     if (
@@ -304,7 +349,7 @@ export function useTTS(): UseTTSResult {
     }
   };
 
-  /** 3) TTS request => fetch audio, parse segments, start. */
+  /** Sends a TTS request: fetches audio, parses segments, starts playback and recording */
   const sendTTSRequest = useCallback(
     async (text: string, voiceConfig: VoiceConfig, onStart?: () => void) => {
       if (!text.trim()) {
@@ -336,7 +381,7 @@ export function useTTS(): UseTTSResult {
         const audioBlob = await response.blob();
         const audioURL = URL.createObjectURL(audioBlob);
 
-        // Create or re-use audio
+        // Create or reuse audio element
         let audio = audioRef.current;
         if (!audio) {
           audio = document.createElement("audio");
@@ -344,10 +389,25 @@ export function useTTS(): UseTTSResult {
           document.body.appendChild(audio);
           audioRef.current = audio;
         }
+
+        // Remove any existing 'ended' listeners to prevent multiple triggers
+        audio.onended = null;
+
         audio.crossOrigin = "anonymous";
         audio.src = audioURL;
 
-        // On loaded
+        // Define the handleEnded function
+        const handleEnded = () => {
+          console.log("[useTTS] audio ended -> stop video");
+          setIsPlaying(false);
+          stopVideoRecording();
+          setCurrentSubtitleIndex(0);
+        };
+
+        // Attach the 'ended' event listener
+        audio.onended = handleEnded;
+
+        // On metadata loaded
         audio.onloadedmetadata = () => {
           console.log("[useTTS] onloadedmetadata => duration:", audio.duration);
           if (audio.duration) {
@@ -357,7 +417,7 @@ export function useTTS(): UseTTSResult {
           }
         };
 
-        // Build segments
+        // Build subtitle segments
         const segments = createSubtitleSegments(text, SUBTITLE_SEGMENTS_COUNT);
         setSubtitleSegments(segments);
         setCurrentSubtitleIndex(0);
@@ -367,7 +427,7 @@ export function useTTS(): UseTTSResult {
         onStart?.();
         setIsPlaying(true);
 
-        // Start video
+        // Start video recording
         await startVideoRecording();
       } catch (err: any) {
         console.error("[useTTS] TTS Error =>", err.message);
@@ -380,20 +440,10 @@ export function useTTS(): UseTTSResult {
     []
   );
 
-  /** 4) End recording when audio ends */
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
+  /** Ends recording when audio ends */
+  // Removed the previous useEffect that tried to attach 'ended' listener
 
-    audio.onended = () => {
-      console.log("[useTTS] audio ended -> stop video");
-      setIsPlaying(false);
-      stopVideoRecording();
-      setCurrentSubtitleIndex(0);
-    };
-  }, [audioRef.current]);
-
-  /** 5) Clear the final .webm */
+  /** Clears the existing video Blob */
   const clearVideoBlob = () => {
     console.log("[useTTS] clearVideoBlob called");
     setVideoBlob(null);
