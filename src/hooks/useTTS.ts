@@ -10,6 +10,7 @@ interface VoiceConfig {
 interface SubtitleSegment {
   text: string;
   color: string;
+  font: string; // Added font property
 }
 
 interface UseTTSResult {
@@ -32,7 +33,7 @@ interface UseTTSResult {
 }
 
 /**
- * Creates an array of { text, color }.
+ * Creates an array of { text, color, font }.
  * If the text is empty, logs a warning and provides a fallback subtitle.
  */
 function createSubtitleSegments(
@@ -46,10 +47,14 @@ function createSubtitleSegments(
     console.warn(
       "[useTTS] No words found in TTS text. Using fallback subtitle."
     );
-    return [{ text: "No TTS text found!", color: "#FF0000" }];
+    return [
+      { text: "No TTS text found!", color: "#FF0000", font: "40px Arial" },
+    ];
   }
 
   const segmentSize = Math.ceil(words.length / segmentsCount);
+
+  // Expanded color options for more variety
   const colorOptions = [
     "#FF5733",
     "#FFC300",
@@ -57,6 +62,24 @@ function createSubtitleSegments(
     "#FF00FF",
     "#00FFFF",
     "#A020F0",
+    "#FF1493",
+    "#32CD32",
+    "#FFD700",
+    "#1E90FF",
+  ];
+
+  // List of font styles to choose from
+  const fontOptions = [
+    "40px Poppins, sans-serif",
+    "40px Arial, sans-serif",
+    "40px 'Times New Roman', serif",
+    "40px 'Courier New', monospace",
+    "40px 'Georgia', serif",
+    "40px 'Verdana', sans-serif",
+    "40px 'Tahoma', sans-serif",
+    "40px 'Trebuchet MS', sans-serif",
+    "40px 'Lucida Console', monospace",
+    "40px 'Impact', sans-serif",
   ];
 
   const segments: SubtitleSegment[] = [];
@@ -64,23 +87,37 @@ function createSubtitleSegments(
     const chunk = words.slice(i, i + segmentSize).join(" ");
     const randColor =
       colorOptions[Math.floor(Math.random() * colorOptions.length)];
-    segments.push({ text: chunk, color: randColor });
+    const randFont =
+      fontOptions[Math.floor(Math.random() * fontOptions.length)];
+    const segment: SubtitleSegment = {
+      text: chunk,
+      color: randColor,
+      font: randFont,
+    };
+    segments.push(segment);
+    console.log("[useTTS] Created segment:", segment);
   }
 
-  console.log("[useTTS] Created segments =>", segments);
+  console.log("[useTTS] All created segments =>", segments);
   return segments;
 }
 
 /** Draws the text with fill and stroke at the bottom center of the canvas. */
 function drawSubtitle(ctx: CanvasRenderingContext2D, segment: SubtitleSegment) {
-  const { text, color } = segment;
-  const fontSize = 40;
+  const { text, color, font } = segment;
 
   // Log the segment being drawn
-  console.log("[useTTS] drawSubtitle => text:", text, "color:", color);
+  console.log(
+    "[useTTS] drawSubtitle => text:",
+    text,
+    "color:",
+    color,
+    "font:",
+    font
+  );
 
   ctx.save();
-  ctx.font = `${fontSize}px Poppins, sans-serif`;
+  ctx.font = font; // Use the font from the segment
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
 
@@ -88,13 +125,20 @@ function drawSubtitle(ctx: CanvasRenderingContext2D, segment: SubtitleSegment) {
   const xPos = ctx.canvas.width / 2;
   const yPos = ctx.canvas.height - 200;
 
+  // Validate color
+  if (!color || typeof color !== "string") {
+    console.warn("[useTTS] Invalid color detected. Defaulting to white.");
+    ctx.fillStyle = "#FFFFFF";
+  } else {
+    ctx.fillStyle = color;
+  }
+
   // Fill text
-  ctx.fillStyle = color || "#FFFFFF";
   ctx.fillText(text || "MISSING TEXT", xPos, yPos);
 
   // Stroke outline
   ctx.lineWidth = 4;
-  ctx.strokeStyle = "#000000";
+  ctx.strokeStyle = "#000000"; // Keep stroke as black for visibility
   ctx.strokeText(text || "MISSING TEXT", xPos, yPos);
 
   ctx.restore();
@@ -126,6 +170,10 @@ export function useTTS(): UseTTSResult {
   // Sync subtitleSegments state to ref
   useEffect(() => {
     subtitleSegmentsRef.current = subtitleSegments;
+    console.log(
+      "[useTTS] subtitleSegmentsRef updated:",
+      subtitleSegmentsRef.current
+    );
   }, [subtitleSegments]);
 
   // Sync currentSubtitleIndex state to ref
@@ -235,10 +283,6 @@ export function useTTS(): UseTTSResult {
         ctx.fillStyle = gradient;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // *** 2) Now draw a red square on top
-        ctx.fillStyle = "red";
-        ctx.fillRect(50, 50, 100, 100);
-
         // *** 3) White border
         ctx.strokeStyle = "#ffffff";
         ctx.lineWidth = 10;
@@ -313,7 +357,7 @@ export function useTTS(): UseTTSResult {
         // *** 6) Draw the subtitle segment or fallback
         const seg = subtitleSegmentsRef.current[clampedIndex];
         if (seg) {
-          console.log("[useTTS] Drawing segment:", seg.text);
+          console.log("[useTTS] Drawing segment:", seg);
           drawSubtitle(ctx, seg);
         } else {
           console.log("[useTTS] Fallback: index out of range =>", clampedIndex);
@@ -439,9 +483,6 @@ export function useTTS(): UseTTSResult {
     },
     []
   );
-
-  /** Ends recording when audio ends */
-  // Removed the previous useEffect that tried to attach 'ended' listener
 
   /** Clears the existing video Blob */
   const clearVideoBlob = () => {
