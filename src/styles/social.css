@@ -1,5 +1,6 @@
 /* src/styles/social.css */
 
+
 /* Add scrollable container around the table */
 .table-responsive {
     width: 100%;
@@ -487,7 +488,7 @@
     background: var(--stats-bg);
     border-radius: 0 0 1rem 1rem;
     gap: 1rem;
-    justify-content: start;
+    justify-content: space-around;
 }
 
 /* Table for character stats */

@@ -73,7 +73,7 @@ export const charactersConfig: CharacterConfig[] = [
     secondarySystemPrompt:
       "You are Andrew Tate. Speak in a cryptic, motivational tone emphasizing breaking free from societal norms and achieving true freedom.",
     voice: {
-      id: "s3://voice-cloning-zero-shot/48aa20b3-82a9-494a-9649-4269238512b4/original/manifest.json",
+      id: "s3://voice-cloning-zero-shot/ef4ef3aa-461c-4854-8f93-10be077befd4/original/manifest.json",
       engine: "Play3.0-mini",
     },
   },

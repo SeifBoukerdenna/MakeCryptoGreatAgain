@@ -1,0 +1,161 @@
+export const thinkingMessages: { [key: string]: string[] } = {
+    "Donald Trump": [
+      "Making America great again...",
+      "Building a wall... figuratively ofc ...",
+      "Tremendous ideas coming...",
+      "Believe me, I'm thinking...",
+      "Huge thoughts happening...",
+      "Big decisions ahead...",
+      "I’m a winner, and I always win...",
+      "Nobody thinks better than me, trust me...",
+      "Creating a better economy, it's a no-brainer...",
+      "The media won't like this, but it'll be huge..."
+
+    ],
+    
+    "Elon Musk": [
+      "Innovating the future...",
+      "Sending rockets to space...",
+      "Trying to colonize Mars...",
+      "Thinking about the next big thing...",
+      "AI and Mars are on my mind...",
+      "Neuralink connections... ",
+      "Revolutionizing transportation...",
+      "Tesla is just getting started...",
+      "Building the future of sustainable energy...",
+      "Thinking about interplanetary transportation...",
+      "I hope you're not dumber than AI...",
+      "Thinking about the next Tesla model...",
+      "Disrupting industries, one idea at a time...",
+      "making the internet free for everyone...",
+    ],
+  
+    "Andrew Tate": [
+      "Top G is thinking...",
+      "Escaping the Matrix...",
+      "Motivation loading...",
+      "Life is game of chess, that I always win...",
+      "Preparing for greatness...",
+      "Rise above the beta-males...",
+      "The world is mine for the taking...",
+      "Stay strong, stay focused...",
+      "Building my empire, brick by brick...",
+      "A real G never gives up...",
+      "Hustler's University is in session...",
+      "I don’t make excuses, I make results...",
+      "You're poor, I'm rich...",
+      "Planning my next big move..."
+    ],
+  
+    "Kanye West": [
+      "Creating genius ideas...",
+      "Being the greatest ever...",
+      "Thinking about the next album...",
+      "Revolutionizing the game...",
+      "Changing the world...",
+      "The culture needs me...",
+      "Ideas coming in waves...",
+      "Turning my vision into reality...",
+      "I’m already on a different level...",
+      "Changing fashion forever...",
+      "I think in terms of revolutions...",
+      "Thinking in five dimensions...",
+      "Next chapter: greatness..."
+    ],
+  
+    "Ben Shapiro": [
+      "Facts are processing...",
+      "Processing logic...",
+      "Getting the facts right...",
+      "Let me explain, logically...",
+      "Fact-checking... Done!",
+      "The left is wrong... again...",
+      "This is a simple matter of facts...",
+      "Logic is the only way forward...",
+      "Every argument has to have its basis in truth...",
+      "Let me counter that with facts...",
+      "Data doesn't lie...",
+      "You can't argue with the truth...",
+      "Let's stick to the facts, people..."
+    ],
+  
+    "Adolf Hitler": [
+      "History is being written...",
+      "Rewriting the past...",
+      "Strategizing... Always strategic...",
+      "Analyzing history...",
+      "Thinking about the Reich...",
+      "Building a new world order...",
+      "I need to secure the future of the nation...",
+      "Victory is within reach...",
+      "Outsmarting the enemy...",
+      "The world will bow before us...",
+      "My vision must be realized...",
+      "We are destined for greatness...",
+      "The time for action is now...",
+      "The ultimate plan is in motion..."
+    ],
+  
+    "Connor Mcgregor": [
+      "Preparing for a knockout...",
+      "Training for the big fight...",
+      "Adversity builds strength...",
+      "Ready to take on the world...",
+      "thinking about beating up Khabib...",
+      "I always rise above...",
+      "The champ is back...",
+      "Time to prove them all wrong...",
+      "Staying focused, staying hungry...",
+      "There’s no fight I can't win...",
+      "The world is watching, time to deliver...",
+      "Conquering the ring..."
+    ],
+  
+    "Logan Paul": [
+      "Investing in thoughts...",
+      "Thinking about social media...",
+      "How to become more famous...",
+      "Scamming my audience...",
+      "The next big thing...",
+      "Content is king...",
+      "Going big or going home...",
+      "How to make more money...",
+      "I’ve got ideas brewing...",
+      "Making the best content possible...",
+      "The internet never sleeps...",
+    ],
+  
+    "Alex Jones": [
+      "Conspiracy theories unfolding...",
+      "The government is watching...",
+      "What’s the truth behind this...",
+      "Think about the deep state...",
+      "The media is lying to you...",
+      "They don't want you to know this...",
+      "This is all part of the plan...",
+      "Follow the money...",
+      "We’ve been lied to for years...",
+      "The globalists are behind it all...",
+      "They don't want the truth to come out...",
+      "It’s time to wake up, people...",
+      "The New World Order is real...",
+      "I’m just telling you what they don’t want you to hear..."
+    ],
+  
+    "Satoshi Nakamoto": [
+      "Bitcoin thoughts forming...",
+      "Thinking about decentralization...",
+      "Creating the future of money...",
+      "Building the blockchain...",
+      "The world needs a new currency...",
+      "The future is decentralized...",
+      "Pushing the boundaries of currency...",
+      "This is just the beginning...",
+      "It’s not about the money, it’s about the idea...",
+      "Changing the world, one block at a time...",
+      "The network is growing, it’s unstoppable...",
+      "We’re on the brink of something huge...",
+      "Changing the way we think about money...",
+    ]
+  };
+  

@@ -1,5 +1,3 @@
-// src/pages/Home.tsx
-
 import React, { useEffect } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -16,6 +14,8 @@ import { useMessages } from '../hooks/useMessages';
 import { useCharacterSelection } from '../hooks/useCharacterSelection';
 import { TEST_MODE, FREE_CHARACTER_ID } from '../configs/test.config';
 import { charactersConfig } from '../configs/characters.config';
+import { thinkingMessages } from '../configs/thinkingMessages.ts';
+import useConversationStore from '../stores/useConversationStore';
 
 const Home: React.FC = () => {
   const { connected } = useWallet();
@@ -38,6 +38,12 @@ const Home: React.FC = () => {
     getSelectedCharacter,
     characters
   } = useCharacterSelection();
+
+  const setMessages = useConversationStore((state) => state.setMessages);
+
+  const handleClearChat = () => {
+    setMessages([]);
+  };
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -92,20 +98,25 @@ const Home: React.FC = () => {
           </div>
         )}
 
-        <div className="messages flex-1 overflow-y-auto mb-4">
-          {messages.map((m, i) => (
-            <div
-              key={i}
-              className={`message ${m.sender} ${m.status} ${m.sender === 'user' ? 'user' : 'character'
-                }`}
-            >
-              {m.sender === 'user'
-                ? m.text
-                : m.status === 'loading'
-                  ? 'Thinking...'
-                  : m.text}
-            </div>
-          ))}
+        <div className="messages flex-1 overflow-y-auto mb-4 p-2 text-sm max-w-[75%] rounded-lg bg-gray-200">
+          {messages.map((m, i) => {
+            let messageText = m.text;
+            if (m.sender !== 'user' && m.status === 'loading') {
+              const characterThinkingMessages = thinkingMessages[selectedCharacter] || [];
+              messageText = characterThinkingMessages[Math.floor(Math.random() * characterThinkingMessages.length)] || 'Thinking...';
+            }
+            
+            const messageClass =
+              m.sender === 'user'
+                ? 'user-message p-2 text-sm max-w-[75%] rounded-lg bg-blue-200 mb-2'
+                : 'character-message p-2 text-sm max-w-[75%] rounded-lg bg-green-200 mb-2';
+
+            return (
+              <div key={i} className={messageClass}>
+                {m.sender === 'user' ? m.text : messageText}
+              </div>
+            );
+          })}
           <div ref={messagesEndRef} />
         </div>
 
@@ -163,7 +174,14 @@ const Home: React.FC = () => {
         </section>
 
         {/* Chat Area */}
-        <section className="chat-area p-6 rounded-lg shadow-lg flex flex-col h-96 pt-6 mt-4 mb-4">
+        <section className="chat-area p-6 rounded-lg shadow-lg flex flex-col h-96 pt-6 mt-4 mb-4 relative">
+          {/* Clear Chat Button */}
+          <button
+            onClick={handleClearChat}
+            className="clear-chat-button"
+          >
+            Clear Chat
+          </button>
           {renderChatArea()}
         </section>
       </div>
