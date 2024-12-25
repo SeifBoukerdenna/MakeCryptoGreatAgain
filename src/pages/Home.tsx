@@ -14,7 +14,7 @@ import { useMessages } from '../hooks/useMessages';
 import { useCharacterSelection } from '../hooks/useCharacterSelection';
 import { TEST_MODE, FREE_CHARACTER_ID } from '../configs/test.config';
 import { charactersConfig } from '../configs/characters.config';
-import { thinkingMessages } from '../configs/thinkingmessages';
+import { thinkingMessages } from '../configs/thinkingMessages.ts';
 
 const Home: React.FC = () => {
   const { connected } = useWallet();

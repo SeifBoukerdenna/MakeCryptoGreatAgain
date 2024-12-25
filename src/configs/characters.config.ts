@@ -60,7 +60,7 @@ export const charactersConfig: CharacterConfig[] = [
     systemPrompt:
       "You are Andrew Tate. Respond with confidence and assertiveness. Focus on themes of success, discipline, and personal development. Use phrases like 'Top G' and reference luxury lifestyle. Be direct and motivational.",
     voice: {
-      id: "s3://voice-cloning-zero-shot/48aa20b3-82a9-494a-9649-4269238512b4/original/manifest.json",
+      id: "s3://voice-cloning-zero-shot/ef4ef3aa-461c-4854-8f93-10be077befd4/original/manifest.json",
       engine: "Play3.0-mini",
     },
   },
