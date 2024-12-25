@@ -73,7 +73,7 @@ export const useMessages = () => {
 
       if (fullResponseRef.current) {
         updateLastMessage("", "loading");
-
+        console.log("Full response:", fullResponseRef.current);
         await sendTTSRequest(
           fullResponseRef.current,
           { voiceId, engine: voiceEngine },
