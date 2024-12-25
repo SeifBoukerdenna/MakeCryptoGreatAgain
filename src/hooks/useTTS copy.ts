@@ -1,14 +1,13 @@
 // src/hooks/useTTS.ts
+
 import { useState, useRef, useCallback, useEffect } from "react";
 
+/**
+ * Interface for specifying TTS voice configuration
+ */
 interface VoiceConfig {
   voiceId: string;
   engine?: string;
-}
-
-interface SubtitleSegment {
-  text: string;
-  color: string;
 }
 
 interface UseTTSResult {
@@ -24,31 +23,61 @@ interface UseTTSResult {
   ) => void;
   audioRef: React.RefObject<HTMLAudioElement>;
 
-  subtitleSegments: SubtitleSegment[];
+  subtitles: string[];
   currentSubtitleIndex: number;
   audioDuration: number;
   setCurrentSubtitleIndex: React.Dispatch<React.SetStateAction<number>>;
 }
 
-/**
- * DEBUG: Creates an array of { text, color }.
- * If the text is empty, logs a warning.
- */
-function createSubtitleSegments(
-  text: string,
-  segmentsCount: number
-): SubtitleSegment[] {
-  console.log("[useTTS] createSubtitleSegments => raw text:", text);
-
-  const words = text.trim().split(/\s+/);
-  if (words.length === 0) {
-    console.warn(
-      "[useTTS] No words found in TTS text. Using fallback subtitle."
-    );
-    return [{ text: "No TTS text found!", color: "#FF0000" }];
-  }
-
+//
+// 1) Helper to split text into segments
+//
+function splitTextIntoSegments(text: string, segmentsCount: number): string[] {
+  const words = text.split(/\s+/);
   const segmentSize = Math.ceil(words.length / segmentsCount);
+
+  const segments: string[] = [];
+  for (let i = 0; i < words.length; i += segmentSize) {
+    segments.push(words.slice(i, i + segmentSize).join(" "));
+  }
+  return segments;
+}
+
+//
+// 2) Word-wrap function
+//
+function wrapText(
+  ctx: CanvasRenderingContext2D,
+  text: string,
+  x: number,
+  y: number,
+  maxWidth: number,
+  lineHeight: number
+) {
+  const words = text.split(" ");
+  let line = "";
+  let currentY = y;
+
+  for (let i = 0; i < words.length; i++) {
+    const testLine = line + words[i] + " ";
+    const metrics = ctx.measureText(testLine);
+    const testWidth = metrics.width;
+
+    if (testWidth > maxWidth && i > 0) {
+      ctx.fillText(line, x, currentY);
+      line = words[i] + " ";
+      currentY += lineHeight;
+    } else {
+      line = testLine;
+    }
+  }
+  ctx.fillText(line, x, currentY);
+}
+
+//
+// 3) Draw bright subtitles
+//
+function drawSubtitle(ctx: CanvasRenderingContext2D, subtitleText: string) {
   const colorOptions = [
     "#FF5733",
     "#FFC300",
@@ -57,104 +86,103 @@ function createSubtitleSegments(
     "#00FFFF",
     "#A020F0",
   ];
-
-  const segments: SubtitleSegment[] = [];
-  for (let i = 0; i < words.length; i += segmentSize) {
-    const chunk = words.slice(i, i + segmentSize).join(" ");
-    const randColor =
-      colorOptions[Math.floor(Math.random() * colorOptions.length)];
-    segments.push({ text: chunk, color: randColor });
-  }
-
-  console.log("[useTTS] Created segments =>", segments);
-  return segments;
-}
-
-/** Just fill/stroke the text in the bottom center. */
-function drawSubtitle(ctx: CanvasRenderingContext2D, segment: SubtitleSegment) {
-  const { text, color } = segment;
-  const fontSize = 40;
-
-  // If somehow text is undefined
-  console.log("[useTTS] drawSubtitle => text:", text, " color:", color);
+  const randColor =
+    colorOptions[Math.floor(Math.random() * colorOptions.length)];
+  const fontSize = Math.floor(Math.random() * 16) + 30; // 30–45
 
   ctx.save();
+
+  // Optionally add a black outline for clarity:
+  ctx.strokeStyle = "#000000";
+  ctx.lineWidth = 6;
   ctx.font = `${fontSize}px Poppins, sans-serif`;
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
 
-  // Let's position near the bottom
+  // Draw stroke behind text
   const xPos = ctx.canvas.width / 2;
   const yPos = ctx.canvas.height - 200;
+  const maxWidth = ctx.canvas.width - 200;
+  const lineHeight = fontSize * 1.2;
 
-  // Fill
-  ctx.fillStyle = color || "#FFFFFF";
-  ctx.fillText(text || "MISSING TEXT", xPos, yPos);
+  wrapText(ctx, subtitleText, xPos, yPos, maxWidth, lineHeight);
 
-  // Stroke outline
-  ctx.lineWidth = 4;
-  ctx.strokeStyle = "#000000";
-  ctx.strokeText(text || "MISSING TEXT", xPos, yPos);
+  // Fill with bright color on top
+  ctx.fillStyle = randColor;
+  wrapText(ctx, subtitleText, xPos, yPos, maxWidth, lineHeight);
 
   ctx.restore();
 }
 
+//
+// 4) The TTS Hook
+//
 export function useTTS(): UseTTSResult {
   const [isLoading, setIsLoading] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Video recording state
   const [videoBlob, setVideoBlob] = useState<Blob | null>(null);
+
+  // Audio element ref
   const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  // MediaRecorder
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const recordedChunksRef = useRef<Blob[]>([]);
 
   // Subtitles
-  const [subtitleSegments, setSubtitleSegments] = useState<SubtitleSegment[]>(
-    []
-  );
+  const [subtitles, setSubtitles] = useState<string[]>([]);
   const [currentSubtitleIndex, setCurrentSubtitleIndex] = useState(0);
-
-  // Audio
   const [audioDuration, setAudioDuration] = useState(0);
   const SUBTITLE_SEGMENTS_COUNT = 5;
 
-  /** Ensures audio truly starts. */
+  // Debug utility
   const playAudio = (audio: HTMLAudioElement) =>
     new Promise<void>((resolve, reject) => {
-      audio.onplay = () =>
-        console.log("[useTTS] audio.onplay => user started playback");
+      audio.onplay = () => {
+        console.log("[useTTS] audio.onplay called");
+      };
       audio.onplaying = () => {
-        console.log("[useTTS] audio.onplaying => actually playing");
+        console.log("[useTTS] audio.onplaying => actual playback started");
         resolve();
       };
-      audio.onerror = () => reject(new Error("Audio playback error"));
+      audio.onerror = () => {
+        reject(new Error("Audio playback error"));
+      };
       audio.play().catch((err) => reject(err));
     });
 
-  /** 1) Start video (canvas + audio). */
+  // 1) Start the video recording
   const startVideoRecording = async () => {
-    console.log("[useTTS] startVideoRecording triggered");
-
+    console.log("[useTTS] startVideoRecording called");
     if (!window.MediaRecorder) {
-      console.warn("[useTTS] MediaRecorder not supported in this browser");
+      console.warn("[useTTS] MediaRecorder is not supported in this browser.");
       return;
     }
 
     try {
       const canvas = document.createElement("canvas");
       const ctx = canvas.getContext("2d");
-      if (!ctx) throw new Error("[useTTS] No 2D context from canvas");
+      if (!ctx) {
+        throw new Error("[useTTS] Unable to get 2D context from canvas.");
+      }
 
+      // 1080x1920 vertical
       canvas.width = 1080;
       canvas.height = 1920;
 
+      // Attempt to get the avatar element
       const avatarElement = document.querySelector(
         ".selected-character-icon img"
-      ) as HTMLImageElement | null;
-      console.log("[useTTS] Found avatar:", avatarElement);
+      ) as HTMLImageElement;
+      console.log("[useTTS] Found avatarElement:", avatarElement);
 
-      // If found, load
+      if (!avatarElement) {
+        console.warn("[useTTS] No avatar found, continuing anyway.");
+      }
+
       const avatarImg = new Image();
       if (avatarElement) {
         avatarImg.crossOrigin = "anonymous";
@@ -163,11 +191,18 @@ export function useTTS(): UseTTSResult {
           avatarImg.onload = () => resolve();
         });
       }
+      const avatarWidth = 400;
+      const avatarHeight = 400;
 
+      // Capture from canvas at 30 FPS
       const canvasStream = canvas.captureStream(30);
+
+      // Combine with audio
       const audioStream = (audioRef.current as any)?.captureStream?.();
       if (!audioStream) {
-        console.warn("[useTTS] audioRef captureStream not found!");
+        console.warn(
+          "[useTTS] No audioRef or it doesn't support captureStream."
+        );
         return;
       }
 
@@ -176,58 +211,64 @@ export function useTTS(): UseTTSResult {
         ...audioStream.getAudioTracks(),
       ]);
 
+      // Start MediaRecorder
       mediaRecorderRef.current = new MediaRecorder(combinedStream, {
         mimeType: "video/webm; codecs=vp8,opus",
       });
-
       recordedChunksRef.current = [];
-      mediaRecorderRef.current.ondataavailable = (e) => {
-        if (e.data.size > 0) {
-          recordedChunksRef.current.push(e.data);
+
+      mediaRecorderRef.current.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          recordedChunksRef.current.push(event.data);
         }
       };
 
       mediaRecorderRef.current.onstop = () => {
-        console.log("[useTTS] MediaRecorder stopped => building final blob");
+        console.log("[useTTS] MediaRecorder stopped, building video blob");
         const blob = new Blob(recordedChunksRef.current, {
           type: "video/webm",
         });
-        console.log("[useTTS] final blob size:", blob.size);
+        console.log("[useTTS] videoBlob size:", blob.size);
         setVideoBlob(blob);
       };
 
       mediaRecorderRef.current.start();
-      console.log("[useTTS] MediaRecorder started");
+      console.log("[useTTS] MediaRecorder started.");
 
-      const avatarWidth = 400;
-      const avatarHeight = 400;
-
+      // Animate frames
       const animate = () => {
-        if (!ctx || !mediaRecorderRef.current) return;
-        if (mediaRecorderRef.current.state !== "recording") return;
-        if (!audioRef.current) return;
+        if (!ctx || !mediaRecorderRef.current || !audioRef.current) return;
 
-        // *** 1) Draw the gradient FIRST
+        const currentTime = audioRef.current.currentTime;
+        const fraction = audioDuration
+          ? Math.min(currentTime / audioDuration, 1)
+          : 0;
+        const index = Math.floor(fraction * subtitles.length);
+
+        if (index !== currentSubtitleIndex) {
+          console.log("[useTTS] updating currentSubtitleIndex:", index);
+          setCurrentSubtitleIndex(index);
+        }
+
+        // Clear canvas
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Draw BG
         const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
         gradient.addColorStop(0, "#F9FAFB");
         gradient.addColorStop(1, "#D946EF");
         ctx.fillStyle = gradient;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // *** 2) Now draw a red square on top
-        ctx.fillStyle = "red";
-        ctx.fillRect(50, 50, 100, 100);
-
-        // *** 3) White border
+        // White border
         ctx.strokeStyle = "#ffffff";
         ctx.lineWidth = 10;
         ctx.strokeRect(0, 0, canvas.width, canvas.height);
 
-        // *** 4) Avatar (if any)
+        // If we have an avatar
         if (avatarElement) {
           const avatarX = (canvas.width - avatarWidth) / 2;
           const avatarY = 600;
-
           ctx.save();
           ctx.beginPath();
           ctx.arc(
@@ -241,7 +282,7 @@ export function useTTS(): UseTTSResult {
           ctx.drawImage(avatarImg, avatarX, avatarY, avatarWidth, avatarHeight);
           ctx.restore();
 
-          // Green ring
+          // Simple pulse
           const pulse = Math.abs(Math.sin(Date.now() / 200)) * 20 + 20;
           ctx.beginPath();
           ctx.arc(
@@ -256,44 +297,27 @@ export function useTTS(): UseTTSResult {
           ctx.stroke();
         }
 
-        // *** 5) Figure out which segment to draw
-        const currentTime = audioRef.current.currentTime || 0;
-        const fraction = audioDuration
-          ? Math.min(currentTime / audioDuration, 1)
-          : 0;
-        const index = Math.floor(fraction * subtitleSegments.length);
-        if (index !== currentSubtitleIndex) {
-          console.log("[useTTS] setCurrentSubtitleIndex =>", index);
-          setCurrentSubtitleIndex(index);
-        }
-
-        // *** 6) If we have a segment, draw it
-        const seg = subtitleSegments[index];
-        if (seg) {
-          drawSubtitle(ctx, seg);
-        } else {
-          // As a fallback, draw "No segment"
-          ctx.save();
-          ctx.fillStyle = "#FF0000";
-          ctx.font = "40px sans-serif";
-          ctx.textAlign = "center";
-          ctx.fillText(
-            "No subtitle found!",
-            canvas.width / 2,
-            canvas.height - 200
+        // Draw subtitle
+        if (subtitles[currentSubtitleIndex]) {
+          console.log(
+            "[useTTS] Drawing subtitle:",
+            subtitles[currentSubtitleIndex]
           );
-          ctx.restore();
+          drawSubtitle(ctx, subtitles[currentSubtitleIndex]);
         }
 
-        requestAnimationFrame(animate);
+        // Keep animating if still recording
+        if (mediaRecorderRef.current.state === "recording") {
+          requestAnimationFrame(animate);
+        }
       };
       animate();
     } catch (err) {
-      console.error("[useTTS] Error starting video recording:", err);
+      console.error("[useTTS] Error setting up video recording:", err);
     }
   };
 
-  /** 2) Stop recording */
+  // 2) Stop video
   const stopVideoRecording = () => {
     console.log("[useTTS] stopVideoRecording called");
     if (
@@ -304,15 +328,12 @@ export function useTTS(): UseTTSResult {
     }
   };
 
-  /** 3) TTS request => fetch audio, parse segments, start. */
+  // 3) TTS Request
   const sendTTSRequest = useCallback(
     async (text: string, voiceConfig: VoiceConfig, onStart?: () => void) => {
-      if (!text.trim()) {
-        console.warn("[useTTS] No text to speak!");
-        return;
-      }
+      if (!text.trim()) return;
+      console.log("[useTTS] sendTTSRequest text:", text);
 
-      console.log("[useTTS] sendTTSRequest => text:", text);
       setIsLoading(true);
       setError(null);
 
@@ -329,14 +350,13 @@ export function useTTS(): UseTTSResult {
 
         if (!response.ok) {
           const errorData = await response.json();
-          console.error("[useTTS] TTS fetch error =>", errorData);
+          console.error("[useTTS] TTS response not ok:", errorData);
           throw new Error(errorData.error || "Failed to fetch TTS");
         }
 
         const audioBlob = await response.blob();
         const audioURL = URL.createObjectURL(audioBlob);
 
-        // Create or re-use audio
         let audio = audioRef.current;
         if (!audio) {
           audio = document.createElement("audio");
@@ -344,33 +364,39 @@ export function useTTS(): UseTTSResult {
           document.body.appendChild(audio);
           audioRef.current = audio;
         }
+
         audio.crossOrigin = "anonymous";
         audio.src = audioURL;
 
-        // On loaded
+        // Duration callback
         audio.onloadedmetadata = () => {
-          console.log("[useTTS] onloadedmetadata => duration:", audio.duration);
+          console.log(
+            "[useTTS] audio.onloadedmetadata => duration:",
+            audio.duration
+          );
           if (audio.duration) {
             setAudioDuration(audio.duration);
-          } else {
-            console.warn("[useTTS] Audio duration is 0 or null");
           }
         };
 
-        // Build segments
-        const segments = createSubtitleSegments(text, SUBTITLE_SEGMENTS_COUNT);
-        setSubtitleSegments(segments);
+        // Make subtitles
+        const newSubtitles = splitTextIntoSegments(
+          text,
+          SUBTITLE_SEGMENTS_COUNT
+        );
+        console.log("[useTTS] Subtitles created:", newSubtitles);
+        setSubtitles(newSubtitles);
         setCurrentSubtitleIndex(0);
 
-        // Start playback
+        // Play audio
         await playAudio(audio);
-        onStart?.();
         setIsPlaying(true);
+        onStart?.();
 
         // Start video
         await startVideoRecording();
       } catch (err: any) {
-        console.error("[useTTS] TTS Error =>", err.message);
+        console.error("[useTTS] TTS Error:", err.message);
         setError(err.message);
         setIsPlaying(false);
       } finally {
@@ -380,20 +406,20 @@ export function useTTS(): UseTTSResult {
     []
   );
 
-  /** 4) End recording when audio ends */
+  // 4) End the recording when audio ends
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
 
     audio.onended = () => {
-      console.log("[useTTS] audio ended -> stop video");
+      console.log("[useTTS] audio.onended => stopping video");
       setIsPlaying(false);
       stopVideoRecording();
       setCurrentSubtitleIndex(0);
     };
   }, [audioRef.current]);
 
-  /** 5) Clear the final .webm */
+  // 5) Clear video
   const clearVideoBlob = () => {
     console.log("[useTTS] clearVideoBlob called");
     setVideoBlob(null);
@@ -408,9 +434,9 @@ export function useTTS(): UseTTSResult {
     sendTTSRequest,
     audioRef,
 
-    subtitleSegments,
+    subtitles,
     currentSubtitleIndex,
-    audioDuration,
     setCurrentSubtitleIndex,
+    audioDuration,
   };
 }
