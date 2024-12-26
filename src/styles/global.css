@@ -517,16 +517,16 @@ html {
 }
 
 .user-message {
-    text-align: right; 
+    text-align: right;
     background-color: var(--message-user-bg);
     color: var(--message-user-text);
     width: fit-content;
     border-radius: 5px;
-    margin-left: auto;  
-    margin-bottom: 0.5rem; 
-  }
-  
-  .character-message {
+    margin-left: auto;
+    margin-bottom: 0.5rem;
+}
+
+.character-message {
     background-color: var(--message-character-bg);
     color: var(--message-character-text);
     width: fit-content;
@@ -534,36 +534,53 @@ html {
     border-radius: 5px;
     margin-right: auto;
     margin-bottom: 0.5rem;
-  }
-  
-  .chat-area {
+}
+
+.chat-area {
     position: relative;
-  }
-  
-  .clear-chat-button {
+}
+
+.clear-chat-button {
     position: absolute;
-    top: 1rem; 
+    top: 1rem;
     right: 1rem;
     font-size: 1rem;
-    background: var(--button-bg);
-    color: #FFFFFF;
+    background: transparent;
+    color: #6366F1;
+    /* Base color matching the gradient */
     z-index: 100;
     padding: 0.75rem 1.5rem;
-    border: none;
     font-weight: 700;
     cursor: pointer;
     border-radius: 30px;
-    transition: background 0.3s ease, opacity 0.3s ease;
-  }
-  
-  .clear-chat-button:hover {
-    background: var(--button-hover-bg);
-    opacity: 0.9;
-  }
-  
-  
+    border: 2px solid #6366F1;
+    transition: all 0.3s ease;
+}
 
-  
+.clear-chat-button:hover {
+    background: rgba(99, 102, 241, 0.1);
+    /* Light purple background on hover */
+    border-color: #4F46E5;
+    /* Slightly darker border on hover */
+    color: #4F46E5;
+    transform: translateY(-1px);
+}
+
+/* Dark mode adjustments */
+.dark .clear-chat-button {
+    color: #8B5CF6;
+    border-color: #8B5CF6;
+}
+
+.dark .clear-chat-button:hover {
+    background: rgba(139, 92, 246, 0.1);
+    border-color: #7C3AED;
+    color: #7C3AED;
+}
+
+
+
+
 
 /* Updated focus shadow with new purple */
 .message-input:focus {

@@ -21,7 +21,6 @@ const Home: React.FC = () => {
   const { connected } = useWallet();
   const {
     messages,
-    loadingResponse,
     isPlaying,
     ttsError,
     messagesEndRef,
@@ -105,7 +104,7 @@ const Home: React.FC = () => {
               const characterThinkingMessages = thinkingMessages[selectedCharacter] || [];
               messageText = characterThinkingMessages[Math.floor(Math.random() * characterThinkingMessages.length)] || 'Thinking...';
             }
-            
+
             const messageClass =
               m.sender === 'user'
                 ? 'user-message p-2 text-sm max-w-[75%] rounded-lg bg-blue-200 mb-2'
@@ -126,7 +125,6 @@ const Home: React.FC = () => {
           clearVideoBlob={clearVideoBlob}
         />
         {ttsError && <p className="text-red-500 mt-2">{ttsError}</p>}
-        {loadingResponse && <p className="text-gray-400 mt-2">Loading response...</p>}
       </>
     );
   };

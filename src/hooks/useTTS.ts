@@ -44,9 +44,9 @@ function createSubtitleSegments(
 
   const words = text.trim().split(/\s+/);
   if (words.length === 0) {
-    console.warn(
-      "[useTTS] No words found in TTS text. Using fallback subtitle."
-    );
+    // console.warn(
+    //   "[useTTS] No words found in TTS text. Using fallback subtitle."
+    // );
     return [
       { text: "No TTS text found!", color: "#FF0000", font: "40px Arial" },
     ];
@@ -95,10 +95,10 @@ function createSubtitleSegments(
       font: randFont,
     };
     segments.push(segment);
-    console.log("[useTTS] Created segment:", segment);
+    // console.log("[useTTS] Created segment:", segment);
   }
 
-  console.log("[useTTS] All created segments =>", segments);
+  // console.log("[useTTS] All created segments =>", segments);
   return segments;
 }
 
@@ -107,14 +107,14 @@ function drawSubtitle(ctx: CanvasRenderingContext2D, segment: SubtitleSegment) {
   const { text, color, font } = segment;
 
   // Log the segment being drawn
-  console.log(
-    "[useTTS] drawSubtitle => text:",
-    text,
-    "color:",
-    color,
-    "font:",
-    font
-  );
+  // console.log(
+  //   "[useTTS] drawSubtitle => text:",
+  //   text,
+  //   "color:",
+  //   color,
+  //   "font:",
+  //   font
+  // );
 
   ctx.save();
   ctx.font = font; // Use the font from the segment
@@ -127,7 +127,7 @@ function drawSubtitle(ctx: CanvasRenderingContext2D, segment: SubtitleSegment) {
 
   // Validate color
   if (!color || typeof color !== "string") {
-    console.warn("[useTTS] Invalid color detected. Defaulting to white.");
+    // console.warn("[useTTS] Invalid color detected. Defaulting to white.");
     ctx.fillStyle = "#FFFFFF";
   } else {
     ctx.fillStyle = color;
@@ -170,10 +170,10 @@ export function useTTS(): UseTTSResult {
   // Sync subtitleSegments state to ref
   useEffect(() => {
     subtitleSegmentsRef.current = subtitleSegments;
-    console.log(
-      "[useTTS] subtitleSegmentsRef updated:",
-      subtitleSegmentsRef.current
-    );
+    // console.log(
+    //   "[useTTS] subtitleSegmentsRef updated:",
+    //   subtitleSegmentsRef.current
+    // );
   }, [subtitleSegments]);
 
   // Sync currentSubtitleIndex state to ref
@@ -190,21 +190,21 @@ export function useTTS(): UseTTSResult {
   const playAudio = (audio: HTMLAudioElement) =>
     new Promise<void>((resolve, reject) => {
       audio.onplay = () =>
-        console.log("[useTTS] audio.onplay => user started playback");
-      audio.onplaying = () => {
-        console.log("[useTTS] audio.onplaying => actually playing");
-        resolve();
-      };
+        // console.log("[useTTS] audio.onplay => user started playback");
+        (audio.onplaying = () => {
+          // console.log("[useTTS] audio.onplaying => actually playing");
+          resolve();
+        });
       audio.onerror = () => reject(new Error("Audio playback error"));
       audio.play().catch((err) => reject(err));
     });
 
   /** Starts video recording (canvas + audio). */
   const startVideoRecording = async () => {
-    console.log("[useTTS] startVideoRecording triggered");
+    // console.log("[useTTS] startVideoRecording triggered");
 
     if (!window.MediaRecorder) {
-      console.warn("[useTTS] MediaRecorder not supported in this browser");
+      // console.warn("[useTTS] MediaRecorder not supported in this browser");
       return;
     }
 
@@ -219,7 +219,7 @@ export function useTTS(): UseTTSResult {
       const avatarElement = document.querySelector(
         ".selected-character-icon img"
       ) as HTMLImageElement | null;
-      console.log("[useTTS] Found avatar:", avatarElement);
+      // console.log("[useTTS] Found avatar:", avatarElement);
 
       // If avatar is found, load it
       const avatarImg = new Image();
@@ -236,7 +236,7 @@ export function useTTS(): UseTTSResult {
       const canvasStream = canvas.captureStream(30);
       const audioStream = (audioRef.current as any)?.captureStream?.();
       if (!audioStream) {
-        console.warn("[useTTS] audioRef.captureStream not found!");
+        // console.warn("[useTTS] audioRef.captureStream not found!");
         return;
       }
 
@@ -257,11 +257,11 @@ export function useTTS(): UseTTSResult {
       };
 
       mediaRecorderRef.current.onstop = () => {
-        console.log("[useTTS] MediaRecorder stopped => building final blob");
+        // console.log("[useTTS] MediaRecorder stopped => building final blob");
         const blob = new Blob(recordedChunksRef.current, {
           type: "video/webm",
         });
-        console.log("[useTTS] final blob size:", blob.size);
+        // console.log("[useTTS] final blob size:", blob.size);
         setVideoBlob(blob);
       };
 
@@ -336,31 +336,31 @@ export function useTTS(): UseTTSResult {
           subtitleSegmentsRef.current.length - 1
         );
 
-        console.log(
-          "[useTTS] animate => currentTime:",
-          currentTime,
-          "duration:",
-          duration,
-          "fraction:",
-          fraction,
-          "rawIndex:",
-          rawIndex,
-          "clampedIndex:",
-          clampedIndex
-        );
+        // console.log(
+        //   "[useTTS] animate => currentTime:",
+        //   currentTime,
+        //   "duration:",
+        //   duration,
+        //   "fraction:",
+        //   fraction,
+        //   "rawIndex:",
+        //   rawIndex,
+        //   "clampedIndex:",
+        //   clampedIndex
+        // );
 
         if (clampedIndex !== currentSubtitleIndexRef.current) {
-          console.log("[useTTS] setCurrentSubtitleIndex =>", clampedIndex);
+          // console.log("[useTTS] setCurrentSubtitleIndex =>", clampedIndex);
           setCurrentSubtitleIndex(clampedIndex);
         }
 
         // *** 6) Draw the subtitle segment or fallback
         const seg = subtitleSegmentsRef.current[clampedIndex];
         if (seg) {
-          console.log("[useTTS] Drawing segment:", seg);
+          // console.log("[useTTS] Drawing segment:", seg);
           drawSubtitle(ctx, seg);
         } else {
-          console.log("[useTTS] Fallback: index out of range =>", clampedIndex);
+          // console.log("[useTTS] Fallback: index out of range =>", clampedIndex);
           ctx.save();
           ctx.fillStyle = "#FF0000";
           ctx.font = "40px sans-serif";
@@ -378,13 +378,13 @@ export function useTTS(): UseTTSResult {
       };
       animate();
     } catch (err) {
-      console.error("[useTTS] Error starting video recording:", err);
+      // console.error("[useTTS] Error starting video recording:", err);
     }
   };
 
   /** Stops video recording */
   const stopVideoRecording = () => {
-    console.log("[useTTS] stopVideoRecording called");
+    // console.log("[useTTS] stopVideoRecording called");
     if (
       mediaRecorderRef.current &&
       mediaRecorderRef.current.state !== "inactive"
@@ -397,11 +397,11 @@ export function useTTS(): UseTTSResult {
   const sendTTSRequest = useCallback(
     async (text: string, voiceConfig: VoiceConfig, onStart?: () => void) => {
       if (!text.trim()) {
-        console.warn("[useTTS] No text to speak!");
+        // console.warn("[useTTS] No text to speak!");
         return;
       }
 
-      console.log("[useTTS] sendTTSRequest => text:", text);
+      // console.log("[useTTS] sendTTSRequest => text:", text);
       setIsLoading(true);
       setError(null);
 
@@ -442,7 +442,7 @@ export function useTTS(): UseTTSResult {
 
         // Define the handleEnded function
         const handleEnded = () => {
-          console.log("[useTTS] audio ended -> stop video");
+          // console.log("[useTTS] audio ended -> stop video");
           setIsPlaying(false);
           stopVideoRecording();
           setCurrentSubtitleIndex(0);
@@ -453,11 +453,11 @@ export function useTTS(): UseTTSResult {
 
         // On metadata loaded
         audio.onloadedmetadata = () => {
-          console.log("[useTTS] onloadedmetadata => duration:", audio.duration);
+          // console.log("[useTTS] onloadedmetadata => duration:", audio.duration);
           if (audio.duration) {
             setAudioDuration(audio.duration);
           } else {
-            console.warn("[useTTS] Audio duration is 0 or null");
+            // console.warn("[useTTS] Audio duration is 0 or null");
           }
         };
 
@@ -474,7 +474,7 @@ export function useTTS(): UseTTSResult {
         // Start video recording
         await startVideoRecording();
       } catch (err: any) {
-        console.error("[useTTS] TTS Error =>", err.message);
+        // console.error("[useTTS] TTS Error =>", err.message);
         setError(err.message);
         setIsPlaying(false);
       } finally {
@@ -486,7 +486,7 @@ export function useTTS(): UseTTSResult {
 
   /** Clears the existing video Blob */
   const clearVideoBlob = () => {
-    console.log("[useTTS] clearVideoBlob called");
+    // console.log("[useTTS] clearVideoBlob called");
     setVideoBlob(null);
   };
 

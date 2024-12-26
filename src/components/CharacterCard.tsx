@@ -96,7 +96,7 @@ const CharacterCard: React.FC<CharacterCardProps> = ({
                 </div>
 
                 {/* Language Dropdown */}
-                <div className="language-dropdown">
+                {characterAllowedLanguages.length > 1 && <div className="language-dropdown">
                     <select
                         id={`language-selector-${id}`}
                         value={characterLanguage}
@@ -111,7 +111,7 @@ const CharacterCard: React.FC<CharacterCardProps> = ({
                             </option>
                         ))}
                     </select>
-                </div>
+                </div>}
 
                 {/* Mode Toggle Switch */}
                 <div className="flex items-center" style={{ marginTop: '1rem' }}>

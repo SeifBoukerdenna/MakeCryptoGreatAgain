@@ -4,8 +4,7 @@ import { VercelRequest, VercelResponse } from "@vercel/node";
 import OpenAI from "openai";
 
 const openai = new OpenAI({
-  apiKey:
-    "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", // Ensure this is set in your environment variables
+  apiKey: process.env.OPENAI_API_KEY,
 });
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -33,11 +32,36 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         { role: "user", content: prompt },
       ],
       stream: true,
+      // Add settings to encourage more complete word tokens
+      temperature: 0.7,
+      max_tokens: 150,
+      frequency_penalty: 0,
+      presence_penalty: 0,
     });
+
+    // Buffer to store partial words
+    let buffer = "";
+    const wordRegex = /^[a-zA-Z]+$/;
 
     for await (const part of stream) {
       const content = part.choices[0]?.delta?.content || "";
-      res.write(`data: ${content}\n\n`);
+
+      // If we have content to process
+      if (content) {
+        buffer += content;
+
+        // If we have a complete word or non-letter character(s)
+        if (!wordRegex.test(content) || content.includes(" ")) {
+          // Send the buffered content
+          res.write(`data: ${buffer}\n\n`);
+          buffer = "";
+        }
+      }
+    }
+
+    // Send any remaining buffered content
+    if (buffer) {
+      res.write(`data: ${buffer}\n\n`);
     }
 
     res.write("data: [DONE]\n\n");

@@ -125,9 +125,9 @@ const PromptInput: React.FC<PromptInputProps> = ({
                         aria-disabled={cameraButtonDisabled}
                     >
                         {shouldRecord ? (
-                            <VideoOff className="w-5 h-5" />
-                        ) : (
                             <Video className="w-5 h-5" />
+                        ) : (
+                            <VideoOff className="w-5 h-5" />
                         )}
                     </button>
                 </Tooltip>
@@ -141,9 +141,9 @@ const PromptInput: React.FC<PromptInputProps> = ({
                     aria-label="Toggle microphone"
                 >
                     {isListening ? (
-                        <MicOff className="w-5 h-5" />
-                    ) : (
                         <Mic className="w-5 h-5" />
+                    ) : (
+                        <MicOff className="w-5 h-5" />
                     )}
                 </button>
 
