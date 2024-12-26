@@ -27,13 +27,14 @@ export async function streamGPTResponse(
     throw new Error("No reader available");
   }
 
+  let previousWasWord = false;
+
   while (true) {
     const { done, value } = await reader.read();
     if (done) break;
 
     buffer += decoder.decode(value, { stream: true });
     const lines = buffer.split("\n");
-
     buffer = lines.pop() || "";
 
     for (const line of lines) {
@@ -42,7 +43,20 @@ export async function streamGPTResponse(
         if (content === "[DONE]") {
           return;
         }
-        onToken(content);
+
+        // Process the token
+        if (content) {
+          // Check if current token is a word
+          const isWord = /^[a-zA-Z]+$/.test(content.trim());
+
+          // Add space only if both previous and current tokens are words
+          if (previousWasWord && isWord && !content.startsWith(" ")) {
+            onToken(" ");
+          }
+
+          onToken(content);
+          previousWasWord = isWord;
+        }
       }
     }
   }
