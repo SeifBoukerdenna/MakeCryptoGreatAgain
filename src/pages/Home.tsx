@@ -21,7 +21,6 @@ const Home: React.FC = () => {
   const { connected } = useWallet();
   const {
     messages,
-    loadingResponse,
     isPlaying,
     ttsError,
     messagesEndRef,
