@@ -9,12 +9,14 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@coral-xyz/anchor": "^0.30.1",
     "@fortawesome/fontawesome-svg-core": "^6.7.2",
     "@fortawesome/free-solid-svg-icons": "^6.7.2",
     "@fortawesome/react-fontawesome": "^0.2.2",
     "@headlessui/react": "^2.2.0",
     "@heroicons/react": "^2.2.0",
     "@simform_solutions/react-native-audio-waveform": "^2.1.2",
+    "@solana/spl-token": "^0.4.9",
     "@solana/wallet-adapter-base": "^0.9.23",
     "@solana/wallet-adapter-react": "^0.15.35",
     "@solana/wallet-adapter-react-ui": "^0.9.35",
@@ -24,6 +26,7 @@
     "@types/dom-speech-recognition": "^0.0.4",
     "@vercel/speed-insights": "^1.1.0",
     "axios": "^1.7.9",
+    "bn.js": "^5.2.1",
     "date-fns": "^4.1.0",
     "lucide-react": "^0.468.0",
     "openai": "^4.76.3",

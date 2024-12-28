@@ -6,6 +6,7 @@ import { supabase } from '../lib/supabase';
 import { Loader2, Plus, Trash2, AlertCircle, Calendar, Clock, Users } from 'lucide-react';
 import '../styles/admin.css';
 import AdminSecrets from '../components/AdminSecrets';
+import SmartContract from './SmartContract';
 
 // List of admin wallet addresses
 const ADMIN_WALLETS = [
@@ -237,6 +238,10 @@ const AdminPage = () => {
                     <button onClick={() => setError(null)}>Dismiss</button>
                 </div>
             )}
+
+            <section className='admin-section'>
+                <SmartContract />
+            </section>
 
             <div className="admin-grid">
                 {/* Character Management Section */}
