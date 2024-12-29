@@ -14,8 +14,49 @@ export type McgaPool = {
   };
   instructions: [
     {
-      name: "depositWithHash";
-      discriminator: [145, 159, 231, 106, 77, 224, 173, 59];
+      name: "checkHash";
+      discriminator: [130, 114, 186, 76, 55, 125, 200, 244];
+      accounts: [
+        {
+          name: "pool";
+          writable: true;
+          pda: {
+            seeds: [
+              {
+                kind: "account";
+                path: "pool.seed";
+                account: "pool";
+              }
+            ];
+          };
+        },
+        {
+          name: "poolTokenAccount";
+          writable: true;
+        },
+        {
+          name: "userTokenAccount";
+          writable: true;
+        },
+        {
+          name: "user";
+          signer: true;
+        },
+        {
+          name: "tokenProgram";
+          address: "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA";
+        }
+      ];
+      args: [
+        {
+          name: "attemptHash";
+          type: "string";
+        }
+      ];
+    },
+    {
+      name: "deposit";
+      discriminator: [242, 35, 198, 137, 82, 225, 242, 182];
       accounts: [
         {
           name: "pool";
@@ -51,10 +92,6 @@ export type McgaPool = {
         {
           name: "amount";
           type: "u64";
-        },
-        {
-          name: "attemptHash";
-          type: "string";
         }
       ];
     },

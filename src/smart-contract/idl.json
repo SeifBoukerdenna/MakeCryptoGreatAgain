@@ -8,16 +8,66 @@
   },
   "instructions": [
     {
-      "name": "deposit_with_hash",
+      "name": "check_hash",
       "discriminator": [
-        145,
-        159,
-        231,
-        106,
-        77,
-        224,
-        173,
-        59
+        130,
+        114,
+        186,
+        76,
+        55,
+        125,
+        200,
+        244
+      ],
+      "accounts": [
+        {
+          "name": "pool",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "pool.seed",
+                "account": "Pool"
+              }
+            ]
+          }
+        },
+        {
+          "name": "pool_token_account",
+          "writable": true
+        },
+        {
+          "name": "user_token_account",
+          "writable": true
+        },
+        {
+          "name": "user",
+          "signer": true
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        }
+      ],
+      "args": [
+        {
+          "name": "attempt_hash",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "deposit",
+      "discriminator": [
+        242,
+        35,
+        198,
+        137,
+        82,
+        225,
+        242,
+        182
       ],
       "accounts": [
         {
@@ -54,10 +104,6 @@
         {
           "name": "amount",
           "type": "u64"
-        },
-        {
-          "name": "attempt_hash",
-          "type": "string"
         }
       ]
     },
