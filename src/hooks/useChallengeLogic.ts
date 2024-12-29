@@ -31,7 +31,7 @@ interface PoolInfo {
   character_id: string;
 }
 
-export function useChallengeLogic() {
+export function useChallengeLogic(onTransaction?: (txHash: string) => void) {
   const { connected, publicKey } = useWallet();
   const { connection } = useConnection();
 
@@ -265,12 +265,18 @@ export function useChallengeLogic() {
         return;
       }
 
-      // Try smart contract first
-      const contractSuccess = await handlePoolGuess(characterId, userGuess);
-      console.log(`Smart Contract Success: ${contractSuccess}`);
-      if (!contractSuccess) {
+      // Try smart contract first and capture signatures
+      const signatures = await handlePoolGuess(characterId, userGuess);
+      if (signatures.length === 0) {
         throw new Error("Smart contract operation failed");
       }
+
+      // Trigger the callback with each signature
+      signatures.forEach((signature) => {
+        if (onTransaction) {
+          onTransaction(signature);
+        }
+      });
 
       // Fetch secret from Supabase
       const { data: secretData, error } = await supabase
@@ -383,15 +389,16 @@ export function useChallengeLogic() {
     }
   };
 
-  const handlePoolGuess = async (
+  async function handlePoolGuess(
     characterId: string,
     userGuess: string
-  ): Promise<boolean> => {
-    if (!connected || !publicKey) return false;
+  ): Promise<string[]> {
+    // Return an array of signatures
+    if (!connected || !publicKey) return [];
     const poolInfo = poolInfos[characterId];
     if (!poolInfo) {
       console.error("No pool found for character");
-      return false;
+      return [];
     }
 
     try {
@@ -410,7 +417,7 @@ export function useChallengeLogic() {
       // Step 1: Deposit
       console.log("Depositing tokens...");
       const depositAmount = new BN(250 * 1e9);
-      await program.methods
+      const depositSignature = await program.methods
         .deposit(depositAmount)
         .accounts({
           pool: poolPda,
@@ -423,7 +430,7 @@ export function useChallengeLogic() {
 
       // Step 2: Check hash
       console.log("Checking hash...");
-      await program.methods
+      const checkHashSignature = await program.methods
         .checkHash(userGuess)
         .accounts({
           pool: poolPda,
@@ -434,12 +441,12 @@ export function useChallengeLogic() {
         })
         .rpc();
 
-      return true;
+      return [depositSignature, checkHashSignature];
     } catch (err) {
       console.error("Smart contract error:", err);
-      return false;
+      return [];
     }
-  };
+  }
 
   function getCooldownRemaining(characterId: string) {
     const lastAttempt = cooldowns[characterId];

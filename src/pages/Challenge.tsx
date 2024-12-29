@@ -12,6 +12,7 @@ import {
     Wallet,
     Copy,
     Coins,
+    ExternalLink, // Import ExternalLink icon
 } from 'lucide-react';
 import { charactersConfig } from '../configs/characters.config';
 import { formatTimeRemaining } from '../utils/time';
@@ -20,21 +21,15 @@ import { useChallengeLogic } from '../hooks/useChallengeLogic';
 import { supabase } from '../lib/supabase';
 import '../styles/challenge.css';
 import TruncatedAddressLink from '../components/TruncatedAddressLink';
+import { toast } from 'react-toastify'; // Import toast from react-toastify
 
-interface PoolInfo {
-    pool_address: string;
-    pool_token_account: string;
-    seed: string;
-    created_at: string;
-    character_id: string;
-}
 
+
+// src/pages/Challenge.tsx
 const ChallengePage = () => {
     const { connected } = useWallet();
     const { connection } = useConnection();
 
-    // Removed local poolInfos state
-    // const [poolInfos, setPoolInfos] = useState<Record<string, PoolInfo>>({});
     const {
         guesses, setGuesses,
         results,
@@ -47,7 +42,7 @@ const ChallengePage = () => {
         handleCopy,
         getCooldownRemaining,
         poolInfos, // Get poolInfos from the hook
-    } = useChallengeLogic();
+    } = useChallengeLogic(handleTransaction);
 
     // Fetch pool balances whenever pool info changes
     const [poolBalances, setPoolBalances] = useState<Record<string, number>>({});
@@ -76,6 +71,46 @@ const ChallengePage = () => {
 
         setPoolBalances(balances);
     };
+
+    // Callback to handle transaction hashes
+    function handleTransaction(txHash: string) {
+        const solscanUrl = `https://solscan.io/tx/${txHash}?cluster=devnet`;
+
+        toast.info(
+            <div className="flex flex-col">
+                <div className="flex items-center justify-between">
+                    <span>Transaction Submitted</span>
+                    <button
+                        onClick={() => navigator.clipboard.writeText(txHash)}
+                        title="Copy Transaction Hash"
+                        className="text-blue-500 hover:text-blue-700"
+                    >
+                        <Copy size={16} />
+                    </button>
+                </div>
+                <div className="flex items-center justify-between mt-2">
+                    <span className="text-sm break-all">{txHash}</span>
+                    <a
+                        href={solscanUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-1 text-blue-500 hover:underline"
+                    >
+                        View on Solscan <ExternalLink size={16} />
+                    </a>
+                </div>
+            </div>,
+            {
+                position: "top-right",
+                autoClose: 8000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+            }
+        );
+    }
 
     // UI Section
     return (
