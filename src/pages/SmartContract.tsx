@@ -3,18 +3,20 @@ import { Program, AnchorProvider, BN } from '@coral-xyz/anchor';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { PublicKey, Keypair, SystemProgram, SYSVAR_RENT_PUBKEY } from '@solana/web3.js';
 import { TOKEN_PROGRAM_ID } from '@solana/spl-token';
+
 import IDL from '../smart-contract/idl.json';
 import type { McgaPool } from '../smart-contract/my_project';
 
 // Constants
-const PROGRAM_ID = new PublicKey("DNsprXHccVbxFTE2RNvchU3E3W1Hn3U4yosFSiVs8bQT");
-const MCGA_MINT = new PublicKey("JDpSTtGrgY6Gv1BVPzA8wSoR1EBgjBg8v7aeBt9xzXLi");
+const PROGRAM_ID = new PublicKey("DNsprXHccVbxFTE2RNvchU3E3W1Hn3U4yosFSiVs8bQT"); // Your deployed program ID
+const MCGA_MINT = new PublicKey("5g1hscK8kkX9ee1Snmm4HvBM4fH1b2u1tfee3GyTewAq"); // New mint address
 
 const SmartContract = () => {
     const { connection } = useConnection();
     const wallet = useWallet();
     const { connected, publicKey } = wallet;
     const [poolAddress, setPoolAddress] = useState<string | null>(null);
+    const [poolTokenAccount, setPoolTokenAccount] = useState<string | null>(null);
     const [depositAmount, setDepositAmount] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -42,27 +44,28 @@ const SmartContract = () => {
 
         try {
             const provider = getProvider();
-            const program = new Program(IDL as McgaPool, provider);
+            const program = new Program<McgaPool>(IDL as McgaPool, provider);
 
-            // Generate new keypairs for pool and pool token account
+            // Generate keypairs
             const pool = Keypair.generate();
             const poolTokenAccount = Keypair.generate();
 
             const tx = await program.methods
                 .initializePool()
                 .accounts({
-                    "pool": pool.publicKey,
-                    "poolTokenAccount": poolTokenAccount.publicKey,
-                    "mcgaMint": MCGA_MINT,
-                    "authority": publicKey,
-                    "systemProgram": SystemProgram.programId,
-                    "token_program": TOKEN_PROGRAM_ID,
-                    "rent": SYSVAR_RENT_PUBKEY,
+                    pool: pool.publicKey,
+                    poolTokenAccount: poolTokenAccount.publicKey,
+                    mcgaMint: MCGA_MINT,
+                    authority: publicKey,
+                    systemProgram: SystemProgram.programId,
+                    tokenProgram: TOKEN_PROGRAM_ID,
+                    rent: SYSVAR_RENT_PUBKEY,
                 })
                 .signers([pool, poolTokenAccount])
                 .rpc();
 
             setPoolAddress(pool.publicKey.toString());
+            setPoolTokenAccount(poolTokenAccount.publicKey.toString());
             setSuccess(`Pool initialized! Transaction: ${tx}`);
         } catch (err) {
             console.error("Error initializing pool:", err);
@@ -78,7 +81,7 @@ const SmartContract = () => {
             return;
         }
 
-        if (!poolAddress) {
+        if (!poolAddress || !poolTokenAccount) {
             setError("Please initialize a pool first");
             return;
         }
@@ -89,7 +92,7 @@ const SmartContract = () => {
 
         try {
             const provider = getProvider();
-            const program = new Program(IDL as McgaPool, provider);
+            const program = new Program<McgaPool>(IDL as McgaPool, provider);
 
             // Get user's token account
             const userTokenAccounts = await connection.getTokenAccountsByOwner(
@@ -105,14 +108,16 @@ const SmartContract = () => {
             const amount = new BN(parseFloat(depositAmount) * 1e9); // Convert to smallest units
 
             const poolPubkey = new PublicKey(poolAddress);
+            const poolTokenPubkey = new PublicKey(poolTokenAccount);
+
             const tx = await program.methods
                 .deposit(amount)
                 .accounts({
-                    "pool": poolPubkey,
-                    "poolTokenAccount": poolPubkey,
-                    "userTokenAccount": userTokenAccount,
-                    "user": publicKey,
-                    "tokenProgram": TOKEN_PROGRAM_ID,
+                    pool: poolPubkey,
+                    poolTokenAccount: poolTokenPubkey,
+                    userTokenAccount: userTokenAccount,
+                    user: publicKey,
+                    tokenProgram: TOKEN_PROGRAM_ID,
                 })
                 .rpc();
 
@@ -140,9 +145,10 @@ const SmartContract = () => {
                     {loading ? "Initializing..." : "Initialize Pool"}
                 </button>
                 {poolAddress && (
-                    <p className="mt-2 text-sm break-all">
-                        Pool Address: {poolAddress}
-                    </p>
+                    <div className="mt-2 text-sm break-all space-y-2">
+                        <p>Pool Address: {poolAddress}</p>
+                        <p>Pool Token Account: {poolTokenAccount}</p>
+                    </div>
                 )}
             </div>
 
