@@ -367,6 +367,7 @@ export function useChallengeLogic() {
       await program.methods
         .deposit(depositAmount)
         .accounts({
+          // @ts-ignore: Suppress the error for poolPda
           pool: poolPda,
           poolTokenAccount: new PublicKey(poolInfo.pool_token_account),
           userTokenAccount,
@@ -380,6 +381,7 @@ export function useChallengeLogic() {
       await program.methods
         .checkHash(userGuess)
         .accounts({
+          // @ts-ignore: Suppress the error for poolPda
           pool: poolPda,
           poolTokenAccount: new PublicKey(poolInfo.pool_token_account),
           userTokenAccount,

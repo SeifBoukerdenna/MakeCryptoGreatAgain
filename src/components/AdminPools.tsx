@@ -78,6 +78,7 @@ const AdminPools: React.FC = () => {
             const tx = await program.methods
                 .initializePool(uniqueSeed, secretHash)
                 .accounts({
+                    // @ts-ignore: Suppress the error for poolPda
                     pool: poolPda,
                     poolTokenAccount: poolTokenAccount.publicKey,
                     mcgaMint: MCGA_MINT,
