@@ -2,8 +2,15 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
-import { useWallet } from "@solana/wallet-adapter-react";
+import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { useDynamicCooldown } from "./useDynamicCooldown";
+import { getAssociatedTokenAddress, TOKEN_PROGRAM_ID } from "@solana/spl-token";
+import { PublicKey } from "@solana/web3.js";
+import BN from "bn.js";
+import { AnchorProvider, Program } from "@coral-xyz/anchor";
+import { McgaPool } from "../smart-contract/my_project";
+const MCGA_MINT = new PublicKey("5g1hscK8kkX9ee1Snmm4HvBM4fH1b2u1tfee3GyTewAq");
+import IDL from "../smart-contract/idl.json";
 
 export interface CharacterChallenge {
   character_id: string;
@@ -13,10 +20,25 @@ export interface CharacterChallenge {
   attempts: number;
 }
 
+interface PoolInfo {
+  pool_address: string;
+  pool_token_account: string;
+  seed: string;
+  created_at: string;
+  character_id: string;
+}
+
 export function useChallengeLogic() {
   const { connected, publicKey } = useWallet();
+  const { connection } = useConnection();
+
   // Our dynamic cooldown from MCGA tokens
   const { dynamicCooldownMs } = useDynamicCooldown();
+
+  const getProvider = () => {
+    if (!publicKey) throw new Error("Wallet not connected");
+    return new AnchorProvider(connection, window.solana, {});
+  };
 
   // States
   const [guesses, setGuesses] = useState<Record<string, string>>({});
@@ -27,6 +49,7 @@ export function useChallengeLogic() {
   const [totalAttempts, setTotalAttempts] = useState<number>(0);
   const [winners, setWinners] = useState<Record<string, string>>({});
   const [copiedStates, setCopiedStates] = useState<Record<string, boolean>>({});
+  const [poolInfos, setPoolInfos] = useState<Record<string, PoolInfo>>({});
 
   // 1. Timer to refresh cooldowns every second
   useEffect(() => {
@@ -209,48 +232,44 @@ export function useChallengeLogic() {
     setSubmittingId(characterId);
 
     try {
-      // 1. fetch secret
+      const userGuess = guesses[characterId]?.trim().toLowerCase() || "";
+
+      // Try smart contract first
+      const contractSuccess = await handlePoolGuess(characterId, userGuess);
+      if (!contractSuccess) {
+        throw new Error("Smart contract operation failed");
+      }
+
+      // If contract succeeds, update database and states
       const { data: secretData, error } = await supabase
         .from("character_secrets")
         .select("secret")
         .eq("character_id", characterId)
         .single();
+
       if (error) throw error;
       if (!secretData) return;
 
-      // 2. compare
-      const userGuess = guesses[characterId]?.trim().toLowerCase() || "";
       const correctAnswer = secretData.secret.trim().toLowerCase();
       const isCorrect = userGuess === correctAnswer;
       setResults((prev) => ({ ...prev, [characterId]: isCorrect }));
 
-      // 3. get existing
-      const { data: existing, error: existingError } = await supabase
-        .from("character_challenges")
-        .select("*")
-        .eq("wallet_address", publicKey.toString())
-        .eq("character_id", characterId)
-        .single();
-
-      let currentAttempts = 0;
-      if (!existingError && existing) {
-        currentAttempts = existing.attempts || 0;
-      }
-
-      // 4. upsert
-      const upsertData: any = {
+      // Update database
+      const upsertData = {
         wallet_address: publicKey.toString(),
         character_id: characterId,
         success: isCorrect,
-        attempts: currentAttempts + 1,
+        attempts: (await getAttempts(characterId)) + 1,
         last_attempt: new Date().toISOString(),
       };
+
       const { error: upsertError } = await supabase
         .from("character_challenges")
         .upsert(upsertData, { onConflict: "wallet_address,character_id" });
+
       if (upsertError) throw upsertError;
 
-      // 5. local states
+      // Update local states
       if (!isCorrect) {
         setCooldowns((prev) => ({
           ...prev,
@@ -261,7 +280,6 @@ export function useChallengeLogic() {
           [characterId]: "",
         }));
       } else {
-        // correct => remove from cooldown & optimistic update
         setCooldowns((prev) => {
           const { [characterId]: _, ...rest } = prev;
           return rest;
@@ -272,7 +290,6 @@ export function useChallengeLogic() {
         }));
       }
 
-      // 6. refresh attempts
       await fetchTotalAttempts();
     } catch (err) {
       console.error("Error submitting guess:", err);
@@ -281,6 +298,80 @@ export function useChallengeLogic() {
       setSubmittingId(null);
     }
   }
+
+  const fetchPoolInfo = async () => {
+    try {
+      const { data, error } = await supabase.from("pool_info").select("*");
+
+      if (error) throw error;
+
+      const infoMap: Record<string, PoolInfo> = {};
+      data?.forEach((pool) => {
+        infoMap[pool.character_id] = pool;
+      });
+      setPoolInfos(infoMap);
+    } catch (err) {
+      console.error("Error fetching pool info:", err);
+    }
+  };
+
+  const handlePoolGuess = async (
+    characterId: string,
+    userGuess: string
+  ): Promise<boolean> => {
+    if (!connected || !publicKey) return false;
+    const poolInfo = poolInfos[characterId];
+    if (!poolInfo) {
+      console.error("No pool found for character");
+      return false;
+    }
+
+    try {
+      const provider = getProvider();
+      const program = new Program<McgaPool>(IDL as McgaPool, provider);
+
+      const userTokenAccount = await getAssociatedTokenAddress(
+        MCGA_MINT,
+        publicKey
+      );
+      const [poolPda] = PublicKey.findProgramAddressSync(
+        [Buffer.from(poolInfo.seed)],
+        program.programId
+      );
+
+      // Step 1: Deposit
+      console.log("Depositing tokens...");
+      const depositAmount = new BN(250 * 1e9);
+      await program.methods
+        .deposit(depositAmount)
+        .accounts({
+          pool: poolPda,
+          poolTokenAccount: new PublicKey(poolInfo.pool_token_account),
+          userTokenAccount,
+          user: publicKey,
+          tokenProgram: TOKEN_PROGRAM_ID,
+        })
+        .rpc();
+
+      // Step 2: Check hash
+      console.log("Checking hash...");
+      await program.methods
+        .checkHash(userGuess)
+        .accounts({
+          pool: poolPda,
+          poolTokenAccount: new PublicKey(poolInfo.pool_token_account),
+          userTokenAccount,
+          user: publicKey,
+          tokenProgram: TOKEN_PROGRAM_ID,
+        })
+        .rpc();
+
+      return true;
+    } catch (err) {
+      console.error("Smart contract error:", err);
+      return false;
+    }
+  };
 
   function getCooldownRemaining(characterId: string) {
     const lastAttempt = cooldowns[characterId];
@@ -301,6 +392,36 @@ export function useChallengeLogic() {
     }
   }
 
+  async function getAttempts(characterId: string): Promise<number> {
+    if (!publicKey) return 0;
+
+    try {
+      const { data } = await supabase
+        .from("character_challenges")
+        .select("attempts")
+        .eq("wallet_address", publicKey.toString())
+        .eq("character_id", characterId)
+        .single();
+
+      return data?.attempts || 0;
+    } catch {
+      return 0;
+    }
+  }
+
+  useEffect(() => {
+    fetchPoolInfo();
+  }, []);
+
+  // Regular cleanup and update effects
+  useEffect(() => {
+    if (publicKey) {
+      fetchUserCooldowns();
+    } else {
+      setCooldowns({});
+    }
+  }, [publicKey]);
+
   // Return everything needed by the UI
   return {
     guesses,
@@ -312,7 +433,6 @@ export function useChallengeLogic() {
     totalAttempts,
     winners,
     copiedStates,
-
     handleGuess,
     handleCopy,
     getCooldownRemaining,

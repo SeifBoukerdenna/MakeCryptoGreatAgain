@@ -7,6 +7,7 @@ import { Loader2, Plus, Trash2, AlertCircle, Calendar, Clock, Users } from 'luci
 import '../styles/admin.css';
 import AdminSecrets from '../components/AdminSecrets';
 import SmartContract from './SmartContract';
+import AdminPools from '../components/AdminPools';
 
 // List of admin wallet addresses
 const ADMIN_WALLETS = [
@@ -348,6 +349,10 @@ const AdminPage = () => {
                             Update Voting Period
                         </button>
                     </form>
+                </section>
+
+                <section className='admin-section'>
+                    <AdminPools />
                 </section>
 
                 <section className='admin-section'>

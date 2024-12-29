@@ -23,17 +23,6 @@
     border-radius: 0 0 1rem 1rem;
 }
 
-/* Header Styles */
-.challenge-card .header {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 1rem;
-    border-bottom: 1px solid var(--card-border);
-    background: var(--stats-bg);
-    border-radius: 1rem 1rem 0 0;
-}
-
 .challenge-card img {
     width: 2rem;
     height: 2rem;
@@ -518,4 +507,63 @@
 .no-winner {
     font-size: 0.875rem;
     color: var(--text-secondary);
+}
+
+/* Add these styles to your challenge.css file */
+
+.header-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.pool-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(147, 51, 234, 0.1);
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+}
+
+.pool-balance {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-family: 'Roboto Mono', monospace;
+}
+
+/* Dark theme adjustments */
+.dark .pool-info {
+    background: rgba(147, 51, 234, 0.2);
+}
+
+/* Update the existing header styles */
+.challenge-card .header {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 1rem;
+    border-bottom: 1px solid var(--card-border);
+    background: var(--stats-bg);
+    border-radius: 1rem 1rem 0 0;
+}
+
+/* Animation for pool balance updates */
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+.pool-balance.updated {
+    animation: pulse 0.3s ease-in-out;
 }
