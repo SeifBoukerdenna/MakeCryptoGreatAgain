@@ -14,6 +14,10 @@ import Social from './pages/Social';
 import RoadmapPage from './pages/RoadMap';
 import AdminCharacters from './pages/Admin';
 import ChallengePage from './pages/Challenge';
+import { Buffer as BufferPolyfill } from 'buffer'
+declare var Buffer: typeof BufferPolyfill;
+globalThis.Buffer = BufferPolyfill
+
 
 const endpoint = 'https://api.devnet.solana.com';
 const wallets = [new PhantomWalletAdapter()];
