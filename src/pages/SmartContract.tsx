@@ -1,42 +1,59 @@
+// src/components/SmartContract.tsx
 import { useState, useEffect } from 'react';
-import { Program, AnchorProvider, BN } from '@coral-xyz/anchor';
+import { Program, AnchorProvider } from '@coral-xyz/anchor';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { PublicKey, Keypair, SystemProgram, SYSVAR_RENT_PUBKEY } from '@solana/web3.js';
 import { TOKEN_PROGRAM_ID } from '@solana/spl-token';
+import BN from 'bn.js';
+import { supabase } from '../lib/supabase';
 
 import IDL from '../smart-contract/idl.json';
 import type { McgaPool } from '../smart-contract/my_project';
 
-// Constants
-const PROGRAM_ID = new PublicKey("DNsprXHccVbxFTE2RNvchU3E3W1Hn3U4yosFSiVs8bQT"); // Your deployed program ID
-const MCGA_MINT = new PublicKey("5g1hscK8kkX9ee1Snmm4HvBM4fH1b2u1tfee3GyTewAq"); // New mint address
+const MCGA_MINT = new PublicKey("5g1hscK8kkX9ee1Snmm4HvBM4fH1b2u1tfee3GyTewAq");
 
-const LOCAL_STORAGE_POOL_KEY = "mcga_pool_address";
-const LOCAL_STORAGE_POOL_TOKEN_ACCOUNT_KEY = "mcga_pool_token_account";
+interface PoolInfo {
+    pool_address: string;
+    pool_token_account: string;
+    created_at: string;
+}
 
 const SmartContract = () => {
     const { connection } = useConnection();
     const wallet = useWallet();
     const { connected, publicKey } = wallet;
-    const [poolAddress, setPoolAddress] = useState<string | null>(null);
-    const [poolTokenAccount, setPoolTokenAccount] = useState<string | null>(null);
+    const [poolInfo, setPoolInfo] = useState<PoolInfo | null>(null);
+    const [poolBalance, setPoolBalance] = useState<number | null>(null);
     const [depositAmount, setDepositAmount] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState<string | null>(null);
 
-    // Load pool data from Local Storage on component mount
+    // Fetch pool info on component mount
     useEffect(() => {
-        if (publicKey) {
-            const savedPoolAddress = localStorage.getItem(LOCAL_STORAGE_POOL_KEY);
-            const savedPoolTokenAccount = localStorage.getItem(LOCAL_STORAGE_POOL_TOKEN_ACCOUNT_KEY);
+        fetchPoolInfo();
+    }, []);
 
-            if (savedPoolAddress && savedPoolTokenAccount) {
-                setPoolAddress(savedPoolAddress);
-                setPoolTokenAccount(savedPoolTokenAccount);
-            }
+    // Fetch pool balance when pool info changes
+    useEffect(() => {
+        if (poolInfo?.pool_token_account) {
+            const poolTokenPubkey = new PublicKey(poolInfo.pool_token_account);
+            fetchPoolBalance(poolTokenPubkey);
+
+            // Subscribe to account changes
+            const subscriptionId = connection.onAccountChange(
+                poolTokenPubkey,
+                () => {
+                    fetchPoolBalance(poolTokenPubkey);
+                },
+                'singleGossip'
+            );
+
+            return () => {
+                connection.removeAccountChangeListener(subscriptionId);
+            };
         }
-    }, [publicKey]);
+    }, [poolInfo, connection]);
 
     const getProvider = () => {
         if (!wallet || !publicKey) throw new Error('Wallet not connected');
@@ -46,6 +63,35 @@ const SmartContract = () => {
             AnchorProvider.defaultOptions()
         );
         return provider;
+    };
+
+    const fetchPoolInfo = async () => {
+        try {
+            const { data, error } = await supabase
+                .from('pool_info')
+                .select('*')
+                .single();
+
+            if (error) {
+                console.error('Error fetching pool info:', error);
+                return;
+            }
+
+            setPoolInfo(data);
+        } catch (err) {
+            console.error('Error in fetchPoolInfo:', err);
+        }
+    };
+
+    const fetchPoolBalance = async (poolTokenPubkey: PublicKey) => {
+        try {
+            const balanceInfo = await connection.getTokenAccountBalance(poolTokenPubkey);
+            const amount = balanceInfo.value.uiAmount;
+            setPoolBalance(amount);
+        } catch (err) {
+            console.error("Error fetching pool balance:", err);
+            setError("Failed to fetch pool balance");
+        }
     };
 
     const initializePool = async () => {
@@ -80,17 +126,29 @@ const SmartContract = () => {
                 .signers([pool, poolTokenAccount])
                 .rpc();
 
-            // Update state
-            const poolAddressStr = pool.publicKey.toString();
-            const poolTokenAccountStr = poolTokenAccount.publicKey.toString();
+            // Store pool info in Supabase
+            const { error: upsertError } = await supabase
+                .from('pool_info')
+                .upsert({
+                    pool_address: pool.publicKey.toString(),
+                    pool_token_account: poolTokenAccount.publicKey.toString(),
+                }, {
+                    onConflict: 'pool_address'
+                });
 
-            setPoolAddress(poolAddressStr);
-            setPoolTokenAccount(poolTokenAccountStr);
+            if (upsertError) throw upsertError;
+
+            // Update local state
+            setPoolInfo({
+                pool_address: pool.publicKey.toString(),
+                pool_token_account: poolTokenAccount.publicKey.toString(),
+                created_at: new Date().toISOString(),
+            });
+
             setSuccess(`Pool initialized! Transaction: ${tx}`);
 
-            // Save to Local Storage
-            localStorage.setItem(LOCAL_STORAGE_POOL_KEY, poolAddressStr);
-            localStorage.setItem(LOCAL_STORAGE_POOL_TOKEN_ACCOUNT_KEY, poolTokenAccountStr);
+            // Refresh pool info
+            await fetchPoolInfo();
         } catch (err) {
             console.error("Error initializing pool:", err);
             setError("Failed to initialize pool: " + (err instanceof Error ? err.message : String(err)));
@@ -105,8 +163,13 @@ const SmartContract = () => {
             return;
         }
 
-        if (!poolAddress || !poolTokenAccount) {
-            setError("Please initialize a pool first");
+        if (!poolInfo) {
+            setError("No pool initialized");
+            return;
+        }
+
+        if (parseFloat(depositAmount) <= 0) {
+            setError("Deposit amount must be greater than zero");
             return;
         }
 
@@ -129,10 +192,10 @@ const SmartContract = () => {
             }
 
             const userTokenAccount = userTokenAccounts.value[0].pubkey;
-            const amount = new BN(parseFloat(depositAmount) * 1e9); // Convert to smallest units
+            const amount = new BN(parseFloat(depositAmount) * 1e9);
 
-            const poolPubkey = new PublicKey(poolAddress);
-            const poolTokenPubkey = new PublicKey(poolTokenAccount);
+            const poolPubkey = new PublicKey(poolInfo.pool_address);
+            const poolTokenPubkey = new PublicKey(poolInfo.pool_token_account);
 
             const tx = await program.methods
                 .deposit(amount)
@@ -146,22 +209,13 @@ const SmartContract = () => {
                 .rpc();
 
             setSuccess(`Deposit successful! Transaction: ${tx}`);
+            setDepositAmount("");
         } catch (err) {
             console.error("Error depositing:", err);
             setError("Failed to deposit: " + (err instanceof Error ? err.message : String(err)));
         } finally {
             setLoading(false);
         }
-    };
-
-    const resetPool = () => {
-        // Optional: Function to reset the pool data from Local Storage
-        localStorage.removeItem(LOCAL_STORAGE_POOL_KEY);
-        localStorage.removeItem(LOCAL_STORAGE_POOL_TOKEN_ACCOUNT_KEY);
-        setPoolAddress(null);
-        setPoolTokenAccount(null);
-        setSuccess(null);
-        setError(null);
     };
 
     return (
@@ -173,27 +227,22 @@ const SmartContract = () => {
                 <h3 className="text-lg font-semibold mb-2">Initialize Pool</h3>
                 <button
                     onClick={initializePool}
-                    disabled={loading || !connected || !!poolAddress}
-                    className={`bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600 disabled:opacity-50 ${poolAddress ? 'cursor-not-allowed' : ''}`}
+                    disabled={loading || !connected || !!poolInfo}
+                    className={`bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600 disabled:opacity-50 ${poolInfo ? 'cursor-not-allowed' : ''}`}
                 >
-                    {loading ? "Initializing..." : poolAddress ? "Pool Initialized" : "Initialize Pool"}
+                    {loading ? "Initializing..." : poolInfo ? "Pool Initialized" : "Initialize Pool"}
                 </button>
-                {poolAddress && (
+                {poolInfo && (
                     <div className="mt-2 text-sm break-all space-y-2">
-                        <p>Pool Address: {poolAddress}</p>
-                        <p>Pool Token Account: {poolTokenAccount}</p>
-                        <button
-                            onClick={resetPool}
-                            className="text-red-500 underline text-sm"
-                        >
-                            Reset Pool
-                        </button>
+                        <p>Pool Address: {poolInfo.pool_address}</p>
+                        <p>Pool Token Account: {poolInfo.pool_token_account}</p>
+                        <p>Pool Balance: {poolBalance !== null ? poolBalance.toLocaleString() : "Loading..."} MCGA</p>
                     </div>
                 )}
             </div>
 
             {/* Deposit Section */}
-            {poolAddress && (
+            {poolInfo && (
                 <div className="bg-gray-100 p-4 rounded-lg">
                     <h3 className="text-lg font-semibold mb-2">Deposit MCGA</h3>
                     <div className="flex space-x-2">
@@ -207,7 +256,7 @@ const SmartContract = () => {
                         />
                         <button
                             onClick={deposit}
-                            disabled={loading || !connected || !poolAddress || parseFloat(depositAmount) <= 0}
+                            disabled={loading || !connected || !poolInfo || parseFloat(depositAmount) <= 0}
                             className={`bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 disabled:opacity-50 ${!depositAmount || parseFloat(depositAmount) <= 0 ? 'cursor-not-allowed' : ''}`}
                         >
                             {loading ? "Depositing..." : "Deposit"}
