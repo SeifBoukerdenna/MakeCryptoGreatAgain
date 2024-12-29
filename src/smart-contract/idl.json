@@ -1,7 +1,7 @@
 {
-  "address": "B1aAzeLpQiWexQd7P35NUrbQh23W8tgDUUtsd6PJGkA",
+  "address": "DNsprXHccVbxFTE2RNvchU3E3W1Hn3U4yosFSiVs8bQT",
   "metadata": {
-    "name": "my_project",
+    "name": "mcga_pool",
     "version": "0.1.0",
     "spec": "0.1.0",
     "description": "Created with Anchor"
@@ -21,42 +21,75 @@
       ],
       "accounts": [
         {
-          "name": "pool_account",
+          "name": "pool",
+          "writable": true
+        },
+        {
+          "name": "pool_token_account",
+          "writable": true
+        },
+        {
+          "name": "user_token_account",
           "writable": true
         },
         {
           "name": "user",
           "signer": true
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
         }
       ],
-      "args": []
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
     },
     {
-      "name": "initialize",
+      "name": "initialize_pool",
       "discriminator": [
-        175,
-        175,
-        109,
-        31,
-        13,
-        152,
-        155,
-        237
+        95,
+        180,
+        10,
+        172,
+        84,
+        174,
+        232,
+        40
       ],
       "accounts": [
         {
-          "name": "pool_account",
+          "name": "pool",
           "writable": true,
           "signer": true
         },
         {
-          "name": "user",
+          "name": "pool_token_account",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "mcga_mint"
+        },
+        {
+          "name": "authority",
           "writable": true,
           "signer": true
         },
         {
           "name": "system_program",
           "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "rent",
+          "address": "SysvarRent111111111111111111111111111111111"
         }
       ],
       "args": []
@@ -64,35 +97,32 @@
   ],
   "accounts": [
     {
-      "name": "PoolAccount",
+      "name": "Pool",
       "discriminator": [
-        116,
-        210,
-        187,
-        119,
-        196,
-        196,
-        52,
-        137
+        241,
+        154,
+        109,
+        4,
+        17,
+        177,
+        109,
+        188
       ]
-    }
-  ],
-  "errors": [
-    {
-      "code": 6000,
-      "name": "Overflow",
-      "msg": "Addition overflow"
     }
   ],
   "types": [
     {
-      "name": "PoolAccount",
+      "name": "Pool",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "size",
-            "type": "u64"
+            "name": "authority",
+            "type": "pubkey"
+          },
+          {
+            "name": "token_account",
+            "type": "pubkey"
           }
         ]
       }

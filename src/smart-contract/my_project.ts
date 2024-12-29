@@ -2,12 +2,12 @@
  * Program IDL in camelCase format in order to be used in JS/TS.
  *
  * Note that this is only a type helper and is not the actual IDL. The original
- * IDL can be found at `target/idl/my_project.json`.
+ * IDL can be found at `target/idl/mcga_pool.json`.
  */
-export type MyProject = {
-  address: "B979w4ShSrvQYrW62iWgijkEyxFaXDVDZS2SwpT4iVNN";
+export type McgaPool = {
+  address: "DNsprXHccVbxFTE2RNvchU3E3W1Hn3U4yosFSiVs8bQT";
   metadata: {
-    name: "myProject";
+    name: "mcgaPool";
     version: "0.1.0";
     spec: "0.1.0";
     description: "Created with Anchor";
@@ -18,23 +18,15 @@ export type MyProject = {
       discriminator: [242, 35, 198, 137, 82, 225, 242, 182];
       accounts: [
         {
-          name: "poolAccount";
-          writable: true;
-          pda: {
-            seeds: [
-              {
-                kind: "const";
-                value: [112, 111, 111, 108];
-              }
-            ];
-          };
-        },
-        {
-          name: "userTokenAccount";
+          name: "pool";
           writable: true;
         },
         {
           name: "poolTokenAccount";
+          writable: true;
+        },
+        {
+          name: "userTokenAccount";
           writable: true;
         },
         {
@@ -46,32 +38,46 @@ export type MyProject = {
           address: "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA";
         }
       ];
-      args: [];
+      args: [
+        {
+          name: "amount";
+          type: "u64";
+        }
+      ];
     },
     {
-      name: "initialize";
-      discriminator: [175, 175, 109, 31, 13, 152, 155, 237];
+      name: "initializePool";
+      discriminator: [95, 180, 10, 172, 84, 174, 232, 40];
       accounts: [
         {
-          name: "poolAccount";
+          name: "pool";
           writable: true;
-          pda: {
-            seeds: [
-              {
-                kind: "const";
-                value: [112, 111, 111, 108];
-              }
-            ];
-          };
+          signer: true;
         },
         {
-          name: "user";
+          name: "poolTokenAccount";
+          writable: true;
+          signer: true;
+        },
+        {
+          name: "mcgaMint";
+        },
+        {
+          name: "authority";
           writable: true;
           signer: true;
         },
         {
           name: "systemProgram";
           address: "11111111111111111111111111111111";
+        },
+        {
+          name: "tokenProgram";
+          address: "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA";
+        },
+        {
+          name: "rent";
+          address: "SysvarRent111111111111111111111111111111111";
         }
       ];
       args: [];
@@ -79,54 +85,22 @@ export type MyProject = {
   ];
   accounts: [
     {
-      name: "poolAccount";
-      discriminator: [116, 210, 187, 119, 196, 196, 52, 137];
-    }
-  ];
-  errors: [
-    {
-      code: 6000;
-      name: "overflow";
-      msg: "Addition overflow";
-    },
-    {
-      code: 6001;
-      name: "invalidAmount";
-      msg: "Invalid deposit amount";
-    },
-    {
-      code: 6002;
-      name: "insufficientFunds";
-      msg: "Insufficient funds for transaction";
-    },
-    {
-      code: 6003;
-      name: "invalidOwner";
-      msg: "Invalid token account owner";
-    },
-    {
-      code: 6004;
-      name: "invalidMint";
-      msg: "Invalid mint";
-    },
-    {
-      code: 6005;
-      name: "invalidAuthority";
-      msg: "Invalid authority";
+      name: "pool";
+      discriminator: [241, 154, 109, 4, 17, 177, 109, 188];
     }
   ];
   types: [
     {
-      name: "poolAccount";
+      name: "pool";
       type: {
         kind: "struct";
         fields: [
           {
-            name: "size";
-            type: "u64";
+            name: "authority";
+            type: "pubkey";
           },
           {
-            name: "authority";
+            name: "tokenAccount";
             type: "pubkey";
           }
         ];

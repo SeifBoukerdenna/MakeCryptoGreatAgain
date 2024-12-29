@@ -11,6 +11,7 @@ import SmartContract from './SmartContract';
 // List of admin wallet addresses
 const ADMIN_WALLETS = [
     // Add your admin wallet addresses here
+    "5WDfDiiSEQ6j8y4QoDeQ4sJrL36rG85YhKqkemboUQ4C",
     "J5mLBezP8VrdxPbzKqtfo8m98wXYt4sxFkFJawPKkdsc"
 ];
 
