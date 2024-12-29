@@ -19,6 +19,7 @@ import { truncateAddress } from '../utils/adress';
 import { useChallengeLogic } from '../hooks/useChallengeLogic';
 import { supabase } from '../lib/supabase';
 import '../styles/challenge.css';
+import TruncatedAddressLink from '../components/TruncatedAddressLink';
 
 interface PoolInfo {
     pool_address: string;
@@ -32,12 +33,8 @@ const ChallengePage = () => {
     const { connected } = useWallet();
     const { connection } = useConnection();
 
-    // State for pools
-    const [poolInfos, setPoolInfos] = useState<Record<string, PoolInfo>>({});
-    const [poolBalances, setPoolBalances] = useState<Record<string, number>>({});
-    const [_, setIsLoadingPools] = useState(true);
-
-    // Get challenge logic
+    // Removed local poolInfos state
+    // const [poolInfos, setPoolInfos] = useState<Record<string, PoolInfo>>({});
     const {
         guesses, setGuesses,
         results,
@@ -49,43 +46,18 @@ const ChallengePage = () => {
         handleGuess,
         handleCopy,
         getCooldownRemaining,
+        poolInfos, // Get poolInfos from the hook
     } = useChallengeLogic();
 
-    // Fetch pool information on mount
-    useEffect(() => {
-        fetchPoolInfo();
-    }, []);
-
     // Fetch pool balances whenever pool info changes
+    const [poolBalances, setPoolBalances] = useState<Record<string, number>>({});
     useEffect(() => {
         if (Object.keys(poolInfos).length > 0) {
             fetchPoolBalances();
-            const interval = setInterval(fetchPoolBalances, 5000); // Refresh every 30s
+            const interval = setInterval(fetchPoolBalances, 5000); // Refresh every 5s
             return () => clearInterval(interval);
         }
     }, [poolInfos, connection]);
-
-    // Fetch all pool information
-    const fetchPoolInfo = async () => {
-        try {
-            setIsLoadingPools(true);
-            const { data, error } = await supabase
-                .from('pool_info')
-                .select('*');
-
-            if (error) throw error;
-
-            const infoMap: Record<string, PoolInfo> = {};
-            data?.forEach(pool => {
-                infoMap[pool.character_id] = pool;
-            });
-            setPoolInfos(infoMap);
-        } catch (err) {
-            console.error('Error fetching pool info:', err);
-        } finally {
-            setIsLoadingPools(false);
-        }
-    };
 
     // Fetch balances for all pools
     const fetchPoolBalances = async () => {
@@ -104,7 +76,6 @@ const ChallengePage = () => {
 
         setPoolBalances(balances);
     };
-
 
     // UI Section
     return (
@@ -153,6 +124,11 @@ const ChallengePage = () => {
                                                 <span className="pool-balance">
                                                     {poolBalance.toLocaleString()} MCGA
                                                 </span>
+                                                {/* Truncated Pool Address Link */}
+                                                <TruncatedAddressLink
+                                                    address={poolInfos[character.id].pool_address}
+                                                    className="mt-2" // Optional: Add margin-top for spacing
+                                                />
                                             </div>
                                         )}
                                     </div>
@@ -318,6 +294,6 @@ const ChallengePage = () => {
             </div>
         </div>
     );
-};
 
+};
 export default ChallengePage;
