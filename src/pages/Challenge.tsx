@@ -23,9 +23,6 @@ import '../styles/challenge.css';
 import TruncatedAddressLink from '../components/TruncatedAddressLink';
 import { toast } from 'react-toastify'; // Import toast from react-toastify
 
-
-
-// src/pages/Challenge.tsx
 const ChallengePage = () => {
     const { connected } = useWallet();
     const { connection } = useConnection();
@@ -80,16 +77,9 @@ const ChallengePage = () => {
             <div className="flex flex-col">
                 <div className="flex items-center justify-between">
                     <span>Transaction Submitted</span>
-                    <button
-                        onClick={() => navigator.clipboard.writeText(txHash)}
-                        title="Copy Transaction Hash"
-                        className="text-blue-500 hover:text-blue-700"
-                    >
-                        <Copy size={16} />
-                    </button>
                 </div>
                 <div className="flex items-center justify-between mt-2">
-                    <span className="text-sm break-all">{txHash}</span>
+                    <span className="text-sm break-all">{truncateAddress(txHash)}</span>
                     <a
                         href={solscanUrl}
                         target="_blank"

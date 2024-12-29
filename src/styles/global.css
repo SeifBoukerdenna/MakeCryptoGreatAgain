@@ -1299,25 +1299,3 @@ button,
     border-style: solid;
     border-color: var(--text-color) transparent transparent transparent;
 }
-
-/* Show Tooltip on Hover */
-.tooltip-container:hover .tooltiptext {
-    visibility: visible;
-    opacity: 1;
-}
-
-.Toastify__toast {
-    background-color: var(--card-bg);
-    color: var(--text-primary);
-    border: 1px solid var(--card-border);
-    border-radius: 0.5rem;
-}
-
-.Toastify__toast--info {
-    background-color: rgba(99, 102, 241, 0.1);
-    /* Example: light purple */
-}
-
-.Toastify__close-button {
-    color: var(--text-secondary);
-}

@@ -10,6 +10,7 @@ import { Program } from "@coral-xyz/anchor";
 import { McgaPool } from "../smart-contract/idl_type";
 import IDL from "../smart-contract/idl.json";
 import { getProvider } from "../smart-contract/anchor";
+import { Price } from "../constants/price";
 
 interface Winner {
   address: string;
@@ -416,10 +417,11 @@ export function useChallengeLogic(onTransaction?: (txHash: string) => void) {
 
       // Step 1: Deposit
       console.log("Depositing tokens...");
-      const depositAmount = new BN(250 * 1e9);
+      const depositAmount = new BN(Price.challengePrice * 1e9);
       const depositSignature = await program.methods
         .deposit(depositAmount)
         .accounts({
+          // @ts-ignore
           pool: poolPda,
           poolTokenAccount: new PublicKey(poolInfo.pool_token_account),
           userTokenAccount,
@@ -433,6 +435,7 @@ export function useChallengeLogic(onTransaction?: (txHash: string) => void) {
       const checkHashSignature = await program.methods
         .checkHash(userGuess)
         .accounts({
+          // @ts-ignore
           pool: poolPda,
           poolTokenAccount: new PublicKey(poolInfo.pool_token_account),
           userTokenAccount,
