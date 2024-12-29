@@ -567,3 +567,26 @@
 .pool-balance.updated {
     animation: pulse 0.3s ease-in-out;
 }
+
+.winner-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.winner-amount {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(147, 51, 234, 0.1);
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.dark .winner-amount {
+    background: rgba(147, 51, 234, 0.2);
+}

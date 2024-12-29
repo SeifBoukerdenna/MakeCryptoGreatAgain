@@ -289,19 +289,25 @@ const ChallengePage = () => {
                             />
                             <h3 className="winner-name">{character.name}</h3>
                             {winners[character.id] ? (
-                                <div className="winner-address">
-                                    <button
-                                        onClick={() => handleCopy(winners[character.id])}
-                                        className="copy-address-button"
-                                        title="Click to copy wallet address"
-                                    >
-                                        <span>{truncateAddress(winners[character.id])}</span>
-                                        {copiedStates[winners[character.id]] ? (
-                                            <Check className="copy-icon" size={16} />
-                                        ) : (
-                                            <Copy className="copy-icon" size={16} />
-                                        )}
-                                    </button>
+                                <div className="winner-info">
+                                    <div className="winner-address">
+                                        <button
+                                            onClick={() => handleCopy(winners[character.id].address)}
+                                            className="copy-address-button"
+                                            title="Click to copy wallet address"
+                                        >
+                                            <span>{truncateAddress(winners[character.id].address)}</span>
+                                            {copiedStates[winners[character.id].address] ? (
+                                                <Check className="copy-icon" size={16} />
+                                            ) : (
+                                                <Copy className="copy-icon" size={16} />
+                                            )}
+                                        </button>
+                                    </div>
+                                    <div className="winner-amount">
+                                        <Coins className="h-4 w-4" />
+                                        <span>{winners[character.id].amount.toLocaleString()} MCGA</span>
+                                    </div>
                                 </div>
                             ) : (
                                 <div className="no-winner">No winners yet</div>

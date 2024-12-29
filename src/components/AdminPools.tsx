@@ -7,7 +7,7 @@ import { Loader2, Plus } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { charactersConfig } from '../configs/characters.config';
 import IDL from '../smart-contract/idl.json';
-import type { McgaPool } from '../smart-contract/my_project';
+import type { McgaPool } from '../smart-contract/idl_type';
 import { TOKEN_PROGRAM_ID } from '@solana/spl-token';
 
 const MCGA_MINT = new PublicKey("5g1hscK8kkX9ee1Snmm4HvBM4fH1b2u1tfee3GyTewAq");

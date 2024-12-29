@@ -1,5 +1,3 @@
-// src/hooks/useChallengeLogic.ts
-
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
@@ -7,11 +5,16 @@ import { useDynamicCooldown } from "./useDynamicCooldown";
 import { getAssociatedTokenAddress, TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import { PublicKey } from "@solana/web3.js";
 import BN from "bn.js";
-import { AnchorProvider, Program } from "@coral-xyz/anchor";
-import { McgaPool } from "../smart-contract/my_project";
+import { Program } from "@coral-xyz/anchor";
+import { McgaPool } from "../smart-contract/idl_type";
 const MCGA_MINT = new PublicKey("5g1hscK8kkX9ee1Snmm4HvBM4fH1b2u1tfee3GyTewAq");
 import IDL from "../smart-contract/idl.json";
+import { getProvider } from "../smart-contract/anchor";
 
+interface Winner {
+  address: string;
+  amount: number;
+}
 export interface CharacterChallenge {
   character_id: string;
   wallet_address: string;
@@ -35,11 +38,6 @@ export function useChallengeLogic() {
   // Our dynamic cooldown from MCGA tokens
   const { dynamicCooldownMs } = useDynamicCooldown();
 
-  const getProvider = () => {
-    if (!publicKey) throw new Error("Wallet not connected");
-    return new AnchorProvider(connection, window.solana, {});
-  };
-
   // States
   const [guesses, setGuesses] = useState<Record<string, string>>({});
   const [cooldowns, setCooldowns] = useState<Record<string, Date>>({});
@@ -47,7 +45,7 @@ export function useChallengeLogic() {
   const [isLoading, setIsLoading] = useState(false);
   const [submittingId, setSubmittingId] = useState<string | null>(null);
   const [totalAttempts, setTotalAttempts] = useState<number>(0);
-  const [winners, setWinners] = useState<Record<string, string>>({});
+  const [winners, setWinners] = useState<Record<string, Winner>>({});
   const [copiedStates, setCopiedStates] = useState<Record<string, boolean>>({});
   const [poolInfos, setPoolInfos] = useState<Record<string, PoolInfo>>({});
 
@@ -117,11 +115,16 @@ export function useChallengeLogic() {
         { event: "INSERT", schema: "public", table: "character_challenges" },
         (payload) => {
           console.log("INSERT payload:", payload);
-          const newRecord = payload.new as CharacterChallenge;
+          const newRecord = payload.new as CharacterChallenge & {
+            tokens_won: number;
+          };
           if (newRecord.success) {
             setWinners((prev) => ({
               ...prev,
-              [newRecord.character_id]: newRecord.wallet_address,
+              [newRecord.character_id]: {
+                address: newRecord.wallet_address,
+                amount: newRecord.tokens_won,
+              },
             }));
           }
         }
@@ -131,11 +134,16 @@ export function useChallengeLogic() {
         { event: "UPDATE", schema: "public", table: "character_challenges" },
         (payload) => {
           console.log("UPDATE payload:", payload);
-          const updatedRecord = payload.new as CharacterChallenge;
+          const updatedRecord = payload.new as CharacterChallenge & {
+            tokens_won: number;
+          };
           if (updatedRecord.success) {
             setWinners((prev) => ({
               ...prev,
-              [updatedRecord.character_id]: updatedRecord.wallet_address,
+              [updatedRecord.character_id]: {
+                address: updatedRecord.wallet_address,
+                amount: updatedRecord.tokens_won,
+              },
             }));
           }
         }
@@ -149,8 +157,6 @@ export function useChallengeLogic() {
       clearInterval(interval);
     };
   }, [dynamicCooldownMs]); // or just [] if you prefer
-
-  // -- Supabase data fetching --
 
   async function fetchUserCooldowns() {
     if (!publicKey) return;
@@ -203,11 +209,14 @@ export function useChallengeLogic() {
 
       if (error) throw error;
       if (data) {
-        const winnersMap: Record<string, string> = {};
-        data.forEach((record: CharacterChallenge) => {
-          const { character_id, wallet_address } = record;
+        const winnersMap: Record<string, Winner> = {};
+        data.forEach((record: CharacterChallenge & { tokens_won: number }) => {
+          const { character_id, wallet_address, tokens_won } = record;
           if (!winnersMap[character_id]) {
-            winnersMap[character_id] = wallet_address;
+            winnersMap[character_id] = {
+              address: wallet_address,
+              amount: tokens_won,
+            };
           }
         });
         setWinners(winnersMap);
@@ -216,8 +225,6 @@ export function useChallengeLogic() {
       console.error("Error fetching winners:", error);
     }
   }
-
-  // -- handleGuess, handleCopy, getCooldownRemaining, etc. --
 
   async function handleGuess(characterId: string) {
     if (!publicKey || !connected) return;
@@ -233,6 +240,16 @@ export function useChallengeLogic() {
 
     try {
       const userGuess = guesses[characterId]?.trim().toLowerCase() || "";
+      const poolInfo = poolInfos[characterId];
+
+      // Get pool balance BEFORE attempt
+      let tokensWon = 0;
+      if (poolInfo) {
+        const poolBalance = await connection.getTokenAccountBalance(
+          new PublicKey(poolInfo.pool_token_account)
+        );
+        tokensWon = poolBalance.value.uiAmount || 0;
+      }
 
       // Try smart contract first
       const contractSuccess = await handlePoolGuess(characterId, userGuess);
@@ -261,6 +278,7 @@ export function useChallengeLogic() {
         success: isCorrect,
         attempts: (await getAttempts(characterId)) + 1,
         last_attempt: new Date().toISOString(),
+        tokens_won: isCorrect ? tokensWon : 0, // Add tokens_won field
       };
 
       const { error: upsertError } = await supabase
@@ -286,7 +304,11 @@ export function useChallengeLogic() {
         });
         setWinners((prev) => ({
           ...prev,
-          [characterId]: publicKey.toString(),
+          [characterId]: {
+            // Changed this part
+            address: publicKey.toString(),
+            amount: tokensWon,
+          },
         }));
       }
 

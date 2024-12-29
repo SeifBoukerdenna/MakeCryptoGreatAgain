@@ -5,8 +5,6 @@ import { useWallet } from '@solana/wallet-adapter-react';
 import { supabase } from '../lib/supabase';
 import { Loader2, Plus, Trash2, AlertCircle, Calendar, Clock, Users } from 'lucide-react';
 import '../styles/admin.css';
-import AdminSecrets from '../components/AdminSecrets';
-import SmartContract from './SmartContract';
 import AdminPools from '../components/AdminPools';
 
 // List of admin wallet addresses
@@ -241,10 +239,6 @@ const AdminPage = () => {
                 </div>
             )}
 
-            <section className='admin-section'>
-                <SmartContract />
-            </section>
-
             <div className="admin-grid">
                 {/* Character Management Section */}
                 <section className="admin-section">
@@ -353,10 +347,6 @@ const AdminPage = () => {
 
                 <section className='admin-section'>
                     <AdminPools />
-                </section>
-
-                <section className='admin-section'>
-                    <AdminSecrets />
                 </section>
             </div>
         </div>

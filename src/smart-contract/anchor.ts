@@ -2,7 +2,7 @@
 import { AnchorProvider, Program } from "@coral-xyz/anchor";
 import { Connection, PublicKey } from "@solana/web3.js";
 import idl from "./idl.json";
-import type { McgaPool } from "./my_project";
+import type { McgaPool } from "./idl_type";
 
 export const NETWORK = "https://api.devnet.solana.com";
 export const PROGRAM_ID = new PublicKey(
