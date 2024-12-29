@@ -14,12 +14,20 @@ export type McgaPool = {
   };
   instructions: [
     {
-      name: "deposit";
-      discriminator: [242, 35, 198, 137, 82, 225, 242, 182];
+      name: "depositWithSecret";
+      discriminator: [221, 97, 98, 212, 138, 133, 119, 183];
       accounts: [
         {
           name: "pool";
           writable: true;
+          pda: {
+            seeds: [
+              {
+                kind: "const";
+                value: [112, 111, 111, 108];
+              }
+            ];
+          };
         },
         {
           name: "poolTokenAccount";
@@ -42,6 +50,10 @@ export type McgaPool = {
         {
           name: "amount";
           type: "u64";
+        },
+        {
+          name: "secret";
+          type: "string";
         }
       ];
     },
@@ -52,7 +64,14 @@ export type McgaPool = {
         {
           name: "pool";
           writable: true;
-          signer: true;
+          pda: {
+            seeds: [
+              {
+                kind: "const";
+                value: [112, 111, 111, 108];
+              }
+            ];
+          };
         },
         {
           name: "poolTokenAccount";
@@ -102,6 +121,10 @@ export type McgaPool = {
           {
             name: "tokenAccount";
             type: "pubkey";
+          },
+          {
+            name: "bump";
+            type: "u8";
           }
         ];
       };
