@@ -14,8 +14,8 @@ export type McgaPool = {
   };
   instructions: [
     {
-      name: "depositWithSecret";
-      discriminator: [221, 97, 98, 212, 138, 133, 119, 183];
+      name: "depositWithHash";
+      discriminator: [145, 159, 231, 106, 77, 224, 173, 59];
       accounts: [
         {
           name: "pool";
@@ -23,8 +23,9 @@ export type McgaPool = {
           pda: {
             seeds: [
               {
-                kind: "const";
-                value: [112, 111, 111, 108];
+                kind: "account";
+                path: "pool.seed";
+                account: "pool";
               }
             ];
           };
@@ -52,7 +53,7 @@ export type McgaPool = {
           type: "u64";
         },
         {
-          name: "secret";
+          name: "attemptHash";
           type: "string";
         }
       ];
@@ -67,8 +68,8 @@ export type McgaPool = {
           pda: {
             seeds: [
               {
-                kind: "const";
-                value: [112, 111, 111, 108];
+                kind: "arg";
+                path: "seed";
               }
             ];
           };
@@ -99,7 +100,16 @@ export type McgaPool = {
           address: "SysvarRent111111111111111111111111111111111";
         }
       ];
-      args: [];
+      args: [
+        {
+          name: "seed";
+          type: "string";
+        },
+        {
+          name: "secretHash";
+          type: "string";
+        }
+      ];
     }
   ];
   accounts: [
@@ -123,8 +133,12 @@ export type McgaPool = {
             type: "pubkey";
           },
           {
-            name: "bump";
-            type: "u8";
+            name: "secretHash";
+            type: "string";
+          },
+          {
+            name: "seed";
+            type: "string";
           }
         ];
       };

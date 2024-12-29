@@ -8,16 +8,16 @@
   },
   "instructions": [
     {
-      "name": "deposit_with_secret",
+      "name": "deposit_with_hash",
       "discriminator": [
-        221,
-        97,
-        98,
-        212,
-        138,
-        133,
-        119,
-        183
+        145,
+        159,
+        231,
+        106,
+        77,
+        224,
+        173,
+        59
       ],
       "accounts": [
         {
@@ -26,13 +26,9 @@
           "pda": {
             "seeds": [
               {
-                "kind": "const",
-                "value": [
-                  112,
-                  111,
-                  111,
-                  108
-                ]
+                "kind": "account",
+                "path": "pool.seed",
+                "account": "Pool"
               }
             ]
           }
@@ -60,7 +56,7 @@
           "type": "u64"
         },
         {
-          "name": "secret",
+          "name": "attempt_hash",
           "type": "string"
         }
       ]
@@ -84,13 +80,8 @@
           "pda": {
             "seeds": [
               {
-                "kind": "const",
-                "value": [
-                  112,
-                  111,
-                  111,
-                  108
-                ]
+                "kind": "arg",
+                "path": "seed"
               }
             ]
           }
@@ -121,7 +112,16 @@
           "address": "SysvarRent111111111111111111111111111111111"
         }
       ],
-      "args": []
+      "args": [
+        {
+          "name": "seed",
+          "type": "string"
+        },
+        {
+          "name": "secret_hash",
+          "type": "string"
+        }
+      ]
     }
   ],
   "accounts": [
@@ -154,8 +154,12 @@
             "type": "pubkey"
           },
           {
-            "name": "bump",
-            "type": "u8"
+            "name": "secret_hash",
+            "type": "string"
+          },
+          {
+            "name": "seed",
+            "type": "string"
           }
         ]
       }

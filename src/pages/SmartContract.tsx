@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Program, AnchorProvider } from '@coral-xyz/anchor';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
-import { Keypair, PublicKey, SystemProgram, SYSVAR_RENT_PUBKEY } from '@solana/web3.js';
+import { PublicKey, Keypair, SystemProgram, SYSVAR_RENT_PUBKEY } from '@solana/web3.js';
 import { TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import BN from 'bn.js';
 import { supabase } from '../lib/supabase';
@@ -10,12 +10,12 @@ import IDL from '../smart-contract/idl.json';
 import type { McgaPool } from '../smart-contract/my_project';
 
 const MCGA_MINT = new PublicKey("5g1hscK8kkX9ee1Snmm4HvBM4fH1b2u1tfee3GyTewAq");
-const PROGRAM_ID = new PublicKey(IDL.address);
 
 interface PoolInfo {
     pool_address: string;
     pool_token_account: string;
     created_at: string;
+    seed: string;
 }
 
 const SmartContract = () => {
@@ -25,7 +25,8 @@ const SmartContract = () => {
     const [poolInfo, setPoolInfo] = useState<PoolInfo | null>(null);
     const [poolBalance, setPoolBalance] = useState<number | null>(null);
     const [depositAmount, setDepositAmount] = useState("");
-    const [secretPhrase, setSecretPhrase] = useState("");
+    const [attemptHash, setAttemptHash] = useState("");
+    const [secretHash, setSecretHash] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState<string | null>(null);
@@ -58,16 +59,9 @@ const SmartContract = () => {
         const provider = new AnchorProvider(
             connection,
             wallet as any,
-            { commitment: 'confirmed' }
+            AnchorProvider.defaultOptions()
         );
         return provider;
-    };
-
-    const findPoolPDA = () => {
-        return PublicKey.findProgramAddressSync(
-            [Buffer.from("pool")],
-            PROGRAM_ID
-        );
     };
 
     const fetchPoolInfo = async () => {
@@ -104,20 +98,29 @@ const SmartContract = () => {
             return;
         }
 
+        if (!secretHash) {
+            setError("Please enter a secret phrase");
+            return;
+        }
+
         setLoading(true);
         setError(null);
         setSuccess(null);
 
         try {
+            const uniqueSeed = `pool_${Date.now()}`;
             const provider = getProvider();
-            const program = new Program<McgaPool>(IDL as any, provider);
-            const [poolPda] = findPoolPDA();
+            const program = new Program<McgaPool>(IDL as McgaPool, provider);
 
-            // Create new token account for the pool
+            const [poolPda] = PublicKey.findProgramAddressSync(
+                [Buffer.from(uniqueSeed)],
+                program.programId
+            );
+
             const poolTokenAccount = Keypair.generate();
 
             const tx = await program.methods
-                .initializePool()
+                .initializePool(uniqueSeed, secretHash)
                 .accounts({
                     pool: poolPda,
                     poolTokenAccount: poolTokenAccount.publicKey,
@@ -130,12 +133,13 @@ const SmartContract = () => {
                 .signers([poolTokenAccount])
                 .rpc();
 
-            // Store pool info in Supabase
             const { error: upsertError } = await supabase
                 .from('pool_info')
                 .upsert({
                     pool_address: poolPda.toString(),
                     pool_token_account: poolTokenAccount.publicKey.toString(),
+                    seed: uniqueSeed,
+                    created_at: new Date().toISOString(),
                 });
 
             if (upsertError) throw upsertError;
@@ -143,6 +147,7 @@ const SmartContract = () => {
             setPoolInfo({
                 pool_address: poolPda.toString(),
                 pool_token_account: poolTokenAccount.publicKey.toString(),
+                seed: uniqueSeed,
                 created_at: new Date().toISOString(),
             });
 
@@ -156,7 +161,7 @@ const SmartContract = () => {
         }
     };
 
-    const trySecret = async () => {
+    const depositWithHash = async () => {
         if (!connected || !publicKey) {
             setError("Please connect your wallet first");
             return;
@@ -167,8 +172,8 @@ const SmartContract = () => {
             return;
         }
 
-        if (parseFloat(depositAmount) <= 0) {
-            setError("Amount must be greater than zero");
+        if (!depositAmount || !attemptHash) {
+            setError("Please enter both amount and hash");
             return;
         }
 
@@ -178,9 +183,8 @@ const SmartContract = () => {
 
         try {
             const provider = getProvider();
-            const program = new Program<McgaPool>(IDL as any, provider);
+            const program = new Program<McgaPool>(IDL as McgaPool, provider);
 
-            // Get user's token account
             const userTokenAccounts = await connection.getTokenAccountsByOwner(
                 publicKey,
                 { mint: MCGA_MINT }
@@ -192,25 +196,31 @@ const SmartContract = () => {
 
             const userTokenAccount = userTokenAccounts.value[0].pubkey;
             const amount = new BN(parseFloat(depositAmount) * 1e9);
-            const [poolPda] = findPoolPDA();
+
+            const [poolPda] = PublicKey.findProgramAddressSync(
+                [Buffer.from(poolInfo.seed)],
+                program.programId
+            );
+
+            const poolTokenPubkey = new PublicKey(poolInfo.pool_token_account);
 
             const tx = await program.methods
-                .depositWithSecret(amount, secretPhrase)
+                .depositWithHash(amount, attemptHash)
                 .accounts({
                     pool: poolPda,
-                    poolTokenAccount: new PublicKey(poolInfo.pool_token_account),
+                    poolTokenAccount: poolTokenPubkey,
                     userTokenAccount: userTokenAccount,
                     user: publicKey,
                     tokenProgram: TOKEN_PROGRAM_ID,
                 })
                 .rpc();
 
-            setSuccess(`Transaction successful! Transaction: ${tx}`);
+            setSuccess(`Transaction successful! Hash: ${tx}`);
             setDepositAmount("");
-            setSecretPhrase("");
+            setAttemptHash("");
         } catch (err) {
-            console.error("Error with secret attempt:", err);
-            setError("Failed to process: " + (err instanceof Error ? err.message : String(err)));
+            console.error("Error depositing:", err);
+            setError("Failed to deposit: " + (err instanceof Error ? err.message : String(err)));
         } finally {
             setLoading(false);
         }
@@ -218,71 +228,86 @@ const SmartContract = () => {
 
     return (
         <div className="flex flex-col space-y-4 max-w-md mx-auto p-4">
-            <h2 className="text-2xl font-bold">MCGA Token Pool</h2>
+            <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-6">MCGA Token Pool</h2>
 
             {/* Initialize Pool Section */}
-            <div className="bg-gray-100 p-4 rounded-lg">
-                <h3 className="text-lg font-semibold mb-2">Initialize Pool</h3>
+            <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+                <h3 className="text-lg font-semibold mb-4">Initialize Pool</h3>
+                {!poolInfo && (
+                    <div className="mb-4">
+                        <input
+                            type="text"
+                            value={secretHash}
+                            onChange={(e) => setSecretHash(e.target.value)}
+                            placeholder="Enter secret phrase for pool"
+                            className="w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-purple-500 mb-4"
+                        />
+                    </div>
+                )}
                 <button
                     onClick={initializePool}
-                    disabled={loading || !connected || !!poolInfo}
-                    className={`bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600 disabled:opacity-50 ${poolInfo ? 'cursor-not-allowed' : ''}`}
+                    disabled={loading || !connected || !!poolInfo || (!poolInfo && !secretHash)}
+                    className="w-full bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 disabled:opacity-50 transition-all duration-200"
                 >
                     {loading ? "Initializing..." : poolInfo ? "Pool Initialized" : "Initialize Pool"}
                 </button>
+
                 {poolInfo && (
-                    <div className="mt-2 text-sm break-all space-y-2">
+                    <div className="mt-4 text-sm space-y-2 bg-gray-50 dark:bg-gray-700 p-4 rounded">
+                        <p className="break-all">Pool Address: {poolInfo.pool_address}</p>
+                        <p className="break-all">Pool Token Account: {poolInfo.pool_token_account}</p>
                         <p>Pool Balance: {poolBalance !== null ? poolBalance.toLocaleString() : "Loading..."} MCGA</p>
                     </div>
                 )}
             </div>
 
-            {/* Try Secret Section */}
+            {/* Deposit With Hash Section */}
             {poolInfo && (
-                <div className="bg-gray-100 p-4 rounded-lg">
-                    <h3 className="text-lg font-semibold mb-2">Try Your Luck</h3>
-                    <div className="space-y-3">
+                <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+                    <h3 className="text-lg font-semibold mb-4">Try Your Luck</h3>
+                    <div className="space-y-4">
                         <div>
-                            <label className="block text-sm mb-1">Amount to Risk</label>
                             <input
                                 type="number"
                                 value={depositAmount}
                                 onChange={(e) => setDepositAmount(e.target.value)}
-                                placeholder="MCGA amount"
-                                className="w-full p-2 border rounded"
+                                placeholder="Amount to deposit"
+                                className="w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-purple-500"
                                 min="0"
                             />
                         </div>
                         <div>
-                            <label className="block text-sm mb-1">Secret Phrase</label>
                             <input
-                                type="password"
-                                value={secretPhrase}
-                                onChange={(e) => setSecretPhrase(e.target.value)}
-                                placeholder="Enter the secret phrase"
-                                className="w-full p-2 border rounded"
+                                type="text"
+                                value={attemptHash}
+                                onChange={(e) => setAttemptHash(e.target.value)}
+                                placeholder="Enter secret phrase"
+                                className="w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-purple-500"
                             />
                         </div>
                         <button
-                            onClick={trySecret}
-                            disabled={loading || !connected || parseFloat(depositAmount) <= 0}
-                            className="w-full bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 disabled:opacity-50"
+                            onClick={depositWithHash}
+                            disabled={loading || !connected || !poolInfo || !depositAmount || !attemptHash}
+                            className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white px-4 py-3 rounded hover:from-purple-700 hover:to-pink-700 disabled:opacity-50 transition-all duration-200 font-medium"
                         >
-                            {loading ? "Processing..." : "Try Secret"}
+                            {loading ? "Processing..." : "Try Your Luck"}
                         </button>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
+                            Enter amount and secret phrase to try winning the pool's balance
+                        </p>
                     </div>
                 </div>
             )}
 
             {/* Status Messages */}
             {error && (
-                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-                    {error}
+                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                    <span className="block sm:inline">{error}</span>
                 </div>
             )}
             {success && (
-                <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
-                    {success}
+                <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
+                    <span className="block sm:inline">{success}</span>
                 </div>
             )}
         </div>
