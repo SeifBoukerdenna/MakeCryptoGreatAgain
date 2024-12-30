@@ -1,6 +1,5 @@
 // src/configs/characters.config.ts
 
-import { obfuscateCharacterConfig } from "../utils/obfuscate";
 import TrumpAvatar from "../assets/trump-memoji.jpg";
 import MuskAvatar from "../assets/musk-memoji.png";
 import TateAvatar from "../assets/tate-memoji.png";
@@ -13,8 +12,21 @@ import JonesAvatar from "../assets/jones-memoji.png";
 import SatoshiAvatar from "../assets/satoshi-memoji.png";
 import { BASE_MULTIPLIER } from "../constants/tokens";
 
-// Raw configuration object that will be obfuscated
-const rawConfig = [
+export interface CharacterConfig {
+  id: string;
+  name: string;
+  avatar: string;
+  description: string;
+  description_secondary: string;
+  price: number;
+  systemPrompt: string;
+  secondarySystemPrompt: string;
+  voice: {
+    id: string;
+    engine?: string;
+  };
+}
+export const charactersConfig: CharacterConfig[] = [
   {
     id: "1",
     name: "Donald Trump",
@@ -184,28 +196,3 @@ const rawConfig = [
     },
   },
 ];
-
-// Export the obfuscated configuration
-export const charactersConfig = obfuscateCharacterConfig(rawConfig);
-
-// Export type for TypeScript support
-export type CharacterConfig = {
-  id: string;
-  name: string;
-  avatar: string;
-  description: string;
-  description_secondary: string;
-  price: number;
-  systemPrompt: {
-    encrypted: string;
-    key: string;
-  };
-  secondarySystemPrompt: {
-    encrypted: string;
-    key: string;
-  };
-  voice: {
-    id: string;
-    engine?: string;
-  };
-};
