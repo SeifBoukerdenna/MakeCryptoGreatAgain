@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { Download } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { Download, X } from 'lucide-react';
 
 interface VideoPreviewOverlayProps {
     videoBlob: Blob;
@@ -10,23 +10,24 @@ interface VideoPreviewOverlayProps {
 const VideoPreviewOverlay: React.FC<VideoPreviewOverlayProps> = ({
     videoBlob,
     onClose,
-    characterName
+    characterName = 'Character'
 }) => {
+    const [videoTitle, setVideoTitle] = useState(`${characterName}_video`);
     const videoURL = URL.createObjectURL(videoBlob);
 
     useEffect(() => {
         document.body.style.overflow = 'hidden';
         return () => {
             document.body.style.overflow = 'auto';
+            URL.revokeObjectURL(videoURL);
         };
-    }, []);
+    }, [videoURL]);
 
     const handleDownload = () => {
         const a = document.createElement('a');
         a.href = videoURL;
-        a.download = `${characterName || 'avatar'}_video.webm`;
+        a.download = `${videoTitle}.webm`;
         a.click();
-        URL.revokeObjectURL(videoURL);
     };
 
     return (
@@ -37,28 +38,33 @@ const VideoPreviewOverlay: React.FC<VideoPreviewOverlayProps> = ({
                     className="close-button"
                     aria-label="Close video preview"
                 >
-                    &times;
+                    <X />
                 </button>
 
                 <h2 className="popup-title">Video Preview</h2>
 
-                <div className="video-container relative">
+                <div className="video-container">
                     <video src={videoURL} controls className="popup-video" />
-                    {characterName && (
-                        <div className="character-name-overlay">
-                            {characterName}
-                        </div>
-                    )}
                 </div>
 
-                {/* Updated button container with equal spacing */}
-                <div className="grid grid-cols-3 gap-4 mt-4">
+                <div className="export-section">
+                    <div className="title-input-wrapper">
+                        <input
+                            id="video-title"
+                            type="text"
+                            value={videoTitle}
+                            onChange={(e) => setVideoTitle(e.target.value)}
+                            className="title-input"
+                            placeholder="Enter a title..."
+                        />
+                    </div>
+
                     <button
                         onClick={handleDownload}
                         className="export-button download-button"
                     >
-                        <Download className="w-5 h-5" />
-                        Download
+                        <Download className="download-icon" />
+                        Download Video
                     </button>
                 </div>
             </div>

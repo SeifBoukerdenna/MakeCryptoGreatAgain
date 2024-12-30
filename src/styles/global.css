@@ -1305,13 +1305,75 @@ button,
     width: 100%;
     border-radius: 8px;
     overflow: hidden;
+    margin-bottom: 1.5rem;
 }
 
+
 .character-name-overlay {
-    z-index: 10;
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 0.5rem 1rem;
+    border-radius: 9999px;
+    color: white;
+    font-size: 0.875rem;
     backdrop-filter: blur(4px);
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-    font-family: 'Inter', sans-serif;
+    z-index: 2;
+}
+
+.title-input-wrapper {
+    margin-bottom: 1.5rem;
+}
+
+.title-label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--text-color);
+}
+
+.title-input {
+    width: 93%;
+    text-align: center;
+    height: 48px;
+    padding: 0 1rem;
+    background: var(--input-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 8px;
+    color: var(--input-text);
+    font-size: 1rem;
+    font-family: inherit;
+    transition: all 0.2s ease;
+}
+
+.title-input:focus {
+    outline: none;
+    border-color: var(--swiper-pagination-active-color);
+    box-shadow: 0 0 0 2px rgba(147, 51, 234, 0.2);
+}
+
+.title-input::placeholder {
+    color: var(--input-placeholder);
+}
+
+/* Download Button */
+.export-button.download-button {
+    width: 100%;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background: var(--button-bg);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
 }
 
 .export-button {
