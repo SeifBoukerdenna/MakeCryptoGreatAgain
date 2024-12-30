@@ -105,45 +105,120 @@ function createSubtitleSegments(
 /** Draws the text with fill and stroke at the bottom center of the canvas. */
 function drawSubtitle(ctx: CanvasRenderingContext2D, segment: SubtitleSegment) {
   const { text, color, font } = segment;
-
-  // Log the segment being drawn
-  // console.log(
-  //   "[useTTS] drawSubtitle => text:",
-  //   text,
-  //   "color:",
-  //   color,
-  //   "font:",
-  //   font
-  // );
+  const maxWidth = ctx.canvas.width * 0.7; // Use 70% of canvas width for safer margins
+  const lineHeight = parseInt(font.match(/\d+/)?.[0] || "40") * 1.2; // Get font size and add 20% for line height
+  const yBasePosition = ctx.canvas.height - 200;
 
   ctx.save();
-  ctx.font = font; // Use the font from the segment
+  ctx.font = font;
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
 
-  // Position near the bottom center
-  const xPos = ctx.canvas.width / 2;
-  const yPos = ctx.canvas.height - 200;
-
   // Validate color
   if (!color || typeof color !== "string") {
-    // console.warn("[useTTS] Invalid color detected. Defaulting to white.");
     ctx.fillStyle = "#FFFFFF";
   } else {
     ctx.fillStyle = color;
   }
 
-  // Fill text
-  ctx.fillText(text || "MISSING TEXT", xPos, yPos);
+  // Optional: Add text shadow for better visibility
+  ctx.shadowColor = "rgba(0, 0, 0, 0.5)";
+  ctx.shadowOffsetX = 2;
+  ctx.shadowOffsetY = 2;
+  ctx.shadowBlur = 4;
 
-  // Stroke outline
-  ctx.lineWidth = 4;
-  ctx.strokeStyle = "#000000"; // Keep stroke as black for visibility
-  ctx.strokeText(text || "MISSING TEXT", xPos, yPos);
+  // Measure text width
+  const textWidth = ctx.measureText(text).width;
+  const xPos = ctx.canvas.width / 2;
+
+  if (textWidth > maxWidth) {
+    // Split text into two lines
+    const words = text.split(" ");
+    let line1 = "";
+    let line2 = "";
+    let currentLine = "";
+
+    // Distribute words between lines
+    for (let i = 0; i < words.length; i++) {
+      const testLine = currentLine + (currentLine ? " " : "") + words[i];
+      const testWidth = ctx.measureText(testLine).width;
+
+      if (testWidth > maxWidth) {
+        // If we haven't started line2 yet, this is the break point
+        if (!line2) {
+          line1 = currentLine;
+          line2 = words[i];
+          currentLine = words[i];
+        } else {
+          // If we're already on line2, just add to it
+          line2 += " " + words[i];
+        }
+      } else {
+        if (!line2) {
+          currentLine = testLine;
+        } else {
+          line2 += " " + words[i];
+        }
+      }
+    }
+
+    // If we never needed line2, but processed all words
+    if (!line2) {
+      // Split the single line roughly in half by words
+      const allWords = currentLine.split(" ");
+      const midpoint = Math.ceil(allWords.length / 2);
+      line1 = allWords.slice(0, midpoint).join(" ");
+      line2 = allWords.slice(midpoint).join(" ");
+
+      // Verify that neither line exceeds maxWidth
+      const line1Width = ctx.measureText(line1).width;
+      const line2Width = ctx.measureText(line2).width;
+
+      // If either line is still too long, redistribute words
+      if (line1Width > maxWidth || line2Width > maxWidth) {
+        let currentLine1 = "";
+        let currentLine2 = "";
+
+        for (const word of allWords) {
+          const testLine1 = currentLine1 + (currentLine1 ? " " : "") + word;
+          if (ctx.measureText(testLine1).width <= maxWidth) {
+            currentLine1 = testLine1;
+          } else {
+            currentLine2 += (currentLine2 ? " " : "") + word;
+          }
+        }
+
+        line1 = currentLine1;
+        line2 = currentLine2;
+      }
+    }
+
+    // Draw the two lines
+    const yPosLine1 = yBasePosition - lineHeight / 2;
+    const yPosLine2 = yBasePosition + lineHeight / 2;
+
+    // Draw stroke for both lines
+    ctx.lineWidth = 4;
+    ctx.strokeStyle = "#000000";
+    ctx.strokeText(line1, xPos, yPosLine1);
+    ctx.strokeText(line2, xPos, yPosLine2);
+
+    // Draw fill for both lines
+    ctx.fillText(line1, xPos, yPosLine1);
+    ctx.fillText(line2, xPos, yPosLine2);
+  } else {
+    // Single line rendering
+    // Draw stroke
+    ctx.lineWidth = 4;
+    ctx.strokeStyle = "#000000";
+    ctx.strokeText(text, xPos, yBasePosition);
+
+    // Draw fill
+    ctx.fillText(text, xPos, yBasePosition);
+  }
 
   ctx.restore();
 }
-
 export function useTTS(): UseTTSResult {
   const [isLoading, setIsLoading] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
