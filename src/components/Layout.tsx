@@ -8,7 +8,8 @@ import { formatToK } from '../utils/numberFormat';
 import BalanceDisplay from './BalanceDisplay';
 import useBalanceStore from '../hooks/useBalanceStore';
 import { TEST_MODE } from '../configs/test.config';
-
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faXTwitter } from '@fortawesome/free-brands-svg-icons';
 interface LayoutProps {
     toggleTheme: () => void;
     theme: 'light' | 'dark';
@@ -23,17 +24,14 @@ const Layout: React.FC<LayoutProps> = ({ toggleTheme, theme }) => {
         const fetchBalances = async () => {
             if (connected && publicKey) {
                 try {
-                    // Fetch SOL balance
                     const solBalance = await connection.getBalance(publicKey);
                     setSolBalance(solBalance / 1e9);
 
-                    // Fetch MCGA token balance
                     const tokenAccounts = await connection.getParsedTokenAccountsByOwner(
                         publicKey,
                         { mint: MCGA_TOKEN_MINT }
                     );
 
-                    // Find MCGA token account
                     const mcgaAccount = tokenAccounts.value[0];
                     if (mcgaAccount) {
                         const tokenAmount = mcgaAccount.account.data.parsed.info.tokenAmount;
@@ -65,7 +63,6 @@ const Layout: React.FC<LayoutProps> = ({ toggleTheme, theme }) => {
                     <h1 className="text-xl font-bold text-gray-800 dark:text-gray-200">Make Crypto Great Again</h1>
                 </div>
 
-                {/* Navigation Links */}
                 <div className="navigation-links">
                     <NavLink
                         to="/"
@@ -107,7 +104,8 @@ const Layout: React.FC<LayoutProps> = ({ toggleTheme, theme }) => {
                     )}
                 </div>
 
-                {/* Balance and Wallet Section */}
+
+
                 <div className="wallet-balance-container">
                     {connected && (
                         <div className="balance-items">
@@ -123,10 +121,20 @@ const Layout: React.FC<LayoutProps> = ({ toggleTheme, theme }) => {
                     </div>
                 </div>
 
-                {/* Theme Toggle */}
+
                 <div className="theme-toggle">
                     <ThemeToggle toggleTheme={toggleTheme} theme={theme} />
+
+                    <a
+                        href="https://x.com/___MCGA___"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center text-gray-600 hover:text-purple-500 dark:text-gray-300 dark:hover:text-purple-400 transition-colors duration-200"
+                    >
+                        <FontAwesomeIcon icon={faXTwitter} size="lg" />
+                    </a>
                 </div>
+
             </nav>
 
             <main className="flex-1 px-4 py-6 md:px-8 bg-gray-50 dark:bg-gray-900">

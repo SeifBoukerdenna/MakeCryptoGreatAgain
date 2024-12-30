@@ -890,6 +890,7 @@ button,
 
 .navbar .theme-toggle {
     display: flex;
+    gap: 1rem;
     flex-wrap: wrap;
 }
 
