@@ -1,15 +1,22 @@
 export const thinkingMessages: { [key: string]: string[] } = {
     "Donald Trump": [
       "Making America great again...",
-      "Building a wall... figuratively ofc ...",
+      "Building a wall... Mexico will pay for it ofc...",
       "Tremendous ideas coming...",
       "Believe me, I'm thinking...",
       "Huge thoughts happening...",
-      "Big decisions ahead...",
-      "I’m a winner, and I always win...",
       "Nobody thinks better than me, trust me...",
-      "Creating a better economy, it's a no-brainer...",
-      "The media won't like this, but it'll be huge..."
+      "Creating a better economy...",
+      "The media won't like this, but it'll be huge...",
+      "The left won't like this...",
+      "Beating China again....",
+      "Making america rich again...",
+      "Bringing america to the top...",
+      "Reviving the american dream...",
+      "Rejecting the fake news...",
+      "This is locker room talk...",
+      
+
 
     ],
     

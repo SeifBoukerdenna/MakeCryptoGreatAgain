@@ -162,7 +162,11 @@ const Home: React.FC = () => {
                 <SwiperSlide key={char.id}>
                   <CharacterCard
                     {...char}
-                    onSelect={() => setSelectedCharacter(char.name)}
+                    onSelect={() => {
+                      if (isPlaying) return
+                      setSelectedCharacter(char.name)
+                      handleClearChat()
+                    }}
                     isSelected={selectedCharacter === char.name}
                   />
                 </SwiperSlide>

@@ -35,7 +35,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       // Add settings to encourage more complete word tokens
       temperature: 0.7,
       max_tokens: 150,
-      frequency_penalty: 0,
+      frequency_penalty: 1.8,
       presence_penalty: 0,
     });
 
