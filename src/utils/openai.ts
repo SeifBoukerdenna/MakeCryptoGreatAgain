@@ -3,12 +3,15 @@
 export async function streamGPTResponse(
   prompt: string,
   systemPrompt: string,
+  conversationHistory: string,
   onToken: (token: string) => void
 ): Promise<void> {
   const response = await fetch(
     `/api/stream-gpt?prompt=${encodeURIComponent(
       prompt
-    )}&systemPrompt=${encodeURIComponent(systemPrompt)}`,
+    )}&systemPrompt=${encodeURIComponent(
+      systemPrompt
+    )}&conversationHistory=${encodeURIComponent(conversationHistory)}`,
     {
       method: "GET",
     }

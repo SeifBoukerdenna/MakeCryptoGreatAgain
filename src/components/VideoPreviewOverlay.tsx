@@ -1,19 +1,19 @@
-// src/components/VideoPreviewOverlay.tsx
-
 import React, { useEffect } from 'react';
+import { Download } from 'lucide-react';
 
 interface VideoPreviewOverlayProps {
     videoBlob: Blob;
     onClose: () => void;
+    characterName?: string;
 }
 
 const VideoPreviewOverlay: React.FC<VideoPreviewOverlayProps> = ({
     videoBlob,
-    onClose
+    onClose,
+    characterName
 }) => {
     const videoURL = URL.createObjectURL(videoBlob);
 
-    // Prevent background scrolling when the overlay is open
     useEffect(() => {
         document.body.style.overflow = 'hidden';
         return () => {
@@ -24,7 +24,7 @@ const VideoPreviewOverlay: React.FC<VideoPreviewOverlayProps> = ({
     const handleDownload = () => {
         const a = document.createElement('a');
         a.href = videoURL;
-        a.download = 'avatar_video.webm'; // You can change the filename/extension if needed
+        a.download = `${characterName || 'avatar'}_video.webm`;
         a.click();
         URL.revokeObjectURL(videoURL);
     };
@@ -39,14 +39,28 @@ const VideoPreviewOverlay: React.FC<VideoPreviewOverlayProps> = ({
                 >
                     &times;
                 </button>
+
                 <h2 className="popup-title">Video Preview</h2>
-                <video src={videoURL} controls className="popup-video" />
-                <button
-                    onClick={handleDownload}
-                    className="download-button"
-                >
-                    Download Video
-                </button>
+
+                <div className="video-container relative">
+                    <video src={videoURL} controls className="popup-video" />
+                    {characterName && (
+                        <div className="character-name-overlay">
+                            {characterName}
+                        </div>
+                    )}
+                </div>
+
+                {/* Updated button container with equal spacing */}
+                <div className="grid grid-cols-3 gap-4 mt-4">
+                    <button
+                        onClick={handleDownload}
+                        className="export-button download-button"
+                    >
+                        <Download className="w-5 h-5" />
+                        Download
+                    </button>
+                </div>
             </div>
         </div>
     );
