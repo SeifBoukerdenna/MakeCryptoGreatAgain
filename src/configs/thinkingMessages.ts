@@ -15,8 +15,6 @@ export const thinkingMessages: { [key: string]: string[] } = {
       "Reviving the american dream...",
       "Rejecting the fake news...",
       "This is locker room talk...",
-      
-
 
     ],
     
@@ -39,19 +37,17 @@ export const thinkingMessages: { [key: string]: string[] } = {
   
     "Andrew Tate": [
       "Top G is thinking...",
-      "Escaping the Matrix...",
-      "Motivation loading...",
-      "Life is game of chess, that I always win...",
-      "Preparing for greatness...",
-      "Rise above the beta-males...",
-      "The world is mine for the taking...",
-      "Stay strong, stay focused...",
-      "Building my empire, brick by brick...",
-      "A real G never gives up...",
       "Hustler's University is in session...",
-      "I don’t make excuses, I make results...",
+      "Escaping the Matrix...",
+      "Fighting the matrix's attacks...",
+      "The war room is active...",
+      "Rise above the beta-males...",
       "You're poor, I'm rich...",
-      "Planning my next big move..."
+      "They try to silence me...",
+      "The world is my chessboard...",
+      "What color is your bugatti...",
+
+
     ],
   
     "Kanye West": [
