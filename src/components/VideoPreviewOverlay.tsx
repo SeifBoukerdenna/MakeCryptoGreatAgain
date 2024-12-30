@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Download, Youtube, Share2 } from 'lucide-react';
+import { Download } from 'lucide-react';
 
 interface VideoPreviewOverlayProps {
     videoBlob: Blob;
@@ -27,14 +27,6 @@ const VideoPreviewOverlay: React.FC<VideoPreviewOverlayProps> = ({
         a.download = `${characterName || 'avatar'}_video.webm`;
         a.click();
         URL.revokeObjectURL(videoURL);
-    };
-
-    const handleYouTubeExport = () => {
-        alert('YouTube export feature coming soon!');
-    };
-
-    const handleTikTokExport = () => {
-        alert('TikTok export feature coming soon!');
     };
 
     return (
@@ -68,23 +60,6 @@ const VideoPreviewOverlay: React.FC<VideoPreviewOverlayProps> = ({
                         <Download className="w-5 h-5" />
                         Download
                     </button>
-                    <div className='socials-container'>
-                        <button
-                            onClick={handleYouTubeExport}
-                            className="export-button youtube-button"
-                        >
-                            <Youtube className="w-5 h-5" />
-                            YouTube
-                        </button>
-
-                        <button
-                            onClick={handleTikTokExport}
-                            className="export-button tiktok-button"
-                        >
-                            <Share2 className="w-5 h-5" />
-                            TikTok
-                        </button>
-                    </div>
                 </div>
             </div>
         </div>

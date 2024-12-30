@@ -1339,34 +1339,51 @@ button,
     background: linear-gradient(135deg, #4F46E5 0%, #C026D3 100%);
 }
 
-/* YouTube button style */
-.youtube-button {
-    background: #FF0000;
-    color: white;
+/* Show tooltip on hover */
+.tooltip-container:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
 }
 
-.youtube-button:hover {
-    background: #CC0000;
+.tooltip-container {
+    position: relative;
+    display: inline-block;
 }
 
-/* TikTok button style */
-.tiktok-button {
-    background: #000000;
-    color: white;
+/* Tooltip Text */
+.tooltip-container .tooltiptext {
+    visibility: hidden;
+    width: max-content;
+    background-color: var(--text-color);
+    color: var(--bg-color);
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 10px;
+    font-size: 0.875rem;
+    white-space: nowrap;
+    position: absolute;
+    z-index: 100;
+    bottom: 125%;
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0;
+    transition: opacity 0.3s;
 }
 
-.tiktok-button:hover {
-    background: #333333;
+/* Show tooltip on hover */
+.tooltip-container:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
 }
 
-/* Dark mode adjustments */
-.dark .export-button {
-    border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.socials-container {
-    display: flex;
-    gap: 1rem;
-    justify-content: center;
-    margin-top: 1rem;
+/* Tooltip Arrow */
+.tooltip-container .tooltiptext::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 5px;
+    border-style: solid;
+    border-color: var(--text-color) transparent transparent transparent;
 }
