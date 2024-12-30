@@ -6,7 +6,7 @@ import { useMcgaBalance } from "./useMcgaBalance";
  * and for each MCGA token they hold, we reduce the cooldown by 100 ms,
  * down to a minimum of 1 second.
  */
-const BASE_COOLDOWN_MS = 6000; // 6 seconds
+const BASE_COOLDOWN_MS = 1200000; // 2 min
 const PER_TOKEN_REDUCTION = 100; // reduce 0.1s per token
 const MIN_COOLDOWN_MS = 1000; // 1 second
 

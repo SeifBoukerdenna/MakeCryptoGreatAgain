@@ -1,26 +1,29 @@
 // src/hooks/useChallengeLogic.ts
-import { useEffect, useState } from "react";
-import { supabase } from "../lib/supabase";
+import { useState, useEffect } from "react";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { useDynamicCooldown } from "./useDynamicCooldown";
-import { getAssociatedTokenAddress, TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import { PublicKey } from "@solana/web3.js";
-import BN from "bn.js";
-import { Program } from "@coral-xyz/anchor";
+import { BN, Program } from "@coral-xyz/anchor";
 import { McgaPool } from "../smart-contract/idl_type";
 import IDL from "../smart-contract/idl.json";
 import { getProvider } from "../smart-contract/anchor";
 import { Price } from "../constants/price";
+import { supabase } from "../lib/supabase";
+import { getAssociatedTokenAddress, TOKEN_PROGRAM_ID } from "@solana/spl-token";
 
-interface Winner {
-  address: string;
-  amount: number;
+interface CharacterStatus {
+  character_id: string;
+  is_solved: boolean;
+  solved_by: string | null;
+  solved_at: string | null;
+  tokens_won: number;
 }
-export interface CharacterChallenge {
+
+interface ChallengeAttempt {
   character_id: string;
   wallet_address: string;
-  success: boolean;
-  last_attempt: string | null;
+  last_attempt: string;
+  next_attempt_allowed: string;
   attempts: number;
 }
 
@@ -35,8 +38,6 @@ interface PoolInfo {
 export function useChallengeLogic(onTransaction?: (txHash: string) => void) {
   const { connected, publicKey } = useWallet();
   const { connection } = useConnection();
-
-  // Our dynamic cooldown from MCGA tokens
   const { dynamicCooldownMs } = useDynamicCooldown();
 
   const MCGA_MINT = new PublicKey(
@@ -45,362 +46,231 @@ export function useChallengeLogic(onTransaction?: (txHash: string) => void) {
 
   // States
   const [guesses, setGuesses] = useState<Record<string, string>>({});
-  const [cooldowns, setCooldowns] = useState<Record<string, Date>>({});
-  const [results, setResults] = useState<Record<string, boolean>>({});
+  const [attempts, setAttempts] = useState<Record<string, ChallengeAttempt>>(
+    {}
+  );
+  const [characterStatuses, setCharacterStatuses] = useState<
+    Record<string, CharacterStatus>
+  >({});
   const [isLoading, setIsLoading] = useState(false);
   const [submittingId, setSubmittingId] = useState<string | null>(null);
-  const [totalAttempts, setTotalAttempts] = useState<number>(0);
-  const [winners, setWinners] = useState<Record<string, Winner>>({});
-  const [copiedStates, setCopiedStates] = useState<Record<string, boolean>>({});
   const [poolInfos, setPoolInfos] = useState<Record<string, PoolInfo>>({});
+  const [copiedStates, setCopiedStates] = useState<Record<string, boolean>>({});
 
-  // 1. Timer to refresh cooldowns every second
+  // Initialize Realtime subscription
   useEffect(() => {
-    const timer = setInterval(() => {
-      setCooldowns((prev) => ({ ...prev }));
-    }, 1000);
-    return () => clearInterval(timer);
-  }, []);
-
-  // 2. Clean up expired cooldowns and clear results for expired cooldowns
-  useEffect(() => {
-    const cleanupInterval = setInterval(() => {
-      setCooldowns((prevCooldowns) => {
-        const now = Date.now();
-        const newCooldowns: Record<string, Date> = {};
-        const expiredIds: string[] = [];
-
-        Object.entries(prevCooldowns).forEach(([id, date]) => {
-          // Instead of a static COOL_DOWN, use dynamicCooldownMs
-          if (now - date.getTime() < dynamicCooldownMs) {
-            newCooldowns[id] = date;
-          } else {
-            expiredIds.push(id);
-          }
-        });
-
-        if (expiredIds.length > 0) {
-          setResults((prevResults) => {
-            const updatedResults = { ...prevResults };
-            expiredIds.forEach((id) => {
-              delete updatedResults[id];
-            });
-            return updatedResults;
-          });
-        }
-
-        return newCooldowns;
-      });
-    }, 1000);
-
-    return () => clearInterval(cleanupInterval);
-  }, [dynamicCooldownMs]);
-
-  // 3. If user changes, fetch cooldowns
-  useEffect(() => {
-    if (publicKey) {
-      fetchUserCooldowns();
-    } else {
-      setCooldowns({});
-    }
-  }, [publicKey]);
-
-  // 4. Re-fetch total attempts whenever a guess is submitted
-  useEffect(() => {
-    fetchTotalAttempts();
-  }, [submittingId]);
-
-  // 5. Realtime subscription + fetch winners
-  useEffect(() => {
-    fetchWinners();
-    const subscription = supabase
-      .channel("character_challenges")
+    const characterStatusSub = supabase
+      .channel("character-status-changes")
       .on(
         "postgres_changes",
-        { event: "INSERT", schema: "public", table: "character_challenges" },
-        (payload) => {
-          console.log("INSERT payload:", payload);
-          const newRecord = payload.new as CharacterChallenge & {
-            tokens_won: number;
-          };
-          if (newRecord.success) {
-            setWinners((prev) => ({
-              ...prev,
-              [newRecord.character_id]: {
-                address: newRecord.wallet_address,
-                amount: newRecord.tokens_won,
-              },
-            }));
-          }
-        }
-      )
-      .on(
-        "postgres_changes",
-        { event: "UPDATE", schema: "public", table: "character_challenges" },
-        (payload) => {
-          console.log("UPDATE payload:", payload);
-          const updatedRecord = payload.new as CharacterChallenge & {
-            tokens_won: number;
-          };
-          if (updatedRecord.success) {
-            setWinners((prev) => ({
-              ...prev,
-              [updatedRecord.character_id]: {
-                address: updatedRecord.wallet_address,
-                amount: updatedRecord.tokens_won,
-              },
-            }));
-          }
-        }
+        { event: "*", schema: "public", table: "character_status" },
+        () => fetchCharacterStatuses()
       )
       .subscribe();
 
-    const interval = setInterval(fetchWinners, 60000);
-
     return () => {
-      subscription.unsubscribe();
-      clearInterval(interval);
+      characterStatusSub.unsubscribe();
     };
-  }, [dynamicCooldownMs]);
+  }, []);
 
-  // 6. Fetch pool information on mount
+  // Fetch initial data
   useEffect(() => {
+    fetchCharacterStatuses();
     fetchPoolInfo();
   }, []);
 
-  // Log winners state updates
+  // Fetch user-specific attempts when wallet connects
   useEffect(() => {
-    console.log("Winners state updated:", winners);
-  }, [winners]);
-
-  async function fetchUserCooldowns() {
-    if (!publicKey) return;
-    const { data, error } = await supabase
-      .from("character_challenges")
-      .select("character_id, last_attempt")
-      .eq("wallet_address", publicKey.toString());
-
-    if (error) {
-      console.error("Error fetching cooldowns:", error);
-      return;
+    if (publicKey) {
+      fetchUserAttempts();
+    } else {
+      setAttempts({});
     }
-    if (data) {
-      const newCooldowns: Record<string, Date> = {};
-      data.forEach((record: any) => {
-        if (record.last_attempt) {
-          const attemptDate = new Date(record.last_attempt);
-          newCooldowns[record.character_id] = attemptDate;
-        }
-      });
-      setCooldowns(newCooldowns);
-    }
-  }
+  }, [publicKey]);
 
-  async function fetchTotalAttempts() {
-    const { data, error } = await supabase
-      .from("character_challenges")
-      .select("attempts");
-
-    if (error) {
-      console.error("Error fetching total attempts:", error);
-      return;
-    }
-    if (data && Array.isArray(data)) {
-      const total = data.reduce(
-        (acc: number, row: any) => acc + (row.attempts || 0),
-        0
-      );
-      setTotalAttempts(total);
-    }
-  }
-
-  async function fetchWinners() {
+  const fetchCharacterStatuses = async () => {
     try {
       const { data, error } = await supabase
-        .from("character_challenges")
-        .select("*")
-        .eq("success", true)
-        .order("last_attempt", { ascending: false });
+        .from("character_status")
+        .select("*");
 
       if (error) throw error;
-      if (data) {
-        const winnersMap: Record<string, Winner> = {};
-        data.forEach((record: CharacterChallenge & { tokens_won: number }) => {
-          const { character_id, wallet_address, tokens_won } = record;
-          if (!winnersMap[character_id]) {
-            winnersMap[character_id] = {
-              address: wallet_address,
-              amount: tokens_won,
-            };
-          }
-        });
-        setWinners(winnersMap);
-      }
-    } catch (error) {
-      console.error("Error fetching winners:", error);
-    }
-  }
 
-  async function handleGuess(characterId: string) {
+      const statusMap: Record<string, CharacterStatus> = {};
+      data?.forEach((status) => {
+        statusMap[status.character_id] = status;
+      });
+      setCharacterStatuses(statusMap);
+    } catch (err) {
+      console.error("Error fetching character statuses:", err);
+    }
+  };
+
+  const fetchUserAttempts = async () => {
+    if (!publicKey) return;
+
+    try {
+      const { data, error } = await supabase
+        .from("challenge_attempts")
+        .select("*")
+        .eq("wallet_address", publicKey.toString());
+
+      if (error) throw error;
+
+      const attemptsMap: Record<string, ChallengeAttempt> = {};
+      data?.forEach((attempt) => {
+        attemptsMap[attempt.character_id] = attempt;
+      });
+      setAttempts(attemptsMap);
+    } catch (err) {
+      console.error("Error fetching user attempts:", err);
+    }
+  };
+
+  const isCoolingDown = (characterId: string): boolean => {
+    const attempt = attempts[characterId];
+    if (!attempt?.next_attempt_allowed) return false;
+
+    const now = new Date();
+    const nextAttemptTime = new Date(attempt.next_attempt_allowed);
+    return now < nextAttemptTime;
+  };
+
+  const getCooldownRemaining = (characterId: string): number => {
+    const attempt = attempts[characterId];
+    if (!attempt?.next_attempt_allowed) return 0;
+
+    const now = new Date().getTime();
+    const nextAttemptTime = new Date(attempt.next_attempt_allowed).getTime();
+    return Math.max(nextAttemptTime - now, 0);
+  };
+
+  const handleGuess = async (characterId: string) => {
     if (!publicKey || !connected) return;
-    if (winners[characterId]) return;
-
-    const lastAttempt = cooldowns[characterId];
-    if (lastAttempt && Date.now() - lastAttempt.getTime() < dynamicCooldownMs) {
-      return;
-    }
+    if (isCoolingDown(characterId)) return;
 
     setIsLoading(true);
     setSubmittingId(characterId);
 
     try {
       const userGuess = guesses[characterId]?.trim().toLowerCase() || "";
-      console.log(`User Guess for Character ${characterId}: "${userGuess}"`);
-
       const poolInfo = poolInfos[characterId];
+
       if (!poolInfo) {
-        console.error(
-          `No pool information found for character_id: ${characterId}`
-        );
-        alert("Pool not initialized for this character.");
-        return;
+        throw new Error("Pool not initialized for this character.");
       }
 
-      // Try smart contract first and capture signatures
+      // Smart contract interaction
       const signatures = await handlePoolGuess(characterId, userGuess);
       if (signatures.length === 0) {
         throw new Error("Smart contract operation failed");
       }
 
-      // Trigger the callback with each signature
-      signatures.forEach((signature) => {
-        if (onTransaction) {
-          onTransaction(signature);
-        }
+      signatures.forEach((sig) => {
+        if (onTransaction) onTransaction(sig);
       });
 
-      // Fetch secret from Supabase
-      const { data: secretData, error } = await supabase
+      // Verify answer
+      const { data: secretData } = await supabase
         .from("character_secrets")
         .select("secret")
         .eq("character_id", characterId)
         .single();
 
-      if (error) {
-        console.error("Error fetching secret:", error);
-        throw error;
-      }
-      if (!secretData) {
-        console.error("No secret found for character_id:", characterId);
-        throw new Error("Secret not found");
-      }
+      if (!secretData) throw new Error("Secret not found");
 
-      const correctAnswer = secretData.secret.trim().toLowerCase();
-      console.log(
-        `Correct Answer for Character ${characterId}: "${correctAnswer}"`
-      );
+      const isCorrect = userGuess === secretData.secret.trim().toLowerCase();
 
-      const isCorrect = userGuess === correctAnswer;
-      console.log(`Is Correct: ${isCorrect}`);
-      setResults((prev) => ({ ...prev, [characterId]: isCorrect }));
+      // Calculate next attempt time
+      const now = new Date();
+      const nextAttemptTime = new Date(now.getTime() + dynamicCooldownMs);
 
-      // Fetch pool balance AFTER the attempt
-      let tokensWon = 0;
-      if (poolInfo) {
+      if (isCorrect) {
+        // If correct - update global character status to mark as solved
         const poolBalanceAfter = await connection.getTokenAccountBalance(
           new PublicKey(poolInfo.pool_token_account)
         );
-        tokensWon = poolBalanceAfter.value.uiAmount || 0;
-        console.log(`Tokens Won: ${tokensWon}`);
-      }
+        const tokensWon = poolBalanceAfter.value.uiAmount || 0;
 
-      // Update database
-      const upsertData = {
-        wallet_address: publicKey.toString(),
-        character_id: characterId,
-        success: isCorrect,
-        attempts: (await getAttempts(characterId)) + 1,
-        last_attempt: new Date().toISOString(),
-        tokens_won: isCorrect ? tokensWon : 0,
-      };
+        // Update global character status - this affects all users
+        const { error: statusError } = await supabase
+          .from("character_status")
+          .upsert({
+            character_id: characterId,
+            is_solved: true,
+            solved_by: publicKey.toString(),
+            solved_at: now.toISOString(),
+            tokens_won: tokensWon,
+          })
+          .select();
 
-      // Perform upsert with detailed logging
-      const { data: upsertDataResponse, error: upsertError } = await supabase
-        .from("character_challenges")
-        .upsert(upsertData, { onConflict: "wallet_address,character_id" })
-        .select();
+        if (statusError) throw statusError;
 
-      if (upsertError) {
-        console.error("Upsert Error:", upsertError);
-        alert(
-          "An error occurred while submitting your guess. Please try again."
-        );
-        return;
-      }
-
-      console.log("Upsert Successful:", upsertDataResponse);
-
-      // Update local states
-      if (!isCorrect) {
-        setCooldowns((prev) => ({
-          ...prev,
-          [characterId]: new Date(),
-        }));
-        setGuesses((prev) => ({
-          ...prev,
-          [characterId]: "",
-        }));
-      } else {
-        setCooldowns((prev) => {
-          const { [characterId]: _, ...rest } = prev;
-          return rest;
-        });
-        setWinners((prev) => ({
+        // Update character statuses immediately
+        setCharacterStatuses((prev) => ({
           ...prev,
           [characterId]: {
-            address: publicKey.toString(),
-            amount: tokensWon,
+            character_id: characterId,
+            is_solved: true,
+            solved_by: publicKey.toString(),
+            solved_at: now.toISOString(),
+            tokens_won: tokensWon,
+          },
+        }));
+      } else {
+        // If incorrect - update user's attempts and cooldown
+        const currentAttempts = attempts[characterId]?.attempts || 0;
+        const { error: attemptError } = await supabase
+          .from("challenge_attempts")
+          .upsert({
+            character_id: characterId,
+            wallet_address: publicKey.toString(),
+            last_attempt: now.toISOString(),
+            next_attempt_allowed: nextAttemptTime.toISOString(),
+            attempts: currentAttempts + 1,
+          })
+          .select();
+
+        if (attemptError) throw attemptError;
+
+        // Update attempts state immediately
+        setAttempts((prev) => ({
+          ...prev,
+          [characterId]: {
+            character_id: characterId,
+            wallet_address: publicKey.toString(),
+            last_attempt: now.toISOString(),
+            next_attempt_allowed: nextAttemptTime.toISOString(),
+            attempts: currentAttempts + 1,
           },
         }));
       }
 
-      await fetchTotalAttempts();
+      // Clear input if incorrect
+      setGuesses((prev) => ({
+        ...prev,
+        [characterId]: isCorrect ? prev[characterId] : "",
+      }));
+
+      // Refresh all data to ensure consistency
+      await Promise.all([fetchCharacterStatuses(), fetchUserAttempts()]);
     } catch (err) {
       console.error("Error submitting guess:", err);
-      alert("An error occurred. Please try again.");
+      throw new Error("Failed to submit guess");
     } finally {
       setIsLoading(false);
       setSubmittingId(null);
     }
-  }
-
-  const fetchPoolInfo = async () => {
-    try {
-      const { data, error } = await supabase.from("pool_info").select("*");
-
-      if (error) throw error;
-
-      const infoMap: Record<string, PoolInfo> = {};
-      data?.forEach((pool) => {
-        infoMap[pool.character_id] = pool;
-      });
-      setPoolInfos(infoMap);
-    } catch (err) {
-      console.error("Error fetching pool info:", err);
-    }
   };
 
-  async function handlePoolGuess(
+  const handlePoolGuess = async (
     characterId: string,
     userGuess: string
-  ): Promise<string[]> {
-    // Return an array of signatures
+  ): Promise<string[]> => {
     if (!connected || !publicKey) return [];
+
     const poolInfo = poolInfos[characterId];
-    if (!poolInfo) {
-      console.error("No pool found for character");
-      return [];
-    }
+    if (!poolInfo) return [];
 
     try {
       const provider = getProvider();
@@ -410,18 +280,17 @@ export function useChallengeLogic(onTransaction?: (txHash: string) => void) {
         MCGA_MINT,
         publicKey
       );
+
       const [poolPda] = PublicKey.findProgramAddressSync(
         [Buffer.from(poolInfo.seed)],
         program.programId
       );
 
-      // Step 1: Deposit
-      console.log("Depositing tokens...");
+      // Deposit
       const depositAmount = new BN(Price.challengePrice * 1e9);
       const depositSignature = await program.methods
         .deposit(depositAmount)
         .accounts({
-          // @ts-ignore
           pool: poolPda,
           poolTokenAccount: new PublicKey(poolInfo.pool_token_account),
           userTokenAccount,
@@ -430,12 +299,10 @@ export function useChallengeLogic(onTransaction?: (txHash: string) => void) {
         })
         .rpc();
 
-      // Step 2: Check hash
-      console.log("Checking hash...");
+      // Check hash
       const checkHashSignature = await program.methods
         .checkHash(userGuess)
         .accounts({
-          // @ts-ignore
           pool: poolPda,
           poolTokenAccount: new PublicKey(poolInfo.pool_token_account),
           userTokenAccount,
@@ -449,16 +316,24 @@ export function useChallengeLogic(onTransaction?: (txHash: string) => void) {
       console.error("Smart contract error:", err);
       return [];
     }
-  }
+  };
 
-  function getCooldownRemaining(characterId: string) {
-    const lastAttempt = cooldowns[characterId];
-    if (!lastAttempt) return 0;
-    const timePassed = Date.now() - lastAttempt.getTime();
-    return Math.max(dynamicCooldownMs - timePassed, 0);
-  }
+  const fetchPoolInfo = async () => {
+    try {
+      const { data, error } = await supabase.from("pool_info").select("*");
+      if (error) throw error;
 
-  async function handleCopy(address: string) {
+      const infoMap: Record<string, PoolInfo> = {};
+      data?.forEach((pool) => {
+        infoMap[pool.character_id] = pool;
+      });
+      setPoolInfos(infoMap);
+    } catch (err) {
+      console.error("Error fetching pool info:", err);
+    }
+  };
+
+  const handleCopy = async (address: string) => {
     try {
       await navigator.clipboard.writeText(address);
       setCopiedStates((prev) => ({ ...prev, [address]: true }));
@@ -468,39 +343,20 @@ export function useChallengeLogic(onTransaction?: (txHash: string) => void) {
     } catch (err) {
       console.error("Failed to copy address:", err);
     }
-  }
+  };
 
-  async function getAttempts(characterId: string): Promise<number> {
-    if (!publicKey) return 0;
-
-    try {
-      const { data } = await supabase
-        .from("character_challenges")
-        .select("attempts")
-        .eq("wallet_address", publicKey.toString())
-        .eq("character_id", characterId)
-        .single();
-
-      return data?.attempts || 0;
-    } catch {
-      return 0;
-    }
-  }
-
-  // Return everything needed by the UI
   return {
     guesses,
     setGuesses,
-    cooldowns,
-    results,
+    attempts,
+    characterStatuses,
     isLoading,
     submittingId,
-    totalAttempts,
-    winners,
+    poolInfos,
     copiedStates,
     handleGuess,
     handleCopy,
     getCooldownRemaining,
-    poolInfos, // Expose poolInfos to the component
+    isCoolingDown,
   };
 }

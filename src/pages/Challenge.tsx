@@ -1,4 +1,5 @@
 // src/pages/Challenge.tsx
+
 import { useEffect, useState } from 'react';
 import { useWallet, useConnection } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
@@ -12,33 +13,33 @@ import {
     Wallet,
     Copy,
     Coins,
-    ExternalLink, // Import ExternalLink icon
+    ExternalLink,
 } from 'lucide-react';
 import { charactersConfig } from '../configs/characters.config';
 import { formatTimeRemaining } from '../utils/time';
 import { truncateAddress } from '../utils/adress';
 import { useChallengeLogic } from '../hooks/useChallengeLogic';
-import { supabase } from '../lib/supabase';
 import '../styles/challenge.css';
 import TruncatedAddressLink from '../components/TruncatedAddressLink';
-import { toast } from 'react-toastify'; // Import toast from react-toastify
+import { toast } from 'react-toastify';
 
 const ChallengePage = () => {
     const { connected } = useWallet();
     const { connection } = useConnection();
 
     const {
-        guesses, setGuesses,
-        results,
+        guesses,
+        setGuesses,
+        attempts,
+        characterStatuses,
         isLoading,
         submittingId,
-        totalAttempts,
-        winners,
+        poolInfos,
         copiedStates,
         handleGuess,
         handleCopy,
         getCooldownRemaining,
-        poolInfos, // Get poolInfos from the hook
+        isCoolingDown,
     } = useChallengeLogic(handleTransaction);
 
     // Fetch pool balances whenever pool info changes
@@ -46,7 +47,7 @@ const ChallengePage = () => {
     useEffect(() => {
         if (Object.keys(poolInfos).length > 0) {
             fetchPoolBalances();
-            const interval = setInterval(fetchPoolBalances, 5000); // Refresh every 5s
+            const interval = setInterval(fetchPoolBalances, 5000);
             return () => clearInterval(interval);
         }
     }, [poolInfos, connection]);
@@ -69,7 +70,7 @@ const ChallengePage = () => {
         setPoolBalances(balances);
     };
 
-    // Callback to handle transaction hashes
+    // Handle transaction notifications
     function handleTransaction(txHash: string) {
         const solscanUrl = `https://solscan.io/tx/${txHash}?cluster=devnet`;
 
@@ -102,7 +103,6 @@ const ChallengePage = () => {
         );
     }
 
-    // UI Section
     return (
         <div className="container mx-auto px-4 py-8">
             <h1 className="text-3xl font-bold mb-8 text-center bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
@@ -117,26 +117,28 @@ const ChallengePage = () => {
                         <div className="stat-value">{charactersConfig.length}</div>
                     </div>
                     <div className="stat-item">
-                        <div className="stat-label">Total Attempts</div>
-                        <div className="stat-value">{totalAttempts}</div>
+                        <div className="stat-label">Solved Characters</div>
+                        <div className="stat-value">
+                            {Object.values(characterStatuses).filter(s => s.is_solved).length}
+                        </div>
                     </div>
                 </div>
 
                 {/* Character Grid */}
                 <div className="challenge-grid">
                     {charactersConfig.map((character) => {
+                        const characterStatus = characterStatuses[character.id];
+                        const attempt = attempts[character.id];
                         const cooldownMs = getCooldownRemaining(character.id);
-                        const hasResult = results[character.id] !== undefined;
-                        const isCorrect = results[character.id];
-                        const isCooldown = cooldownMs > 0;
-                        const isSolved = !!winners[character.id];
+                        const isSolved = characterStatus?.is_solved;
+                        const currentlyCoolingDown = isCoolingDown(character.id);
                         const poolBalance = poolBalances[character.id] || 0;
                         const hasPool = !!poolInfos[character.id];
 
                         return (
                             <div
                                 key={character.id}
-                                className={`challenge-card ${isSolved ? 'solved' : hasResult ? (isCorrect ? 'success' : 'error') : ''}`}
+                                className={`challenge-card ${isSolved ? 'solved' : ''}`}
                             >
                                 {/* Card Header */}
                                 <div className="header">
@@ -149,10 +151,9 @@ const ChallengePage = () => {
                                                 <span className="pool-balance">
                                                     {poolBalance.toLocaleString()} MCGA
                                                 </span>
-                                                {/* Truncated Pool Address Link */}
                                                 <TruncatedAddressLink
                                                     address={poolInfos[character.id].pool_address}
-                                                    className="mt-2" // Optional: Add margin-top for spacing
+                                                    className="mt-2"
                                                 />
                                             </div>
                                         )}
@@ -170,7 +171,7 @@ const ChallengePage = () => {
                                                     ? 'Pool not initialized'
                                                     : isSolved
                                                         ? 'Solved'
-                                                        : isCooldown
+                                                        : currentlyCoolingDown
                                                             ? 'Waiting for cooldown...'
                                                             : 'Enter the secret phrase...'
                                         }
@@ -179,7 +180,7 @@ const ChallengePage = () => {
                                             ...guesses,
                                             [character.id]: e.target.value,
                                         })}
-                                        disabled={!hasPool || isCooldown || !connected || isSolved}
+                                        disabled={!hasPool || currentlyCoolingDown || !connected || isSolved}
                                     />
 
                                     {/* Status Section */}
@@ -192,13 +193,7 @@ const ChallengePage = () => {
                                                     <Lock />
                                                 ) : isSolved ? (
                                                     <Check color="#10B981" />
-                                                ) : hasResult ? (
-                                                    isCorrect ? (
-                                                        <Check color="#10B981" />
-                                                    ) : (
-                                                        <X color="#EF4444" />
-                                                    )
-                                                ) : isCooldown ? (
+                                                ) : currentlyCoolingDown ? (
                                                     <Lock />
                                                 ) : (
                                                     <Unlock />
@@ -211,21 +206,17 @@ const ChallengePage = () => {
                                                         ? 'Pool not initialized'
                                                         : isSolved
                                                             ? 'Secret found'
-                                                            : hasResult
-                                                                ? isCorrect
-                                                                    ? 'Correct!'
-                                                                    : 'Wrong answer'
-                                                                : isCooldown
-                                                                    ? 'Cooldown active'
-                                                                    : 'Ready to guess'}
+                                                            : currentlyCoolingDown
+                                                                ? 'Cooldown active'
+                                                                : 'Ready to guess'}
                                             </div>
                                         </div>
 
                                         {/* Action Button */}
                                         <button
                                             onClick={() => handleGuess(character.id)}
-                                            disabled={!hasPool || isCooldown || !connected || isLoading || isSolved}
-                                            className={`challenge-button ${isCooldown || isSolved ? 'cooldown' : 'ready'}`}
+                                            disabled={!hasPool || currentlyCoolingDown || !connected || isLoading || isSolved}
+                                            className={`challenge-button ${currentlyCoolingDown || isSolved ? 'cooldown' : 'ready'}`}
                                         >
                                             {!connected ? (
                                                 <>
@@ -241,7 +232,7 @@ const ChallengePage = () => {
                                                 </>
                                             ) : isSolved ? (
                                                 'Solved'
-                                            ) : isCooldown ? (
+                                            ) : currentlyCoolingDown ? (
                                                 <>
                                                     <Timer />
                                                     {formatTimeRemaining(cooldownMs)}
@@ -253,7 +244,7 @@ const ChallengePage = () => {
                                     </div>
 
                                     {/* Overlays */}
-                                    {isCooldown && (
+                                    {currentlyCoolingDown && (
                                         <div className="cooldown-overlay">
                                             <div className="cooldown-timer">
                                                 <Timer />
@@ -262,7 +253,7 @@ const ChallengePage = () => {
                                         </div>
                                     )}
 
-                                    {!connected && !isCooldown && !isSolved && (
+                                    {!connected && !currentlyCoolingDown && !isSolved && (
                                         <div className="connect-wallet-overlay">
                                             <div className="connect-wallet-message">
                                                 <Wallet />
@@ -281,44 +272,49 @@ const ChallengePage = () => {
             <div className="winner-section">
                 <h2 className="text-2xl font-bold mb-4 text-center">Winners</h2>
                 <div className="winner-grid">
-                    {charactersConfig.map((character) => (
-                        <div key={character.id} className="winner-card">
-                            <img
-                                src={character.avatar}
-                                alt={character.name}
-                                className="winner-avatar"
-                            />
-                            <h3 className="winner-name">{character.name}</h3>
-                            {winners[character.id] ? (
-                                <div className="winner-info">
-                                    <div className="winner-address">
-                                        <button
-                                            onClick={() => handleCopy(winners[character.id].address)}
-                                            className="copy-address-button"
-                                            title="Click to copy wallet address"
-                                        >
-                                            <span>{truncateAddress(winners[character.id].address)}</span>
-                                            {copiedStates[winners[character.id].address] ? (
-                                                <Check className="copy-icon" size={16} />
-                                            ) : (
-                                                <Copy className="copy-icon" size={16} />
-                                            )}
-                                        </button>
+                    {charactersConfig.map((character) => {
+                        const status = characterStatuses[character.id];
+                        return (
+                            <div key={character.id} className="winner-card">
+                                <img
+                                    src={character.avatar}
+                                    alt={character.name}
+                                    className="winner-avatar"
+                                />
+                                <h3 className="winner-name">{character.name}</h3>
+                                {status?.is_solved ? (
+                                    <div className="winner-info">
+                                        <div className="winner-address">
+                                            <button
+                                                onClick={() => handleCopy(status.solved_by || '')}
+                                                className="copy-address-button"
+                                                title="Click to copy wallet address"
+                                            >
+                                                <span>{truncateAddress(status.solved_by || '')}</span>
+                                                {copiedStates[status.solved_by || ''] ? (
+                                                    <Check className="copy-icon" size={16} />
+                                                ) : (
+                                                    <Copy className="copy-icon" size={16} />
+                                                )}
+                                            </button>
+                                        </div>
+                                        {status.tokens_won > 0 && (
+                                            <div className="winner-amount">
+                                                <Coins className="h-4 w-4" />
+                                                {status.tokens_won.toLocaleString()} MCGA
+                                            </div>
+                                        )}
                                     </div>
-                                    <div className="winner-amount">
-                                        <Coins className="h-4 w-4" />
-                                        <span>{winners[character.id].amount.toLocaleString()} MCGA</span>
-                                    </div>
-                                </div>
-                            ) : (
-                                <div className="no-winner">No winners yet</div>
-                            )}
-                        </div>
-                    ))}
+                                ) : (
+                                    <div className="no-winner">No winner yet</div>
+                                )}
+                            </div>
+                        );
+                    })}
                 </div>
             </div>
         </div>
     );
-
 };
+
 export default ChallengePage;
