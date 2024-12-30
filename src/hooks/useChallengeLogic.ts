@@ -336,6 +336,7 @@ export function useChallengeLogic(onTransaction?: (txHash: string) => void) {
       const depositSignature = await program.methods
         .deposit(depositAmount)
         .accounts({
+          // @ts-ignore
           pool: poolPda,
           poolTokenAccount: new PublicKey(poolInfo.pool_token_account),
           userTokenAccount,
@@ -348,6 +349,7 @@ export function useChallengeLogic(onTransaction?: (txHash: string) => void) {
       const checkHashSignature = await program.methods
         .checkHash(userGuess)
         .accounts({
+          // @ts-ignore
           pool: poolPda,
           poolTokenAccount: new PublicKey(poolInfo.pool_token_account),
           userTokenAccount,

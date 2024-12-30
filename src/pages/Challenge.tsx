@@ -8,7 +8,6 @@ import {
     Unlock,
     RefreshCw,
     Check,
-    X,
     Timer,
     Wallet,
     Copy,
@@ -30,7 +29,6 @@ const ChallengePage = () => {
     const {
         guesses,
         setGuesses,
-        attempts,
         characterStatuses,
         isLoading,
         submittingId,
@@ -69,6 +67,39 @@ const ChallengePage = () => {
 
         setPoolBalances(balances);
     };
+
+    const startCountdownTimer = (characterId: string, endTime: number) => {
+        // Get the timer element for this character
+        const timerElement = document.querySelector(`[data-timer-id="${characterId}"]`);
+        if (!timerElement) return;
+
+        // Clear any existing interval
+        const existingInterval = (window as any)[`timerInterval_${characterId}`];
+        if (existingInterval) {
+            clearInterval(existingInterval);
+        }
+
+        const updateTimer = () => {
+            const now = Date.now();
+            const timeLeft = endTime - now;
+
+            if (timeLeft <= 0) {
+                clearInterval((window as any)[`timerInterval_${characterId}`]);
+                timerElement.textContent = 'Ready';
+                return;
+            }
+
+            // Format time remaining
+            const minutes = Math.floor(timeLeft / (60 * 1000));
+            const seconds = Math.floor((timeLeft % (60 * 1000)) / 1000);
+            timerElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        };
+
+        // Start interval
+        updateTimer(); // Initial update
+        (window as any)[`timerInterval_${characterId}`] = setInterval(updateTimer, 1000);
+    };
+
 
     // Handle transaction notifications
     function handleTransaction(txHash: string) {
@@ -128,7 +159,6 @@ const ChallengePage = () => {
                 <div className="challenge-grid">
                     {charactersConfig.map((character) => {
                         const characterStatus = characterStatuses[character.id];
-                        const attempt = attempts[character.id];
                         const cooldownMs = getCooldownRemaining(character.id);
                         const isSolved = characterStatus?.is_solved;
                         const currentlyCoolingDown = isCoolingDown(character.id);
@@ -235,7 +265,16 @@ const ChallengePage = () => {
                                             ) : currentlyCoolingDown ? (
                                                 <>
                                                     <Timer />
-                                                    {formatTimeRemaining(cooldownMs)}
+                                                    <span
+                                                        data-timer-id={character.id}
+                                                        ref={(el) => {
+                                                            if (el && cooldownMs > 0) {
+                                                                startCountdownTimer(character.id, Date.now() + cooldownMs);
+                                                            }
+                                                        }}
+                                                    >
+                                                        {formatTimeRemaining(cooldownMs)}
+                                                    </span>
                                                 </>
                                             ) : (
                                                 'Submit'
@@ -248,7 +287,16 @@ const ChallengePage = () => {
                                         <div className="cooldown-overlay">
                                             <div className="cooldown-timer">
                                                 <Timer />
-                                                Next attempt in {formatTimeRemaining(cooldownMs)}
+                                                <span
+                                                    data-timer-id={`overlay-${character.id}`}
+                                                    ref={(el) => {
+                                                        if (el && cooldownMs > 0) {
+                                                            startCountdownTimer(`overlay-${character.id}`, Date.now() + cooldownMs);
+                                                        }
+                                                    }}
+                                                >
+                                                    {formatTimeRemaining(cooldownMs)}
+                                                </span>
                                             </div>
                                         </div>
                                     )}
