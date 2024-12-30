@@ -101,17 +101,22 @@ export const thinkingMessages: { [key: string]: string[] } = {
   
     "Connor Mcgregor": [
       "Preparing for a knockout...",
-      "Training for the big fight...",
-      "Adversity builds strength...",
-      "Ready to take on the world...",
-      "thinking about beating up Khabib...",
-      "I always rise above...",
-      "The champ is back...",
+      "Preparing my revenge for Khabib...",
+      "The champ champ is back...",
       "Time to prove them all wrong...",
-      "Staying focused, staying hungry...",
       "There’s no fight I can't win...",
-      "The world is watching, time to deliver...",
-      "Conquering the ring..."
+      "Your wife is in mi DMs...",
+      "Conquering the ring...",
+      "The irish king is back...",
+      "get ready for my left hand...",
+      "Making the best whiskey in the world...",
+      "The all want to be me...",
+      "I made the UFC...",
+      "I'm the face of the fight game...",
+      "I'm the king of the octagon...",
+      "You'll do nothing...",
+      "I'm the money fight..."
+      
     ],
   
     "Logan Paul": [
