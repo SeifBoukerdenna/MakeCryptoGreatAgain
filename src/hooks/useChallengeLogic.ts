@@ -133,7 +133,17 @@ export function useChallengeLogic(onTransaction?: (txHash: string) => void) {
 
     const now = new Date();
     const nextAttemptTime = new Date(attempt.next_attempt_allowed);
-    return now < nextAttemptTime;
+    const isInCooldown = now < nextAttemptTime;
+
+    // Add logging for debugging
+    console.log("Cooldown check:", {
+      characterId,
+      now: now.toISOString(),
+      nextAttemptTime: nextAttemptTime.toISOString(),
+      isInCooldown,
+    });
+
+    return isInCooldown;
   };
 
   const getCooldownRemaining = (characterId: string): number => {
@@ -147,12 +157,19 @@ export function useChallengeLogic(onTransaction?: (txHash: string) => void) {
 
   const handleGuess = async (characterId: string) => {
     if (!publicKey || !connected) return;
-    if (isCoolingDown(characterId)) return;
-
-    setIsLoading(true);
-    setSubmittingId(characterId);
 
     try {
+      // First check if there's a current cooldown
+      if (isCoolingDown(characterId)) {
+        console.log("Still in cooldown period");
+        throw new Error(
+          "You must wait for the cooldown period to end before trying again"
+        );
+      }
+
+      setIsLoading(true);
+      setSubmittingId(characterId);
+
       const userGuess = guesses[characterId]?.trim().toLowerCase() || "";
       const poolInfo = poolInfos[characterId];
 
@@ -192,7 +209,6 @@ export function useChallengeLogic(onTransaction?: (txHash: string) => void) {
         );
         const tokensWon = poolBalanceAfter.value.uiAmount || 0;
 
-        // Update global character status - this affects all users
         const { error: statusError } = await supabase
           .from("character_status")
           .upsert({
@@ -206,7 +222,6 @@ export function useChallengeLogic(onTransaction?: (txHash: string) => void) {
 
         if (statusError) throw statusError;
 
-        // Update character statuses immediately
         setCharacterStatuses((prev) => ({
           ...prev,
           [characterId]: {
@@ -218,45 +233,75 @@ export function useChallengeLogic(onTransaction?: (txHash: string) => void) {
           },
         }));
       } else {
-        // If incorrect - update user's attempts and cooldown
-        const currentAttempts = attempts[characterId]?.attempts || 0;
-        const { error: attemptError } = await supabase
+        // On wrong answer - ALWAYS update the cooldown
+        // Try to insert new record first
+        const { error: insertError } = await supabase
           .from("challenge_attempts")
-          .upsert({
+          .insert({
             character_id: characterId,
             wallet_address: publicKey.toString(),
             last_attempt: now.toISOString(),
             next_attempt_allowed: nextAttemptTime.toISOString(),
-            attempts: currentAttempts + 1,
-          })
-          .select();
+            attempts: 1,
+          });
 
-        if (attemptError) throw attemptError;
+        // If we get a duplicate key error, update the existing record
+        if (insertError?.code === "23505") {
+          const { error: updateError } = await supabase
+            .from("challenge_attempts")
+            .update({
+              last_attempt: now.toISOString(),
+              next_attempt_allowed: nextAttemptTime.toISOString(),
+              attempts: (attempts[characterId]?.attempts || 0) + 1,
+            })
+            .eq("character_id", characterId)
+            .eq("wallet_address", publicKey.toString());
 
-        // Update attempts state immediately
-        setAttempts((prev) => ({
+          if (updateError) throw updateError;
+        }
+
+        // Clear the input field
+        setGuesses((prev) => ({
           ...prev,
-          [characterId]: {
-            character_id: characterId,
-            wallet_address: publicKey.toString(),
-            last_attempt: now.toISOString(),
-            next_attempt_allowed: nextAttemptTime.toISOString(),
-            attempts: currentAttempts + 1,
-          },
+          [characterId]: "",
         }));
       }
 
-      // Clear input if incorrect
-      setGuesses((prev) => ({
-        ...prev,
-        [characterId]: isCorrect ? prev[characterId] : "",
-      }));
-
-      // Refresh all data to ensure consistency
+      // Refresh data to ensure consistency
       await Promise.all([fetchCharacterStatuses(), fetchUserAttempts()]);
-    } catch (err) {
-      console.error("Error submitting guess:", err);
-      throw new Error("Failed to submit guess");
+    } catch (error: any) {
+      console.error("Error submitting guess:", error);
+
+      // Check for specific error types
+      if (error.code === "23505") {
+        // Handle duplicate key error silently - just update the attempt
+        const now = new Date();
+        const nextAttemptTime = new Date(now.getTime() + dynamicCooldownMs);
+
+        try {
+          const { error: updateError } = await supabase
+            .from("challenge_attempts")
+            .update({
+              last_attempt: now.toISOString(),
+              next_attempt_allowed: nextAttemptTime.toISOString(),
+              attempts: attempts[characterId]?.attempts + 1 || 1,
+            })
+            .eq("character_id", characterId)
+            .eq("wallet_address", publicKey.toString());
+
+          if (updateError) {
+            console.error("Error updating attempt:", updateError);
+          }
+        } catch (err) {
+          console.error("Error handling duplicate key:", err);
+        }
+      } else if (error.message.includes("cooldown")) {
+        // Cooldown error - let it propagate to UI
+        throw error;
+      } else {
+        // Other errors
+        throw new Error("Failed to submit guess");
+      }
     } finally {
       setIsLoading(false);
       setSubmittingId(null);
