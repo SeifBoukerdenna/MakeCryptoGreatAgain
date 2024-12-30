@@ -107,7 +107,7 @@ const EngagementLeaderboard = () => {
         };
 
         fetchUserEngagement();
-        const interval = setInterval(fetchUserEngagement, 60000); // Refresh every minute
+        const interval = setInterval(fetchUserEngagement, 600000); // Refresh every minute
         return () => clearInterval(interval);
     }, [connection]);
 

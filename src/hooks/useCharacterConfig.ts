@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+// @ts-ignore
 import { charactersConfig } from "../configs/characters.config";
 import useCharacterStore from "../stores/useCharacterStore";
 import useModeStore from "../stores/useModeStore";
@@ -11,6 +12,7 @@ export const useCharacterConfig = () => {
 
   const currentConfig = useMemo(() => {
     const config = charactersConfig.find(
+      // @ts-ignore
       (char) => char.name === selectedCharacter
     );
     return config || charactersConfig[0];
