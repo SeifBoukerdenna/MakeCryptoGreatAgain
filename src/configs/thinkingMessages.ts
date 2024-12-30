@@ -46,8 +46,6 @@ export const thinkingMessages: { [key: string]: string[] } = {
       "They try to silence me...",
       "The world is my chessboard...",
       "What color is your bugatti...",
-
-
     ],
   
     "Kanye West": [
@@ -70,7 +68,7 @@ export const thinkingMessages: { [key: string]: string[] } = {
       "Facts are processing...",
       "Processing logic...",
       "Getting the facts right...",
-      "Let me explain, logically...",
+      "Let me explain,logically...",
       "Fact-checking... Done!",
       "The left is wrong... again...",
       "This is a simple matter of facts...",
@@ -78,8 +76,7 @@ export const thinkingMessages: { [key: string]: string[] } = {
       "Every argument has to have its basis in truth...",
       "Let me counter that with facts...",
       "Data doesn't lie...",
-      "You can't argue with the truth...",
-      "Let's stick to the facts, people..."
+      "You can't argue with the truth..."
     ],
   
     "Adolf Hitler": [
