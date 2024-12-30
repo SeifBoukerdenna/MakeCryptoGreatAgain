@@ -1326,6 +1326,26 @@ button,
     margin-bottom: 1.5rem;
 }
 
+.format-label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-color);
+    transition: color 0.3s ease;
+}
+
+.active-format {
+    color: var(--swiper-pagination-active-color);
+    font-weight: bold;
+}
+
+.format-switch {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
 .title-label {
     display: block;
     font-size: 0.875rem;

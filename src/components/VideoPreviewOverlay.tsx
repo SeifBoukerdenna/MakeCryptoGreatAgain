@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Download, X } from 'lucide-react';
 import Switch from 'react-switch';
+import { SwitchColors } from './ThemeToggle';
 
 interface VideoPreviewOverlayProps {
     videoBlob: Blob;
@@ -100,6 +101,22 @@ const VideoPreviewOverlay: React.FC<VideoPreviewOverlayProps> = ({
         }
     };
 
+    const switchColors: SwitchColors = {
+        offColor: getComputedStyle(document.documentElement)
+            .getPropertyValue('--toggle-bg-light')
+            .trim() || '#888888',
+        onColor: getComputedStyle(document.documentElement)
+            .getPropertyValue('--toggle-bg-dark')
+            .trim() || '#6366F1',
+        offHandleColor: getComputedStyle(document.documentElement)
+            .getPropertyValue('--toggle-handle-light')
+            .trim() || '#ffffff',
+        onHandleColor: getComputedStyle(document.documentElement)
+            .getPropertyValue('--toggle-handle-dark')
+            .trim() || '#ffffff',
+    };
+
+
     return (
         <div className="video-overlay">
             <div className="video-popup">
@@ -125,24 +142,30 @@ const VideoPreviewOverlay: React.FC<VideoPreviewOverlayProps> = ({
                         />
                     </div>
 
-                    <div className="format-switch flex items-center justify-center gap-4 mb-4">
-                        <span className={`text-sm ${!isMP4 ? 'text-purple-500 font-bold' : ''}`}>WebM</span>
+                    <div className="format-switch">
+                        <span className={`format-label ${!isMP4 ? 'active-format' : ''}`}>WebM</span>
                         <Switch
                             onChange={setIsMP4}
                             checked={isMP4}
-                            onColor="#8B5CF6"
-                            offColor="#D1D5DB"
+                            offColor={switchColors.offColor}
+                            onColor={switchColors.onColor}
+                            offHandleColor={switchColors.offHandleColor}
+                            onHandleColor={switchColors.onHandleColor}
                             height={24}
                             width={48}
                             handleDiameter={20}
+                            uncheckedIcon={false}
+                            checkedIcon={false}
+                            className="switch-component"
                         />
-                        <span className={`text-sm ${isMP4 ? 'text-purple-500 font-bold' : ''}`}>MP4</span>
+                        <span className={`format-label ${isMP4 ? 'active-format' : ''}`}>MP4</span>
                     </div>
 
                     <button
                         onClick={handleDownload}
-                        className="export-button download-button"
+                        className={`export-button download-button ${isConverting ? 'disabled-button' : ''}`}
                         disabled={isConverting}
+                        aria-label={`Download video as ${isMP4 ? 'MP4' : 'WebM'}`}
                     >
                         <Download className="download-icon" />
                         {isConverting ? 'Converting...' : `Download ${isMP4 ? 'MP4' : 'WebM'}`}

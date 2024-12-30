@@ -9,7 +9,7 @@ interface ThemeToggleProps {
     theme: 'light' | 'dark';
 }
 
-interface SwitchColors {
+export interface SwitchColors {
     offColor: string;
     onColor: string;
     offHandleColor: string;
