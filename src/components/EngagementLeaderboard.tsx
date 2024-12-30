@@ -33,7 +33,7 @@ const EngagementLeaderboard = () => {
         }
     };
 
-    const fetchMcgaBalance = async (address: string): Promise<number> => {
+    const fetchMcgaBalance = async (address: string, retries = 3, delay = 1000): Promise<number> => {
         try {
             const pubKey = new PublicKey(address);
             const tokenAccounts = await connection.getParsedTokenAccountsByOwner(
@@ -47,9 +47,15 @@ const EngagementLeaderboard = () => {
                 return parseInt(tokenAmount.amount) / Math.pow(10, tokenAmount.decimals);
             }
             return 0;
-        } catch (err) {
-            console.error('Error fetching MCGA balance:', err);
-            return 0;
+        } catch (err: any) {
+            if (err.response?.status === 429 && retries > 0) {
+                console.warn(`Rate limited. Retrying in ${delay}ms...`);
+                await new Promise(res => setTimeout(res, delay));
+                return fetchMcgaBalance(address, retries - 1, delay * 2);
+            } else {
+                console.error('Error fetching MCGA balance:', err);
+                return 0;
+            }
         }
     };
 
@@ -59,7 +65,7 @@ const EngagementLeaderboard = () => {
                 setIsLoading(true);
                 setError(null);
 
-                // Get interaction counts from message_stats
+                // Fetch interaction data from Supabase
                 const { data, error: fetchError } = await supabase
                     .from('message_stats')
                     .select('wallet_address, message_count, last_used')
@@ -84,20 +90,26 @@ const EngagementLeaderboard = () => {
                     return acc;
                 }, {});
 
-                // Fetch MCGA balances for each user
-                const usersWithBalances = await Promise.all(
-                    Object.values(aggregatedData).map(async (user) => ({
-                        ...user,
-                        mcga_balance: await fetchMcgaBalance(user.wallet_address)
-                    }))
-                );
+                const userAddresses = Object.keys(aggregatedData);
 
-                // Sort by total interactions
-                const sortedUsers = usersWithBalances.sort(
+                // Limit concurrent requests to avoid rate limiting
+                const BATCH_SIZE = 5; // Adjust based on API limits
+                for (let i = 0; i < userAddresses.length; i += BATCH_SIZE) {
+                    const batch = userAddresses.slice(i, i + BATCH_SIZE);
+                    const balances = await Promise.all(
+                        batch.map(address => fetchMcgaBalance(address))
+                    );
+                    batch.forEach((address, index) => {
+                        aggregatedData[address].mcga_balance = balances[index];
+                    });
+                }
+
+                // Convert aggregated data to array and sort
+                const usersWithBalances = Object.values(aggregatedData).sort(
                     (a, b) => b.total_interactions - a.total_interactions
                 );
 
-                setUsers(sortedUsers);
+                setUsers(usersWithBalances);
             } catch (err) {
                 console.error('Error fetching user engagement:', err);
                 setError('Failed to fetch user engagement data');
@@ -107,7 +119,7 @@ const EngagementLeaderboard = () => {
         };
 
         fetchUserEngagement();
-        const interval = setInterval(fetchUserEngagement, 600000); // Refresh every minute
+        const interval = setInterval(fetchUserEngagement, 10000); // Fetch every 10 seconds
         return () => clearInterval(interval);
     }, [connection]);
 

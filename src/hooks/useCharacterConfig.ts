@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 // @ts-ignore
+// import { charactersConfig } from "../configs/characters.config";
 import { charactersConfig } from "../configs/characters.config";
 import useCharacterStore from "../stores/useCharacterStore";
 import useModeStore from "../stores/useModeStore";
