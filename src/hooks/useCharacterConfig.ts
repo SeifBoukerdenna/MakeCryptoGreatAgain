@@ -1,7 +1,10 @@
+// src/hooks/useCharacterConfig.ts
+
 import { useMemo } from "react";
 import { charactersConfig } from "../configs/characters.config";
 import useCharacterStore from "../stores/useCharacterStore";
 import useModeStore from "../stores/useModeStore";
+import { getPrompt } from "../utils/obfuscate";
 
 export const useCharacterConfig = () => {
   const selectedCharacter = useCharacterStore(
@@ -17,10 +20,12 @@ export const useCharacterConfig = () => {
   }, [selectedCharacter]);
 
   const mode = modes[currentConfig.id] || "normal";
+
+  // Get the appropriate prompt based on mode
   const systemPrompt =
     mode === "secret"
-      ? currentConfig.secondarySystemPrompt
-      : currentConfig.systemPrompt;
+      ? getPrompt(currentConfig, true) // Get secondary prompt
+      : getPrompt(currentConfig); // Get primary prompt
 
   return {
     systemPrompt,
