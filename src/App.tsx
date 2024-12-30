@@ -14,6 +14,8 @@ import Social from './pages/Social';
 import RoadmapPage from './pages/RoadMap';
 import AdminCharacters from './pages/Admin';
 import ChallengePage from './pages/Challenge';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { Buffer as BufferPolyfill } from 'buffer'
 declare var Buffer: typeof BufferPolyfill;
 globalThis.Buffer = BufferPolyfill
@@ -59,6 +61,17 @@ const App = () => {
               </Route>
             </Routes>
           </Router>
+          <ToastContainer
+            position="top-right"
+            autoClose={5000}
+            hideProgressBar={false}
+            newestOnTop={false}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+          />
         </WalletModalProvider>
       </WalletProvider>
     </ConnectionProvider>
