@@ -53,7 +53,7 @@ const App = () => {
             <Routes>
               <Route path="/" element={<Layout toggleTheme={toggleTheme} theme={theme} />}>
                 <Route index element={<Home />} />
-                <Route path="about" element={<About />} />
+                <Route path="about" element={<About theme={theme} />} />
                 <Route path="social" element={<Social />} />
                 <Route path="/challenge" element={<ChallengePage />} />
                 <Route path="roadmap" element={<RoadmapPage />} />

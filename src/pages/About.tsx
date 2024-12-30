@@ -4,7 +4,10 @@ import banner from "../assets/banner.png";
 import SmartContractViewer from '../components/SmartContractViewer';
 import { motion } from 'framer-motion';
 
-const About = () => {
+interface AboutProps {
+    theme: 'light' | 'dark';
+}
+const About = ({ theme }: AboutProps) => {
     const contractCode = `
 use anchor_lang::prelude::*;
 use anchor_spl::token::{self, Token, TokenAccount, Transfer};
@@ -327,9 +330,12 @@ pub struct Pool {
                         your favorite personalities.
                     </motion.p>
                 </div>
-                <div className="mt-8">
-                    <SmartContractViewer code={contractCode} language="rust" />
+                <div className="mt-8 flex justify-center">
+                    <div className="max-w-4xl w-full">
+                        <SmartContractViewer code={contractCode} language="rust" theme={theme} />
+                    </div>
                 </div>
+
             </motion.section>
         </div>
 
