@@ -88,6 +88,9 @@ const Home: React.FC = () => {
               alt={`${getSelectedCharacter()!.name} Avatar`}
               className={`selected-avatar ${isPlaying ? 'speaking' : ''} w-24 h-24`}
             />
+            <div className="selected-character-name" style={{ display: 'none' }}>
+              {getSelectedCharacter()!.name}
+            </div>
             {isPlaying && (
               <div className="waveform-under-avatar absolute inset-0 flex items-center justify-center">
                 <Waveform />

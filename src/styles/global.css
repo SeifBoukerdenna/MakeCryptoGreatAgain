@@ -1299,3 +1299,74 @@ button,
     border-style: solid;
     border-color: var(--text-color) transparent transparent transparent;
 }
+
+.video-container {
+    position: relative;
+    width: 100%;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.character-name-overlay {
+    z-index: 10;
+    backdrop-filter: blur(4px);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    font-family: 'Inter', sans-serif;
+}
+
+.export-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.export-button:hover {
+    transform: translateY(-2px);
+}
+
+/* Download button style */
+.download-button {
+    background: linear-gradient(135deg, #6366F1 0%, #D946EF 100%);
+    color: white;
+}
+
+.download-button:hover {
+    background: linear-gradient(135deg, #4F46E5 0%, #C026D3 100%);
+}
+
+/* YouTube button style */
+.youtube-button {
+    background: #FF0000;
+    color: white;
+}
+
+.youtube-button:hover {
+    background: #CC0000;
+}
+
+/* TikTok button style */
+.tiktok-button {
+    background: #000000;
+    color: white;
+}
+
+.tiktok-button:hover {
+    background: #333333;
+}
+
+/* Dark mode adjustments */
+.dark .export-button {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.socials-container {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 1rem;
+}
