@@ -32,8 +32,8 @@ const EngagementLeaderboard = () => {
             console.error('Failed to copy address:', err);
         }
     };
-
-    const fetchMcgaBalance = async (address: string, retries = 3, delay = 1000): Promise<number> => {
+    const fetchInterval = 60000 * 5; // 5 minutes
+    const fetchMcgaBalance = async (address: string, retries = 3, delay = fetchInterval): Promise<number> => {
         try {
             const pubKey = new PublicKey(address);
             const tokenAccounts = await connection.getParsedTokenAccountsByOwner(

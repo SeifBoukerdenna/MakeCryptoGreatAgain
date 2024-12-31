@@ -2,7 +2,7 @@
 
 /* Import Poppins Font */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
-
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
 
 /* CSS Variables for Light and Dark Themes */
 :root {
@@ -198,13 +198,11 @@ html {
     height: 2px;
     bottom: -2px;
     left: 0;
-    /* Replaces #6b46c1 with a variable that matches your new purples */
     background-color: var(--swiper-pagination-active-color);
     transition: width 0.3s ease;
 }
 
 .nav-link:hover {
-    /* Replaces #6b46c1 with your new active purple */
     color: var(--swiper-pagination-active-color);
 }
 
@@ -230,7 +228,6 @@ html {
 
 /* Optional: Add focus styles for accessibility */
 .nav-link:focus {
-    /* Replaces #6b46c1 */
     outline: 2px solid var(--swiper-pagination-active-color);
     outline-offset: 2px;
 }
@@ -365,7 +362,6 @@ html {
 .character-description {
     font-size: 1rem;
     color: #666666;
-    /* Could use a var(--text-secondary) if you like */
     text-align: center;
     line-height: 1.6;
 }
@@ -421,7 +417,6 @@ html {
 /* Selected Character Icon */
 .selected-character-icon {
     position: relative;
-    /* Allows absolute positioning of waveform */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -434,18 +429,14 @@ html {
     border-radius: 50%;
     border: 4px solid #D3D3D3;
     object-fit: cover;
-    /* Updated box-shadow already handled above */
     box-shadow: 0 0 20px rgba(147, 51, 234, 0.5);
 }
 
 .waveform-under-avatar {
     position: absolute;
     bottom: -50px;
-    /* Adjust as needed to position below the avatar */
     left: 50%;
     transform: translateX(-50%);
-    /* Optional: Add additional styles such as width */
-    /* width: 80px; */
 }
 
 .isSelected-avatar {
@@ -490,32 +481,6 @@ html {
     animation: fadeInUp 0.3s ease;
 }
 
-
-/* Prompt Input */
-.message-input-container {
-    display: flex;
-    gap: 0.5rem;
-    align-items: center;
-}
-
-.message-input {
-    flex: 1;
-    padding: 0.75rem 1.5rem;
-    border: none;
-    border-radius: 30px;
-    background: var(--input-bg);
-    color: var(--input-text);
-    outline: none;
-    font-size: 1rem;
-    transition: box-shadow 0.3s ease;
-}
-
-.message-input::placeholder {
-    color: var(--input-placeholder);
-    font-style: italic;
-    font-size: 1rem;
-}
-
 .user-message {
     text-align: right;
     background-color: var(--message-user-bg);
@@ -547,9 +512,8 @@ html {
     font-size: 1rem;
     background: transparent;
     color: #6366F1;
-    /* Base color matching the gradient */
     z-index: 100;
-    padding: 0.75rem 1.5rem;
+    padding: 0.5rem .5rem;
     font-weight: 700;
     cursor: pointer;
     border-radius: 30px;
@@ -559,9 +523,7 @@ html {
 
 .clear-chat-button:hover {
     background: rgba(99, 102, 241, 0.1);
-    /* Light purple background on hover */
     border-color: #4F46E5;
-    /* Slightly darker border on hover */
     color: #4F46E5;
     transform: translateY(-1px);
 }
@@ -576,15 +538,6 @@ html {
     background: rgba(139, 92, 246, 0.1);
     border-color: #7C3AED;
     color: #7C3AED;
-}
-
-
-
-
-
-/* Updated focus shadow with new purple */
-.message-input:focus {
-    box-shadow: 0 0 15px rgba(147, 51, 234, 0.5);
 }
 
 .send-button {
@@ -632,7 +585,6 @@ html {
 .balances {
     display: flex;
     gap: 1rem;
-    /* justify-content: center; */
 }
 
 /* Responsive Design */
@@ -660,10 +612,6 @@ html {
         margin-bottom: 1rem;
     }
 
-    .message-input-container {
-        gap: 0.25rem;
-    }
-
     .send-button {
         padding: 0.5rem 1rem;
     }
@@ -675,9 +623,7 @@ html {
     align-items: center;
     gap: 0.5rem;
     max-width: 200px;
-    /* Restricts the maximum width */
     flex-shrink: 0;
-    /* Prevents the container from shrinking */
 }
 
 .wallet-info .balance-amount {
@@ -685,7 +631,6 @@ html {
     font-weight: 600;
     font-size: 1.1rem;
     white-space: nowrap;
-    /* Prevents address from wrapping */
 }
 
 .wallet-info {
@@ -776,7 +721,6 @@ button,
     cursor: not-allowed;
 }
 
-/* Optional: Adjust ConnectWallet in connected state */
 .wallet-connected p {
     margin: 0;
     font-size: 0.9rem;
@@ -794,7 +738,12 @@ button,
     flex-direction: column;
     align-items: center;
     gap: 1rem;
-    /* Adjust the spacing between the elements */
+}
+
+.theme-toggle {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
 }
 
 /* Border animation for 'speaking' avatars */
@@ -835,18 +784,6 @@ button,
     border: 1px solid var(--card-border);
     border-radius: 8px;
     padding: 0.5rem 1rem;
-}
-
-/* Updated navbar layout (redundant for clarity, but left as is) */
-.navbar {
-    display: grid;
-    grid-template-columns: auto 1fr auto auto;
-    align-items: center;
-    gap: 2rem;
-    padding: 1rem 2rem;
-    background: linear-gradient(180deg, rgba(147, 51, 234, 0.05) 0%, rgba(0, 0, 0, 0) 100%);
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    border-bottom: 1px solid var(--card-border);
 }
 
 .balance-items {
@@ -925,13 +862,11 @@ button,
     border-radius: 12px;
     backdrop-filter: blur(10px);
     align-items: center;
-    /* Center items vertically */
 }
 
 .balance-item.wallet button {
     margin-top: 0.5rem;
     width: 100%;
-    /* Ensures the button spans the entire width of the balance item */
 }
 
 .balance-item {
@@ -968,36 +903,24 @@ button,
 
 .balance-item.wallet {
     background: rgba(255, 215, 0, 0.15);
-    /* Gold-like background */
     border: 1px solid rgba(255, 215, 0, 0.3);
-    /* Gold-like border */
 }
-
 
 .balance-item.wallet .balance-symbol {
     color: #FFA500;
-    /* Orange color */
 }
 
 .balance-item.wallet .select-button {
     background: #FFD700;
-    /* Gold background */
     color: #333333;
-    /* Dark text */
 }
 
 .balance-item.wallet .select-button:hover {
     background: #FFC107;
-    /* Darker gold on hover */
 }
 
 .message-input-container button:hover {
     color: var(--button-hover-bg);
-}
-
-/* Ensure the microphone button has a smooth transition */
-.message-input-container button {
-    transition: color 0.3s ease;
 }
 
 .language-dropdown {
@@ -1036,7 +959,6 @@ button,
     box-shadow: 0 0 8px rgba(147, 51, 234, 0.5);
 }
 
-/* Disabled styling so users see it's not selectable right now */
 .dropdown:disabled {
     opacity: 0.6;
     cursor: not-allowed;
@@ -1055,7 +977,6 @@ button,
     z-index: 1000;
     animation: fadeIn 0.3s ease;
     padding: 1rem;
-    /* Ensure some padding on smaller screens */
 }
 
 .video-popup {
@@ -1066,7 +987,6 @@ button,
     max-width: 90%;
     width: 500px;
     max-height: 90vh;
-    /* Prevents popup from exceeding viewport height */
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
     position: relative;
     animation: slideDown 0.3s ease;
@@ -1107,9 +1027,7 @@ button,
     margin-bottom: 1.5rem;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     max-height: 60vh;
-    /* Ensures the video doesn't exceed available space */
     object-fit: contain;
-    /* Maintains aspect ratio */
 }
 
 .download-button {
@@ -1130,7 +1048,6 @@ button,
     transform: translateY(-2px);
 }
 
-/* Animations */
 @keyframes fadeIn {
     from {
         opacity: 0;
@@ -1151,14 +1068,12 @@ button,
     }
 }
 
-/* Responsive Design */
 @media (max-width: 600px) {
     .video-popup {
         padding: 1.5rem;
         width: 100%;
         max-width: 100%;
         max-height: 95vh;
-        /* Allow more height on smaller screens */
     }
 
     .popup-title {
@@ -1172,11 +1087,9 @@ button,
 
     .popup-video {
         max-height: 50vh;
-        /* Adjust video size for smaller screens */
     }
 }
 
-/* Smooth Transitions for All Elements */
 .video-overlay,
 .video-popup,
 .close-button,
@@ -1186,13 +1099,11 @@ button,
     transition: all 0.3s ease;
 }
 
-/* Camera Button Styles */
 .camera-button {
     border: 1px solid var(--swiper-pagination-active-color);
-    border-radius: 0.25rem;
+    border-radius: 10px;
     background: var(--input-bg);
     color: var(--input-placeholder);
-    margin-right: 0.5rem;
     transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
 }
 
@@ -1200,17 +1111,6 @@ button,
     background: var(--button-hover-bg);
     color: #FFFFFF;
     transform: scale(1.05);
-}
-
-.camera-button:hover {
-    background: var(--button-hover-bg);
-    color: #FFFFFF;
-    transform: scale(1.05);
-}
-
-.camera-button.active {
-    background: var(--button-hover-bg);
-    color: #FFFFFF;
 }
 
 .camera-button.active {
@@ -1227,10 +1127,9 @@ button,
     transform: none;
 }
 
-/* Microphone Button Styles */
 .mic-button {
     border: 1px solid var(--swiper-pagination-active-color);
-    border-radius: 0.25rem;
+    border-radius: 10px;
     background: var(--input-bg);
     color: var(--input-placeholder);
     transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
@@ -1247,28 +1146,11 @@ button,
     color: #FFFFFF;
 }
 
-/* Adjust input field to accommodate the microphone button */
-.message-input-container {
-    position: relative;
-}
-
-.message-input {
-    padding-right: 3rem;
-    /* Increased padding to avoid overlap with send button */
-}
-
-/* Optional: Add some spacing between camera and input */
-.camera-button {
-    margin-left: 0;
-}
-
 .tooltip-container {
     position: relative;
     display: inline-block;
-    /* Ensure the container fits the wrapped element */
 }
 
-/* Tooltip Text */
 .tooltip-container .tooltiptext {
     visibility: hidden;
     width: max-content;
@@ -1288,17 +1170,20 @@ button,
     transition: opacity 0.3s;
 }
 
-/* Tooltip Arrow */
 .tooltip-container .tooltiptext::after {
     content: '';
     position: absolute;
     top: 100%;
-    /* Arrow at the bottom of the tooltip */
     left: 50%;
     transform: translateX(-50%);
     border-width: 5px;
     border-style: solid;
     border-color: var(--text-color) transparent transparent transparent;
+}
+
+.tooltip-container:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
 }
 
 .video-container {
@@ -1308,7 +1193,6 @@ button,
     overflow: hidden;
     margin-bottom: 1.5rem;
 }
-
 
 .character-name-overlay {
     position: absolute;
@@ -1379,7 +1263,6 @@ button,
     color: var(--input-placeholder);
 }
 
-/* Download Button */
 .export-button.download-button {
     width: 100%;
     height: 48px;
@@ -1412,7 +1295,6 @@ button,
     transform: translateY(-2px);
 }
 
-/* Download button style */
 .download-button {
     background: linear-gradient(135deg, #6366F1 0%, #D946EF 100%);
     color: white;
@@ -1422,18 +1304,11 @@ button,
     background: linear-gradient(135deg, #4F46E5 0%, #C026D3 100%);
 }
 
-/* Show tooltip on hover */
-.tooltip-container:hover .tooltiptext {
-    visibility: visible;
-    opacity: 1;
-}
-
 .tooltip-container {
     position: relative;
     display: inline-block;
 }
 
-/* Tooltip Text */
 .tooltip-container .tooltiptext {
     visibility: hidden;
     width: max-content;
@@ -1453,13 +1328,11 @@ button,
     transition: opacity 0.3s;
 }
 
-/* Show tooltip on hover */
 .tooltip-container:hover .tooltiptext {
     visibility: visible;
     opacity: 1;
 }
 
-/* Tooltip Arrow */
 .tooltip-container .tooltiptext::after {
     content: '';
     position: absolute;
@@ -1469,4 +1342,85 @@ button,
     border-width: 5px;
     border-style: solid;
     border-color: var(--text-color) transparent transparent transparent;
+}
+
+/* PromptInput Mobile Overrides
+   ---------------------------------------------------------
+   Only change layout on mobile. Desktop remains unchanged.
+   --------------------------------------------------------- */
+.prompt-input-container {
+    display: flex;
+    align-items: center;
+    /* single row on desktop */
+    gap: 0.5rem;
+}
+
+.text-input {
+    /* Placeholder text */
+    --tw-placeholder-color: #9ca3af;
+    background: var(--input-bg);
+    /* Tailwind gray-400 */
+
+    /* Core styles */
+    display: flex;
+    /* For flex container behavior (optional if unused) */
+    flex: 1;
+    /* Allows input to grow and fill available space */
+    padding: 0.75rem 1rem;
+    /* Corresponds to p-3 and pr-20 */
+    border: 1px solid #d1d5db;
+    /* Tailwind gray-300 */
+    border-radius: 9999px;
+    /* Rounded-full */
+    font-size: inherit;
+    line-height: inherit;
+    transition: all 0.3s ease;
+    /* Matches "transition-colors duration-300" */
+
+    /* Focus styles */
+    outline: none;
+    --tw-ring-color: #8b5cf6;
+
+    color: var(--input-text);
+
+    font-family: 'Inter', sans-serif;
+}
+
+.text-input:focus {
+    box-shadow: 0 0 0 2px var(--tw-ring-color);
+    /* Matches Tailwind focus:ring-2 */
+}
+
+/* Placeholder color */
+.text-input::placeholder {
+    color: var(--tw-placeholder-color);
+    /* Matches placeholder-gray-400 */
+}
+
+.button-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+@media (max-width: 768px) {
+    .prompt-input-container {
+        /* Switch to column layout */
+        flex-direction: column;
+        align-items: stretch;
+        /* Let the input fill the container width */
+    }
+
+    .text-input {
+        /* full width on mobile, with a bit of margin below for spacing */
+        width: 90%;
+        text-align: center;
+        margin-bottom: 0.75rem;
+    }
+
+    /* Put the 3 buttons on a new row, centered horizontally */
+    .button-group {
+        justify-content: center;
+        /* center the 3 buttons horizontally */
+    }
 }

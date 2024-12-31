@@ -1,5 +1,3 @@
-// src/components/PromptInput.tsx
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Mic, MicOff, Video, VideoOff } from 'lucide-react';
 import VideoPreviewOverlay from './VideoPreviewOverlay';
@@ -32,12 +30,14 @@ const PromptInput: React.FC<PromptInputProps> = ({
     const mcgaBalance = useBalanceStore((state) => state.mcgaBalance);
 
     // Determine if the user has at least 50,000 MCGA
-    const hasSufficientTokens = mcgaBalance !== null && mcgaBalance >= Price.exportVideo;
+    const hasSufficientTokens =
+        mcgaBalance !== null && mcgaBalance >= Price.exportVideo;
 
     useEffect(() => {
         // Initialize Speech Recognition
         const SpeechRecognitionConstructor =
-            (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+            (window as any).SpeechRecognition ||
+            (window as any).webkitSpeechRecognition;
         if (SpeechRecognitionConstructor) {
             recognitionRef.current = new SpeechRecognitionConstructor();
             if (recognitionRef.current) {
@@ -91,79 +91,81 @@ const PromptInput: React.FC<PromptInputProps> = ({
 
     const getTooltipMessage = () => {
         if (!hasSufficientTokens) {
-            return `You need at least ${formatToK(Price.exportVideo)} MCGA tokens to use this feature.`;
+            return `You need at least ${formatToK(
+                Price.exportVideo
+            )} MCGA tokens to use this feature.`;
         }
         if (!isChromium) {
-            return "This feature is only supported in Chrome.";
+            return 'This feature is only supported in Chrome.';
         }
-        return "Record a short format video of the answer";
+        return 'Record a short format video of the answer';
     };
 
     const cameraButtonDisabled = !hasSufficientTokens || !isChromium;
 
     return (
         <>
-            <div className="message-input-container flex items-center relative">
+            <div className="prompt-input-container">
+                {/* The text input */}
                 <input
                     type="text"
                     placeholder="Ask your question..."
                     value={value}
                     onChange={(e) => setValue(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
-                    className="message-input placeholder-gray-400 flex-1 p-3 pr-20 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors duration-300"
+                    className="text-input placeholder-gray-400 flex-1 p-3 pr-20 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors duration-300"
                 />
 
-                {/* Camera Button with Tooltip */}
-                <Tooltip message={getTooltipMessage()}>
+                {/* Button group (camera, mic, send) */}
+                <div className="button-group">
+                    {/* Camera Button + Tooltip */}
+                    <Tooltip message={getTooltipMessage()}>
+                        <button
+                            type="button"
+                            onClick={toggleShouldRecord}
+                            className={`camera-button ${shouldRecord ? 'active' : ''
+                                } ${cameraButtonDisabled ? 'disabled' : ''}`}
+                            disabled={cameraButtonDisabled}
+                            aria-disabled={cameraButtonDisabled}
+                            aria-label="Toggle video"
+                        >
+                            {shouldRecord ? (
+                                <Video className="icon" />
+                            ) : (
+                                <VideoOff className="icon" />
+                            )}
+                        </button>
+                    </Tooltip>
+
+                    {/* Microphone Button */}
                     <button
                         type="button"
-                        onClick={toggleShouldRecord}
-                        className={`camera-button p-2 rounded-full focus:outline-none transition-transform ${shouldRecord ? 'active' : ''
-                            } ${cameraButtonDisabled ? 'disabled' : ''}`}
-                        aria-label="Toggle video"
-                        disabled={cameraButtonDisabled}
-                        aria-disabled={cameraButtonDisabled}
+                        onClick={toggleListening}
+                        className={`mic-button ${isListening ? 'active' : ''}`}
+                        aria-label="Toggle microphone"
                     >
-                        {shouldRecord ? (
-                            <Video className="w-5 h-5" />
+                        {isListening ? (
+                            <Mic className="icon" />
                         ) : (
-                            <VideoOff className="w-5 h-5" />
+                            <MicOff className="icon" />
                         )}
                     </button>
-                </Tooltip>
 
-                {/* Microphone Icon */}
-                <button
-                    type="button"
-                    onClick={toggleListening}
-                    className={`mic-button p-2 rounded-full focus:outline-none transition-transform ${isListening ? 'active' : ''
-                        }`}
-                    aria-label="Toggle microphone"
-                >
-                    {isListening ? (
-                        <Mic className="w-5 h-5" />
-                    ) : (
-                        <MicOff className="w-5 h-5" />
-                    )}
-                </button>
-
-                {/* Send button */}
-                <button
-                    type="button"
-                    onClick={handleSubmit}
-                    disabled={!value.trim()}
-                    className="send-button absolute right-0 top-1/2 transform -translate-y-1/2 px-4 py-2 bg-purple-500 text-white rounded-full disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-300"
-                >
-                    Send
-                </button>
+                    {/* Send Button */}
+                    <button
+                        type="button"
+                        onClick={handleSubmit}
+                        disabled={!value.trim()}
+                        className="send-button"
+                    >
+                        Send
+                    </button>
+                </div>
             </div>
 
             {/* Video Preview Overlay */}
             {videoBlob && shouldRecord && (
-                <VideoPreviewOverlay
-                    videoBlob={videoBlob}
-                    onClose={clearVideoBlob}
-                />
+                <VideoPreviewOverlay videoBlob={videoBlob} onClose={clearVideoBlob} />
             )}
         </>
     );
