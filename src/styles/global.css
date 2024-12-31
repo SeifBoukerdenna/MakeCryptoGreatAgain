@@ -168,6 +168,51 @@ html {
     border-radius: 8px;
 }
 
+.title h1 {
+    position: relative;
+    z-index: 1;
+    background: linear-gradient(135deg, #6366F1, #D946EF);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    transition: all 0.3s ease;
+}
+
+.title::before {
+    content: '';
+    position: absolute;
+    background: linear-gradient(45deg,
+            #6366F1, #D946EF, #6366F1, #D946EF);
+    background-size: 400% 400%;
+    z-index: 0;
+    animation: gradientBorder 3s ease alternate infinite;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.title:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(147, 51, 234, 0.25);
+}
+
+.title:hover h1 {
+    transform: scale(1.02);
+}
+
+@keyframes gradientBorder {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
 /* Navbar Title */
 .navbar h1 {
     font-size: 1.25rem;
