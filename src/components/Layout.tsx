@@ -94,14 +94,16 @@ const Layout: React.FC<LayoutProps> = ({ toggleTheme, theme }) => {
                     >
                         About
                     </NavLink>
-                    <a
-                        href="https://x.com/___MCGA___"
+                    <NavLink
+                        to="/https://x.com/___MCGA___"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center text-gray-600 hover:text-purple-500 dark:text-gray-300 dark:hover:text-purple-400 transition-colors duration-200"
+                        className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
                     >
+
                         <FontAwesomeIcon icon={faXTwitter} size="lg" color='rgba(147, 51, 234, 0.5)' />
-                    </a>
+                    </NavLink>
+
                     {/* {TEST_MODE && (
                         <NavLink
                             to="/admin"
