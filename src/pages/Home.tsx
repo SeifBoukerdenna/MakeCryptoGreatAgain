@@ -16,6 +16,7 @@ import { TEST_MODE, FREE_CHARACTER_ID } from '../configs/test.config';
 import { charactersConfig } from '../configs/characters.config';
 import { thinkingMessages } from '../configs/thinkingMessages.ts';
 import useConversationStore from '../stores/useConversationStore';
+import GuidedTour from '../components/tours/GuidedTour.tsx';
 
 const Home: React.FC = () => {
   const { connected } = useWallet();
@@ -70,7 +71,7 @@ const Home: React.FC = () => {
     if (!selectedCharacter) {
       return (
         <div className="flex flex-col items-center justify-center h-full text-center my-8">
-          <p className="text-xl text-gray-400 dark:text-gray-500">
+          <p className="text-xl text-gray-400 dark:text-gray-500 font-bold">
             Select a character to start chatting
           </p>
         </div>
@@ -149,60 +150,64 @@ const Home: React.FC = () => {
 
 
   return (
-    <div className="home-container min-h-screen flex flex-col">
-      <div className="container mx-auto flex-1 p-6 space-y-16">
-        {/* Character Selection */}
-        <section className="px-4 mb-8 mt-8">
-          <div className="flex justify-center items-center">
-            <Swiper
-              modules={[Navigation, Pagination]}
-              spaceBetween={20}
-              breakpoints={{
-                0: { slidesPerView: 2 },
-                640: { slidesPerView: 4 },
-              }}
-              centeredSlides={false}
-              navigation
-              pagination={{
-                clickable: true,
-                bulletClass: 'swiper-pagination-bullet',
-                bulletActiveClass: 'swiper-pagination-bullet-active',
-              }}
-              loop={true}
-              className="mySwiper"
-              onSwiper={(swiper) => {
-                swiperRef.current = swiper;
-                if (selectedIndex !== -1) {
-                  swiper.slideToLoop(selectedIndex, 0);
-                }
-              }}
-            >
-              {characters.map((char) => (
-                <SwiperSlide key={char.id}>
-                  <CharacterCard
-                    {...char}
-                    onSelect={() => setSelectedCharacter(char.name)}
-                    isSelected={selectedCharacter === char.name}
-                  />
-                </SwiperSlide>
-              ))}
-            </Swiper>
-          </div>
-        </section>
+    <>
+      <GuidedTour />
+      <div className="home-container min-h-screen flex flex-col">
+        <div className="container mx-auto flex-1 p-6 space-y-16">
+          {/* Character Selection */}
+          <section className="px-4 mb-8 mt-8">
+            <div className="flex justify-center items-center">
+              <Swiper
+                modules={[Navigation, Pagination]}
+                spaceBetween={20}
+                breakpoints={{
+                  0: { slidesPerView: 2 },
+                  640: { slidesPerView: 4 },
+                }}
+                centeredSlides={false}
+                navigation
+                pagination={{
+                  clickable: true,
+                  bulletClass: 'swiper-pagination-bullet',
+                  bulletActiveClass: 'swiper-pagination-bullet-active',
+                }}
+                loop={true}
+                className="mySwiper"
+                onSwiper={(swiper) => {
+                  swiperRef.current = swiper;
+                  if (selectedIndex !== -1) {
+                    swiper.slideToLoop(selectedIndex, 0);
+                  }
+                }}
+              >
+                {characters.map((char) => (
+                  <SwiperSlide key={char.id}>
+                    <CharacterCard
+                      {...char}
+                      onSelect={() => setSelectedCharacter(char.name)}
+                      isSelected={selectedCharacter === char.name}
+                    />
+                  </SwiperSlide>
+                ))}
+              </Swiper>
+            </div>
+          </section>
 
-        {/* Chat Area */}
-        <section className="chat-area p-6 rounded-lg shadow-lg flex flex-col h-96 pt-6 mt-4 mb-4 relative">
-          {/* Clear Chat Button */}
-          <button
-            onClick={handleClearChat}
-            className="clear-chat-button"
-          >
-            Clear Chat
-          </button>
-          {renderChatArea()}
-        </section>
+          {/* Chat Area */}
+          <section className="chat-area p-6 rounded-lg shadow-lg flex flex-col h-96 pt-6 mt-4 mb-4 relative">
+            {/* Clear Chat Button */}
+            <button
+              onClick={handleClearChat}
+              className="clear-chat-button"
+            >
+              Clear Chat
+            </button>
+            {renderChatArea()}
+          </section>
+        </div>
       </div>
-    </div>
+    </>
+
   );
 };
 

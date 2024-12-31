@@ -7,7 +7,7 @@ import { MCGA_TOKEN_MINT } from '../constants/tokens';
 import { formatToK } from '../utils/numberFormat';
 import BalanceDisplay from './BalanceDisplay';
 import useBalanceStore from '../hooks/useBalanceStore';
-import { TEST_MODE } from '../configs/test.config';
+// import { TEST_MODE } from '../configs/test.config';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faXTwitter } from '@fortawesome/free-brands-svg-icons';
 interface LayoutProps {
@@ -60,7 +60,7 @@ const Layout: React.FC<LayoutProps> = ({ toggleTheme, theme }) => {
         <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-gray-900">
             <nav className="navbar">
                 <div className="title">
-                    <h1 className="text-xl font-bold text-gray-800 dark:text-gray-200">Make Crypto Great Again</h1>
+                    <h1 className="text-l font-bold text-gray-800 dark:text-gray-200">Make Crypto Great Again</h1>
                 </div>
 
                 <div className="navigation-links">
@@ -94,14 +94,22 @@ const Layout: React.FC<LayoutProps> = ({ toggleTheme, theme }) => {
                     >
                         About
                     </NavLink>
-                    {TEST_MODE && (
+                    <a
+                        href="https://x.com/___MCGA___"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center text-gray-600 hover:text-purple-500 dark:text-gray-300 dark:hover:text-purple-400 transition-colors duration-200"
+                    >
+                        <FontAwesomeIcon icon={faXTwitter} size="lg" color='rgba(147, 51, 234, 0.5)' />
+                    </a>
+                    {/* {TEST_MODE && (
                         <NavLink
                             to="/admin"
                             className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
                         >
                             Admin
                         </NavLink>
-                    )}
+                    )} */}
                 </div>
 
 
@@ -124,15 +132,6 @@ const Layout: React.FC<LayoutProps> = ({ toggleTheme, theme }) => {
 
                 <div className="theme-toggle">
                     <ThemeToggle toggleTheme={toggleTheme} theme={theme} />
-
-                    <a
-                        href="https://x.com/___MCGA___"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center text-gray-600 hover:text-purple-500 dark:text-gray-300 dark:hover:text-purple-400 transition-colors duration-200"
-                    >
-                        <FontAwesomeIcon icon={faXTwitter} size="lg" color='rgba(147, 51, 234, 0.5)' />
-                    </a>
                 </div>
 
             </nav>
