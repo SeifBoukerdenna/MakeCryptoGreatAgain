@@ -2,7 +2,7 @@
 
 /* Import Poppins Font */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
-
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
 
 /* CSS Variables for Light and Dark Themes */
 :root {
@@ -1380,7 +1380,10 @@ button,
     /* Focus styles */
     outline: none;
     --tw-ring-color: #8b5cf6;
-    /* Tailwind purple-500 */
+
+    color: var(--input-text);
+
+    font-family: 'Inter', sans-serif;
 }
 
 .text-input:focus {

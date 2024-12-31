@@ -52,7 +52,7 @@ const Home: React.FC = () => {
     // In test mode, allow chat if Trump is selected
     const isTrumpSelectedInTestMode =
       TEST_MODE &&
-      selectedCharacter === charactersConfig.find(char => char.id === FREE_CHARACTER_ID)?.name;
+      selectedCharacter === charactersConfig.find((char) => char.id === FREE_CHARACTER_ID)?.name;
 
     if (!connected && !isTrumpSelectedInTestMode) {
       return (
@@ -61,9 +61,7 @@ const Home: React.FC = () => {
             Connect your wallet to start chatting
           </p>
           {TEST_MODE && (
-            <p className="text-purple-500">
-              Test Mode: Trump is available without connecting
-            </p>
+            <p className="text-purple-500">Test Mode: Trump is available without connecting</p>
           )}
         </div>
       );
@@ -71,7 +69,7 @@ const Home: React.FC = () => {
 
     if (!selectedCharacter) {
       return (
-        <div className="flex flex-col items-center justify-center h-full text-center">
+        <div className="flex flex-col items-center justify-center h-full text-center my-8">
           <p className="text-xl text-gray-400 dark:text-gray-500">
             Select a character to start chatting
           </p>
@@ -81,6 +79,7 @@ const Home: React.FC = () => {
 
     return (
       <>
+        {/* Avatar + Waveform up top */}
         {getSelectedCharacter() && (
           <div className="selected-character-icon relative">
             <img
@@ -100,12 +99,31 @@ const Home: React.FC = () => {
           </div>
         )}
 
-        <div className="messages flex-1 overflow-y-auto mb-4 p-2 text-sm max-w-[75%] rounded-lg bg-gray-200">
+        {/* Messages Container (scrollable when too many messages) */}
+        <div
+          className="
+          messages
+          flex-1
+          overflow-y-auto
+          mb-4
+          p-2
+          text-sm
+          max-w-[75%]
+          rounded-lg
+          bg-gray-200
+          max-h-80
+        "
+          style={{ maxHeight: '20rem' }}
+        /* Alternatively: className="max-h-[20rem] ..." in Tailwind */
+        >
           {messages.map((m, i) => {
             let messageText = m.text;
             if (m.sender !== 'user' && m.status === 'loading') {
               const characterThinkingMessages = thinkingMessages[selectedCharacter] || [];
-              messageText = characterThinkingMessages[Math.floor(Math.random() * characterThinkingMessages.length)] || 'Thinking...';
+              messageText =
+                characterThinkingMessages[
+                Math.floor(Math.random() * characterThinkingMessages.length)
+                ] || 'Thinking...';
             }
 
             const messageClass =
@@ -122,15 +140,13 @@ const Home: React.FC = () => {
           <div ref={messagesEndRef} />
         </div>
 
-        <PromptInput
-          onSubmit={handleSend}
-          videoBlob={videoBlob}
-          clearVideoBlob={clearVideoBlob}
-        />
+        {/* Prompt Input */}
+        <PromptInput onSubmit={handleSend} videoBlob={videoBlob} clearVideoBlob={clearVideoBlob} />
         {ttsError && <p className="text-red-500 mt-2">{ttsError}</p>}
       </>
     );
   };
+
 
   return (
     <div className="home-container min-h-screen flex flex-col">
