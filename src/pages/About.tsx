@@ -303,22 +303,22 @@ pub struct Pool {
             </motion.section>
 
             {/* CTA Section */}
-            <motion.section
+            <section
                 className="cta-section"
             >
                 <div className="cta-container">
-                    <motion.h2
+                    <h2
                         className="cta-title"
                     >
                         Start Chatting Today
-                    </motion.h2>
-                    <motion.p
+                    </h2>
+                    <p
                         className="cta-text"
                     >
                         Join the revolution in celebrity-fan interactions. Connect your wallet,
                         acquire MCGA tokens, and start having meaningful conversations with
                         your favorite personalities.
-                    </motion.p>
+                    </p>
                 </div>
                 <div className="contract-viewer-section">
                     <div className="contract-viewer-wrapper">
@@ -326,7 +326,7 @@ pub struct Pool {
                     </div>
                 </div>
 
-            </motion.section>
+            </section>
         </div>
 
     );
