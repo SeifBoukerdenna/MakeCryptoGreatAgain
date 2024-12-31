@@ -1,40 +1,52 @@
 import { useState, useEffect } from 'react';
 import Joyride, { Step, CallBackProps, ACTIONS, EVENTS, STATUS } from 'react-joyride';
 
-const SocialTour = () => {
+const ChallengeTour = () => {
     const [run, setRun] = useState(false);
     const [stepIndex, setStepIndex] = useState(0);
 
     const steps: Step[] = [
         {
             target: '.token-holder-card',
-            content: 'Check out our top users ranked by their interaction levels. The more you chat, the higher you climb!',
+            content: 'Welcome to Character Challenges! Here you can test your knowledge of each character and win MCGA tokens.',
             placement: 'center',
             disableBeacon: true,
         },
         {
-            target: '.rank-badge.gold',
-            content: 'Top users get special badges. Can you make it to #1?',
+            target: '.holder-stats',
+            content: 'Keep track of your progress and see how many characters have been solved by the community.',
+            placement: 'bottom',
+            disableBeacon: true,
+        },
+        {
+            target: '.pool-info',
+            content: 'Each character has a token pool. If you guess their secret phrase correctly, you win all the tokens in their pool!',
             placement: 'right',
             disableBeacon: true,
         },
         {
-            target: '.character-stats-card',
-            content: 'See which characters are the most popular and track their usage statistics.',
+            target: '.challenge-card input',
+            content: 'Enter your guess for the secret phrase here. But choose wisely - there\'s a cooldown period between attempts!',
             placement: 'top',
             disableBeacon: true,
         },
         {
-            target: '.character-stats-summary',
-            content: 'Keep an eye on global statistics to see how the community is growing!',
+            target: '.challenge-button',
+            content: 'Submit your guess when you\'re ready. You\'ll need to pay a small fee in MCGA tokens for each attempt.',
             placement: 'bottom',
+            disableBeacon: true,
+        },
+        {
+            target: '.winner-section',
+            content: 'Check out who has already solved each character\'s challenge and how many tokens they won!',
+            placement: 'top',
             disableBeacon: true,
         }
     ];
 
     useEffect(() => {
-        const hasSocialTour = localStorage.getItem('hasSocialTour');
-        if (!hasSocialTour) {
+        const hasChallengeTour = localStorage.getItem('hasChallengeTour');
+        if (!hasChallengeTour) {
             setRun(true);
         }
     }, []);
@@ -43,7 +55,7 @@ const SocialTour = () => {
         const { action, index, status, type } = data;
         // @ts-ignore
         if ([STATUS.FINISHED, STATUS.SKIPPED].includes(status)) {
-            localStorage.setItem('hasSocialTour', 'true');
+            localStorage.setItem('hasChallengeTour', 'true');
             setRun(false);
             setStepIndex(0);
             return;
@@ -115,4 +127,4 @@ const SocialTour = () => {
     );
 };
 
-export default SocialTour;
+export default ChallengeTour;

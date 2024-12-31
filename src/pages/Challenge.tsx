@@ -21,6 +21,7 @@ import { useChallengeLogic } from '../hooks/useChallengeLogic';
 import '../styles/challenge.css';
 import TruncatedAddressLink from '../components/TruncatedAddressLink';
 import { toast } from 'react-toastify';
+import ChallengeTour from '../components/tours/ChallengeTour';
 
 const ChallengePage = () => {
     const { connected } = useWallet();
@@ -136,6 +137,7 @@ const ChallengePage = () => {
 
     return (
         <div className="container mx-auto px-4 py-8">
+            <ChallengeTour />
             <h1 className="text-3xl font-bold mb-8 text-center bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
                 Character Challenges
             </h1>
