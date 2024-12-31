@@ -1,5 +1,3 @@
-// src/components/PromptInput.tsx
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Mic, MicOff, Video, VideoOff } from 'lucide-react';
 import VideoPreviewOverlay from './VideoPreviewOverlay';
@@ -47,13 +45,9 @@ const PromptInput: React.FC<PromptInputProps> = ({
                 recognitionRef.current.interimResults = false;
                 recognitionRef.current.lang = 'en-US';
 
-                recognitionRef.current.onresult = (
-                    event: SpeechRecognitionEvent
-                ) => {
+                recognitionRef.current.onresult = (event: SpeechRecognitionEvent) => {
                     const transcript = event.results[0][0].transcript;
-                    setValue((prev) =>
-                        prev ? `${prev} ${transcript}` : transcript
-                    );
+                    setValue((prev) => (prev ? `${prev} ${transcript}` : transcript));
                 };
 
                 recognitionRef.current.onerror = (event: any) => {
@@ -66,9 +60,7 @@ const PromptInput: React.FC<PromptInputProps> = ({
                 };
             }
         } else {
-            console.warn(
-                'Speech Recognition API is not supported in this browser.'
-            );
+            console.warn('Speech Recognition API is not supported in this browser.');
         }
     }, []);
 
@@ -113,25 +105,20 @@ const PromptInput: React.FC<PromptInputProps> = ({
 
     return (
         <>
-            {/*
-              Container for the input and buttons
-              Desktop: single row
-              Mobile: stack (see global.css @media)
-            */}
             <div className="prompt-input-container">
-                {/* Text input */}
+                {/* The text input */}
                 <input
-                    className="text-input"
                     type="text"
                     placeholder="Ask your question..."
                     value={value}
                     onChange={(e) => setValue(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
+                    className="text-input"
                 />
 
-                {/* Buttons group (Video, Mic, Send) */}
+                {/* Button group (camera, mic, send) */}
                 <div className="button-group">
-                    {/* Camera Button with Tooltip */}
+                    {/* Camera Button + Tooltip */}
                     <Tooltip message={getTooltipMessage()}>
                         <button
                             type="button"
@@ -143,9 +130,9 @@ const PromptInput: React.FC<PromptInputProps> = ({
                             aria-label="Toggle video"
                         >
                             {shouldRecord ? (
-                                <Video className="w-5 h-5" />
+                                <Video className="icon" />
                             ) : (
-                                <VideoOff className="w-5 h-5" />
+                                <VideoOff className="icon" />
                             )}
                         </button>
                     </Tooltip>
@@ -158,9 +145,9 @@ const PromptInput: React.FC<PromptInputProps> = ({
                         aria-label="Toggle microphone"
                     >
                         {isListening ? (
-                            <Mic className="w-5 h-5" />
+                            <Mic className="icon" />
                         ) : (
-                            <MicOff className="w-5 h-5" />
+                            <MicOff className="icon" />
                         )}
                     </button>
 
@@ -178,10 +165,7 @@ const PromptInput: React.FC<PromptInputProps> = ({
 
             {/* Video Preview Overlay */}
             {videoBlob && shouldRecord && (
-                <VideoPreviewOverlay
-                    videoBlob={videoBlob}
-                    onClose={clearVideoBlob}
-                />
+                <VideoPreviewOverlay videoBlob={videoBlob} onClose={clearVideoBlob} />
             )}
         </>
     );

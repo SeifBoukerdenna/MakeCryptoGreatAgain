@@ -1370,18 +1370,22 @@ button,
 
 @media (max-width: 768px) {
     .prompt-input-container {
+        /* Switch to column layout */
         flex-direction: column;
-        /* stack vertically on mobile */
         align-items: stretch;
+        /* Let the input fill the container width */
     }
 
     .text-input {
-        width: 100%;
-        margin-bottom: 0.5rem;
-        /* gap between input and buttons */
+        /* full width on mobile, with a bit of margin below for spacing */
+        width: 90%;
+        text-align: center;
+        margin-bottom: 0.75rem;
     }
 
+    /* Put the 3 buttons on a new row, centered horizontally */
     .button-group {
-        justify-content: flex-start;
+        justify-content: center;
+        /* center the 3 buttons horizontally */
     }
 }
