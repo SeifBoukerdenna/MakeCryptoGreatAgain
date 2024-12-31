@@ -513,7 +513,7 @@ html {
     background: transparent;
     color: #6366F1;
     z-index: 100;
-    padding: 0.75rem 1.5rem;
+    padding: 0.5rem .5rem;
     font-weight: 700;
     cursor: pointer;
     border-radius: 30px;
@@ -1101,6 +1101,7 @@ button,
 
 .camera-button {
     border: 1px solid var(--swiper-pagination-active-color);
+    border-radius: 10px;
     background: var(--input-bg);
     color: var(--input-placeholder);
     transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
@@ -1128,6 +1129,7 @@ button,
 
 .mic-button {
     border: 1px solid var(--swiper-pagination-active-color);
+    border-radius: 10px;
     background: var(--input-bg);
     color: var(--input-placeholder);
     transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
@@ -1354,12 +1356,42 @@ button,
 }
 
 .text-input {
+    /* Placeholder text */
+    --tw-placeholder-color: #9ca3af;
+    background: var(--input-bg);
+    /* Tailwind gray-400 */
+
+    /* Core styles */
+    display: flex;
+    /* For flex container behavior (optional if unused) */
     flex: 1;
-    /* wide as possible */
+    /* Allows input to grow and fill available space */
     padding: 0.75rem 1rem;
+    /* Corresponds to p-3 and pr-20 */
+    border: 1px solid #d1d5db;
+    /* Tailwind gray-300 */
     border-radius: 9999px;
-    border: 1px solid #ccc;
-    font-size: 1rem;
+    /* Rounded-full */
+    font-size: inherit;
+    line-height: inherit;
+    transition: all 0.3s ease;
+    /* Matches "transition-colors duration-300" */
+
+    /* Focus styles */
+    outline: none;
+    --tw-ring-color: #8b5cf6;
+    /* Tailwind purple-500 */
+}
+
+.text-input:focus {
+    box-shadow: 0 0 0 2px var(--tw-ring-color);
+    /* Matches Tailwind focus:ring-2 */
+}
+
+/* Placeholder color */
+.text-input::placeholder {
+    color: var(--tw-placeholder-color);
+    /* Matches placeholder-gray-400 */
 }
 
 .button-group {
