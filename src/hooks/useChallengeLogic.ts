@@ -17,6 +17,7 @@ interface CharacterStatus {
   solved_by: string | null;
   solved_at: string | null;
   tokens_won: number;
+  secret_phrase: string;
 }
 
 interface ChallengeAttempt {
@@ -217,6 +218,7 @@ export function useChallengeLogic(onTransaction?: (txHash: string) => void) {
             solved_by: publicKey.toString(),
             solved_at: now.toISOString(),
             tokens_won: tokensWon,
+            secret_phrase: guesses[characterId], // Store the correct answer
           })
           .select();
 
@@ -230,6 +232,7 @@ export function useChallengeLogic(onTransaction?: (txHash: string) => void) {
             solved_by: publicKey.toString(),
             solved_at: now.toISOString(),
             tokens_won: tokensWon,
+            secret_phrase: guesses[characterId],
           },
         }));
       } else {
