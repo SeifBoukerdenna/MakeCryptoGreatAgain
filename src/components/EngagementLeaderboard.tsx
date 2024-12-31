@@ -77,7 +77,7 @@ const EngagementLeaderboard = () => {
         };
 
         fetchUserEngagement();
-        const interval = setInterval(fetchUserEngagement, 10000); // Fetch every 10 seconds
+        const interval = setInterval(fetchUserEngagement, 60000); // Fetch every minute
         return () => clearInterval(interval);
     }, [connection]);
 

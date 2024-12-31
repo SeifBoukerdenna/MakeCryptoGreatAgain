@@ -4,7 +4,6 @@ import { okaidia } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { materialLight } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { FaCopy, FaCheck, FaExternalLinkAlt, FaShieldAlt, FaLock, FaCode, FaCheckCircle } from 'react-icons/fa';
-import { motion } from 'framer-motion';
 import '../styles/SmartContractViewer.css';
 
 interface SmartContractViewerProps {
@@ -69,12 +68,8 @@ const SmartContractViewer: React.FC<SmartContractViewerProps> = ({ code, languag
     return (
         <div className="contract-viewer-container">
             {/* Contract Info Card */}
-            <motion.div
+            <div
                 className="address-card"
-                initial={{ opacity: 0, x: -20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5 }}
             >
                 {/* Contract Address Section */}
                 <section className="contract-section">
@@ -148,28 +143,22 @@ const SmartContractViewer: React.FC<SmartContractViewerProps> = ({ code, languag
                         ))}
                     </div>
                 </section>
-            </motion.div>
+            </div>
 
             {/* Code Viewer */}
-            <motion.div
+            <div
                 className="code-viewer"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5 }}
             >
                 <CopyToClipboard text={code} onCopy={handleCopy}>
-                    <motion.button
+                    <button
                         className="code-copy-button"
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.9 }}
                     >
                         {copied ? (
                             <FaCheck className="copy-success" />
                         ) : (
                             <FaCopy />
                         )}
-                    </motion.button>
+                    </button>
                 </CopyToClipboard>
 
                 <SyntaxHighlighter
@@ -190,7 +179,7 @@ const SmartContractViewer: React.FC<SmartContractViewerProps> = ({ code, languag
                 >
                     {code}
                 </SyntaxHighlighter>
-            </motion.div>
+            </div>
         </div>
     );
 };

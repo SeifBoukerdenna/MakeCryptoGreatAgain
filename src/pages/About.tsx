@@ -303,40 +303,30 @@ pub struct Pool {
             </motion.section>
 
             {/* CTA Section */}
-            <motion.section
+            <section
                 className="cta-section"
-                initial={{ opacity: 0, y: 50 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.2 }}
-                transition={{ duration: 1 }}
             >
                 <div className="cta-container">
-                    <motion.h2
+                    <h2
                         className="cta-title"
-                        initial={{ opacity: 0, y: -20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 1, delay: 0.3 }}
                     >
                         Start Chatting Today
-                    </motion.h2>
-                    <motion.p
+                    </h2>
+                    <p
                         className="cta-text"
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 1, delay: 0.6 }}
                     >
                         Join the revolution in celebrity-fan interactions. Connect your wallet,
                         acquire MCGA tokens, and start having meaningful conversations with
                         your favorite personalities.
-                    </motion.p>
+                    </p>
                 </div>
-                <div className="mt-8 flex justify-center">
-                    <div className="max-w-4xl w-full">
+                <div className="contract-viewer-section">
+                    <div className="contract-viewer-wrapper">
                         <SmartContractViewer code={contractCode} language="rust" theme={theme} />
                     </div>
                 </div>
 
-            </motion.section>
+            </section>
         </div>
 
     );
