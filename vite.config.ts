@@ -6,7 +6,7 @@ export default defineConfig({
   plugins: [
     react(),
     {
-      ...(nodePolyfills() as unknown as Plugin),
+      ...(nodePolyfills({}) as unknown as Plugin),
       enforce: "post",
     },
   ],

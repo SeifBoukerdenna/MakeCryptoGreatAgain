@@ -1,0 +1,24 @@
+/* src/styles/TruncatedAddressLink.css */
+.truncated-address-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    color: var(--text-primary);
+    text-decoration: none;
+    font-family: 'Roboto Mono', monospace;
+    transition: color 0.3s ease;
+}
+
+.truncated-address-link:hover {
+    color: #6366F1;
+    /* Change to a highlight color on hover */
+}
+
+.link-icon {
+    transition: transform 0.2s ease;
+}
+
+.truncated-address-link:hover .link-icon {
+    transform: translateX(2px);
+    /* Slight movement for a slick effect */
+}

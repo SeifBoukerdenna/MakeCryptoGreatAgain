@@ -105,45 +105,120 @@ function createSubtitleSegments(
 /** Draws the text with fill and stroke at the bottom center of the canvas. */
 function drawSubtitle(ctx: CanvasRenderingContext2D, segment: SubtitleSegment) {
   const { text, color, font } = segment;
-
-  // Log the segment being drawn
-  // console.log(
-  //   "[useTTS] drawSubtitle => text:",
-  //   text,
-  //   "color:",
-  //   color,
-  //   "font:",
-  //   font
-  // );
+  const maxWidth = ctx.canvas.width * 0.7; // Use 70% of canvas width for safer margins
+  const lineHeight = parseInt(font.match(/\d+/)?.[0] || "40") * 1.2; // Get font size and add 20% for line height
+  const yBasePosition = ctx.canvas.height - 200;
 
   ctx.save();
-  ctx.font = font; // Use the font from the segment
+  ctx.font = font;
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
 
-  // Position near the bottom center
-  const xPos = ctx.canvas.width / 2;
-  const yPos = ctx.canvas.height - 200;
-
   // Validate color
   if (!color || typeof color !== "string") {
-    // console.warn("[useTTS] Invalid color detected. Defaulting to white.");
     ctx.fillStyle = "#FFFFFF";
   } else {
     ctx.fillStyle = color;
   }
 
-  // Fill text
-  ctx.fillText(text || "MISSING TEXT", xPos, yPos);
+  // Optional: Add text shadow for better visibility
+  ctx.shadowColor = "rgba(0, 0, 0, 0.5)";
+  ctx.shadowOffsetX = 2;
+  ctx.shadowOffsetY = 2;
+  ctx.shadowBlur = 4;
 
-  // Stroke outline
-  ctx.lineWidth = 4;
-  ctx.strokeStyle = "#000000"; // Keep stroke as black for visibility
-  ctx.strokeText(text || "MISSING TEXT", xPos, yPos);
+  // Measure text width
+  const textWidth = ctx.measureText(text).width;
+  const xPos = ctx.canvas.width / 2;
+
+  if (textWidth > maxWidth) {
+    // Split text into two lines
+    const words = text.split(" ");
+    let line1 = "";
+    let line2 = "";
+    let currentLine = "";
+
+    // Distribute words between lines
+    for (let i = 0; i < words.length; i++) {
+      const testLine = currentLine + (currentLine ? " " : "") + words[i];
+      const testWidth = ctx.measureText(testLine).width;
+
+      if (testWidth > maxWidth) {
+        // If we haven't started line2 yet, this is the break point
+        if (!line2) {
+          line1 = currentLine;
+          line2 = words[i];
+          currentLine = words[i];
+        } else {
+          // If we're already on line2, just add to it
+          line2 += " " + words[i];
+        }
+      } else {
+        if (!line2) {
+          currentLine = testLine;
+        } else {
+          line2 += " " + words[i];
+        }
+      }
+    }
+
+    // If we never needed line2, but processed all words
+    if (!line2) {
+      // Split the single line roughly in half by words
+      const allWords = currentLine.split(" ");
+      const midpoint = Math.ceil(allWords.length / 2);
+      line1 = allWords.slice(0, midpoint).join(" ");
+      line2 = allWords.slice(midpoint).join(" ");
+
+      // Verify that neither line exceeds maxWidth
+      const line1Width = ctx.measureText(line1).width;
+      const line2Width = ctx.measureText(line2).width;
+
+      // If either line is still too long, redistribute words
+      if (line1Width > maxWidth || line2Width > maxWidth) {
+        let currentLine1 = "";
+        let currentLine2 = "";
+
+        for (const word of allWords) {
+          const testLine1 = currentLine1 + (currentLine1 ? " " : "") + word;
+          if (ctx.measureText(testLine1).width <= maxWidth) {
+            currentLine1 = testLine1;
+          } else {
+            currentLine2 += (currentLine2 ? " " : "") + word;
+          }
+        }
+
+        line1 = currentLine1;
+        line2 = currentLine2;
+      }
+    }
+
+    // Draw the two lines
+    const yPosLine1 = yBasePosition - lineHeight / 2;
+    const yPosLine2 = yBasePosition + lineHeight / 2;
+
+    // Draw stroke for both lines
+    ctx.lineWidth = 4;
+    ctx.strokeStyle = "#000000";
+    ctx.strokeText(line1, xPos, yPosLine1);
+    ctx.strokeText(line2, xPos, yPosLine2);
+
+    // Draw fill for both lines
+    ctx.fillText(line1, xPos, yPosLine1);
+    ctx.fillText(line2, xPos, yPosLine2);
+  } else {
+    // Single line rendering
+    // Draw stroke
+    ctx.lineWidth = 4;
+    ctx.strokeStyle = "#000000";
+    ctx.strokeText(text, xPos, yBasePosition);
+
+    // Draw fill
+    ctx.fillText(text, xPos, yBasePosition);
+  }
 
   ctx.restore();
 }
-
 export function useTTS(): UseTTSResult {
   const [isLoading, setIsLoading] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -200,11 +275,9 @@ export function useTTS(): UseTTSResult {
     });
 
   /** Starts video recording (canvas + audio). */
+  /** Starts video recording (canvas + audio). */
   const startVideoRecording = async () => {
-    // console.log("[useTTS] startVideoRecording triggered");
-
     if (!window.MediaRecorder) {
-      // console.warn("[useTTS] MediaRecorder not supported in this browser");
       return;
     }
 
@@ -219,7 +292,12 @@ export function useTTS(): UseTTSResult {
       const avatarElement = document.querySelector(
         ".selected-character-icon img"
       ) as HTMLImageElement | null;
-      // console.log("[useTTS] Found avatar:", avatarElement);
+
+      // Get the character name element
+      const characterNameElement = document.querySelector(
+        ".selected-character-name"
+      ) as HTMLElement | null;
+      const characterName = characterNameElement?.textContent || "";
 
       // If avatar is found, load it
       const avatarImg = new Image();
@@ -236,7 +314,6 @@ export function useTTS(): UseTTSResult {
       const canvasStream = canvas.captureStream(30);
       const audioStream = (audioRef.current as any)?.captureStream?.();
       if (!audioStream) {
-        // console.warn("[useTTS] audioRef.captureStream not found!");
         return;
       }
 
@@ -257,16 +334,13 @@ export function useTTS(): UseTTSResult {
       };
 
       mediaRecorderRef.current.onstop = () => {
-        // console.log("[useTTS] MediaRecorder stopped => building final blob");
         const blob = new Blob(recordedChunksRef.current, {
           type: "video/webm",
         });
-        // console.log("[useTTS] final blob size:", blob.size);
         setVideoBlob(blob);
       };
 
       mediaRecorderRef.current.start();
-      console.log("[useTTS] MediaRecorder started");
 
       const avatarWidth = 400;
       const avatarHeight = 400;
@@ -276,23 +350,24 @@ export function useTTS(): UseTTSResult {
         if (mediaRecorderRef.current.state !== "recording") return;
         if (!audioRef.current) return;
 
-        // *** 1) Draw the gradient FIRST
+        // Draw gradient background
         const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
         gradient.addColorStop(0, "#F9FAFB");
         gradient.addColorStop(1, "#D946EF");
         ctx.fillStyle = gradient;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // *** 3) White border
+        // White border
         ctx.strokeStyle = "#ffffff";
         ctx.lineWidth = 10;
         ctx.strokeRect(0, 0, canvas.width, canvas.height);
 
-        // *** 4) Avatar (if any)
+        // Avatar and name positioning
         if (avatarElement && avatarImg.complete) {
           const avatarX = (canvas.width - avatarWidth) / 2;
           const avatarY = 600;
 
+          // Draw avatar with circular clip
           ctx.save();
           ctx.beginPath();
           ctx.arc(
@@ -306,7 +381,7 @@ export function useTTS(): UseTTSResult {
           ctx.drawImage(avatarImg, avatarX, avatarY, avatarWidth, avatarHeight);
           ctx.restore();
 
-          // Green ring
+          // Pulsing green ring
           const pulse = Math.abs(Math.sin(Date.now() / 200)) * 20 + 20;
           ctx.beginPath();
           ctx.arc(
@@ -319,14 +394,37 @@ export function useTTS(): UseTTSResult {
           ctx.strokeStyle = "green";
           ctx.lineWidth = 10;
           ctx.stroke();
+
+          // Draw character name
+          if (characterName) {
+            ctx.save();
+            ctx.font = "bold 48px Poppins, sans-serif";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "top";
+
+            // Draw text shadow (update the Y position to be higher)
+            ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+            ctx.fillText(
+              characterName,
+              canvas.width / 2 + 2,
+              300 // Changed from avatarY + avatarHeight + 32
+            );
+
+            // Draw main text (update the Y position to match)
+            ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+            ctx.fillText(
+              characterName,
+              canvas.width / 2,
+              298 // Changed from avatarY + avatarHeight + 30
+            );
+            ctx.restore();
+          }
         }
 
-        // *** 5) Determine which subtitle segment to draw
+        // Handle subtitles
         const audio = audioRef.current;
         const currentTime = audio.currentTime || 0;
         const duration = audioDurationRef.current;
-
-        // Prevent division by zero
         const fraction = duration > 0 ? Math.min(currentTime / duration, 1) : 0;
         const rawIndex = Math.floor(
           fraction * subtitleSegmentsRef.current.length
@@ -336,31 +434,15 @@ export function useTTS(): UseTTSResult {
           subtitleSegmentsRef.current.length - 1
         );
 
-        // console.log(
-        //   "[useTTS] animate => currentTime:",
-        //   currentTime,
-        //   "duration:",
-        //   duration,
-        //   "fraction:",
-        //   fraction,
-        //   "rawIndex:",
-        //   rawIndex,
-        //   "clampedIndex:",
-        //   clampedIndex
-        // );
-
         if (clampedIndex !== currentSubtitleIndexRef.current) {
-          // console.log("[useTTS] setCurrentSubtitleIndex =>", clampedIndex);
           setCurrentSubtitleIndex(clampedIndex);
         }
 
-        // *** 6) Draw the subtitle segment or fallback
+        // Draw subtitles
         const seg = subtitleSegmentsRef.current[clampedIndex];
         if (seg) {
-          // console.log("[useTTS] Drawing segment:", seg);
           drawSubtitle(ctx, seg);
         } else {
-          // console.log("[useTTS] Fallback: index out of range =>", clampedIndex);
           ctx.save();
           ctx.fillStyle = "#FF0000";
           ctx.font = "40px sans-serif";
@@ -373,12 +455,11 @@ export function useTTS(): UseTTSResult {
           ctx.restore();
         }
 
-        // Continue the animation loop
         requestAnimationFrame(animate);
       };
       animate();
     } catch (err) {
-      // console.error("[useTTS] Error starting video recording:", err);
+      console.error("[useTTS] Error starting video recording:", err);
     }
   };
 

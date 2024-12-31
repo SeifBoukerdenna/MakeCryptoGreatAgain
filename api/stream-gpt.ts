@@ -2,13 +2,14 @@
 
 import { VercelRequest, VercelResponse } from "@vercel/node";
 import OpenAI from "openai";
+import { ChatCompletionMessage } from "openai/resources/chat/index.mjs";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  const { prompt, systemPrompt } = req.query;
+  const { prompt, systemPrompt, conversationHistory } = req.query;
 
   if (
     !prompt ||
@@ -25,14 +26,30 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader("Connection", "keep-alive");
 
   try {
+    // Build messages array with conversation history
+    const messages: Array<any> = [{ role: "system", content: systemPrompt }];
+
+    // Add conversation history if it exists
+    if (conversationHistory && typeof conversationHistory === "string") {
+      const history = JSON.parse(conversationHistory);
+      messages.push(
+        ...history.map(
+          (msg: any) =>
+            ({
+              role: msg.sender === "user" ? "user" : "assistant",
+              content: msg.text,
+            } as ChatCompletionMessage)
+        )
+      );
+    }
+
+    // Add current prompt
+    messages.push({ role: "user", content: prompt });
+
     const stream = await openai.chat.completions.create({
       model: "gpt-3.5-turbo",
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: prompt },
-      ],
+      messages: messages as any, // Type assertion needed due to OpenAI types
       stream: true,
-      // Add settings to encourage more complete word tokens
       temperature: 0.7,
       max_tokens: 150,
       frequency_penalty: 1.8,

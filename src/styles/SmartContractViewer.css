@@ -1,0 +1,398 @@
+/* src/styles/SmartContractViewer.css */
+
+.contract-viewer-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: 100%;
+}
+
+@media (min-width: 1024px) {
+    .contract-viewer-container {
+        flex-direction: row;
+    }
+}
+
+/* Contract Address Card */
+.address-card {
+    flex: 1;
+    padding: 1.5rem;
+    border-radius: 1rem;
+    border: 1px solid var(--card-border);
+    background: var(--card-bg);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+@media (min-width: 1024px) {
+    .address-card {
+        width: 25%;
+    }
+}
+
+.address-card-header {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+}
+
+.address-content {
+    padding: 1rem;
+    border-radius: 0.75rem;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+}
+
+.address-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+}
+
+.address-label span {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+.copy-button {
+    background: none;
+    border: none;
+    padding: 0.5rem;
+    cursor: pointer;
+    color: var(--text-secondary);
+    transition: opacity 0.2s ease;
+}
+
+.copy-button:hover {
+    opacity: 0.75;
+}
+
+.contract-address {
+    font-family: 'Roboto Mono', monospace;
+    font-size: 0.875rem;
+    color: var(--text-primary);
+    word-break: break-all;
+    margin-bottom: 1rem;
+    padding: 0.5rem;
+    background: var(--input-bg);
+    border-radius: 0.5rem;
+}
+
+.solscan-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    background: linear-gradient(135deg, #6366F1 0%, #D946EF 100%);
+    color: white;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.solscan-link:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(147, 51, 234, 0.2);
+}
+
+.solscan-link svg {
+    width: 0.75rem;
+    height: 0.75rem;
+}
+
+/* Code Viewer */
+.code-viewer {
+    flex: 1;
+    position: relative;
+    border-radius: 1rem;
+    overflow: hidden;
+    border: 1px solid var(--card-border);
+    background: var(--card-bg);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+@media (min-width: 1024px) {
+    .code-viewer {
+        width: 75%;
+    }
+}
+
+.code-copy-button {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    padding: 0.5rem;
+    border-radius: 0.375rem;
+    background: var(--input-bg);
+    color: var(--text-primary);
+    border: 1px solid var(--card-border);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    z-index: 10;
+}
+
+.code-copy-button:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Success State */
+.copy-success {
+    color: #10B981;
+}
+
+/* Dark Mode Adjustments */
+.dark .address-card {
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.dark .address-content {
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.dark .contract-address {
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.dark .code-copy-button {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* Animation classes */
+.fade-in {
+    animation: fadeIn 0.5s ease-out;
+}
+
+.slide-in {
+    animation: slideIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(-20px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.contract-section {
+    margin-bottom: 2rem;
+}
+
+.contract-section:last-child {
+    margin-bottom: 0;
+}
+
+/* Instructions Content */
+.instructions-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.instruction-item {
+    padding: 1rem;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 0.75rem;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.instruction-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(147, 51, 234, 0.1);
+}
+
+.instruction-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.instruction-number {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    background: linear-gradient(135deg, #6366F1 0%, #D946EF 100%);
+    color: white;
+    border-radius: 50%;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.instruction-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.instruction-description {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    margin: 0.5rem 0;
+}
+
+.instruction-function {
+    display: inline-block;
+    font-family: 'Roboto Mono', monospace;
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    background: var(--input-bg);
+    border-radius: 0.25rem;
+    color: #D946EF;
+    border: 1px solid rgba(147, 51, 234, 0.2);
+}
+
+/* Dark mode adjustments */
+.dark .instruction-item {
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.dark .instruction-function {
+    background: rgba(0, 0, 0, 0.3);
+    border-color: rgba(147, 51, 234, 0.3);
+}
+
+/* Utility classes */
+.mt-6 {
+    margin-top: 1.5rem;
+}
+
+.security-features {
+    display: grid;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.security-item {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 0.75rem;
+    transition: all 0.3s ease;
+}
+
+.security-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(147, 51, 234, 0.1);
+}
+
+.security-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    background: linear-gradient(135deg, #6366F1 0%, #D946EF 100%);
+    border-radius: 0.75rem;
+    color: white;
+    flex-shrink: 0;
+}
+
+.security-icon svg {
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
+.security-content {
+    flex: 1;
+}
+
+.security-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 0.25rem 0;
+}
+
+.security-description {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    margin: 0;
+}
+
+/* Instruction Icon */
+.instruction-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    color: #D946EF;
+}
+
+.instruction-icon svg {
+    width: 1rem;
+    height: 1rem;
+}
+
+/* Dark mode adjustments */
+.dark .security-item {
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.dark .security-icon {
+    background: linear-gradient(135deg, #4F46E5 0%, #C026D3 100%);
+}
+
+/* Animation for security items */
+.security-item {
+    animation: fadeInUp 0.5s ease-out forwards;
+    opacity: 0;
+}
+
+.security-item:nth-child(1) {
+    animation-delay: 0.1s;
+}
+
+.security-item:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.security-item:nth-child(3) {
+    animation-delay: 0.3s;
+}
+
+.security-item:nth-child(4) {
+    animation-delay: 0.4s;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

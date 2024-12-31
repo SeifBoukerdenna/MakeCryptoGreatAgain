@@ -54,26 +54,36 @@ export const useMessages = () => {
     addMessage({ sender: "character", text: "", status: "loading" });
 
     try {
+      // Filter only relevant messages for context (last 10 messages)
+      const contextMessages = messages.slice(-10).map((msg) => ({
+        sender: msg.sender,
+        text: msg.text,
+      }));
+
       await new Promise<void>((resolve, reject) => {
-        streamGPTResponse(userText, finalSystemPrompt, (token: string) => {
-          if (!token) return;
+        streamGPTResponse(
+          userText,
+          finalSystemPrompt,
+          JSON.stringify(contextMessages),
+          (token: string) => {
+            if (!token) return;
 
-          const needsSpace =
-            fullResponseRef.current.length > 0 &&
-            !fullResponseRef.current.endsWith(" ") &&
-            !token.startsWith(" ") &&
-            !token.match(/^[.,!?;:)'"%\]}]/) &&
-            !fullResponseRef.current.match(/[({\["'%]$/);
+            const needsSpace =
+              fullResponseRef.current.length > 0 &&
+              !fullResponseRef.current.endsWith(" ") &&
+              !token.startsWith(" ") &&
+              !token.match(/^[.,!?;:)'"%\]}]/) &&
+              !fullResponseRef.current.match(/[({\["'%]$/);
 
-          fullResponseRef.current += (needsSpace ? " " : "") + token;
-        })
+            fullResponseRef.current += (needsSpace ? " " : "") + token;
+          }
+        )
           .then(() => resolve())
           .catch(reject);
       });
 
       if (fullResponseRef.current) {
         updateLastMessage("", "loading");
-        console.log("Full response:", fullResponseRef.current);
         await sendTTSRequest(
           fullResponseRef.current,
           { voiceId, engine: voiceEngine },
@@ -82,18 +92,11 @@ export const useMessages = () => {
           }
         );
 
-        // Log attempt to increment message count
-        console.log("Attempting to increment message count for:", {
-          characterId: config.id,
-          walletAddress: publicKey?.toString(),
-        });
-
-        // Direct database update
+        // Update database records
         if (publicKey) {
           try {
             const walletAddress = publicKey.toString();
 
-            // Try to get existing record
             const { data: existingRecord } = await supabase
               .from("message_stats")
               .select("*")
@@ -102,35 +105,26 @@ export const useMessages = () => {
               .single();
 
             if (existingRecord) {
-              // Update existing record
-              const { error: updateError } = await supabase
+              await supabase
                 .from("message_stats")
                 .update({
                   message_count: existingRecord.message_count + 1,
                   last_used: new Date().toISOString(),
                 })
                 .eq("id", existingRecord.id);
-
-              console.log("Update result:", updateError || "Success");
             } else {
-              // Insert new record
-              const { error: insertError } = await supabase
-                .from("message_stats")
-                .insert({
-                  character_id: config.id,
-                  wallet_address: walletAddress,
-                  message_count: 1,
-                  last_used: new Date().toISOString(),
-                });
-
-              console.log("Insert result:", insertError || "Success");
+              await supabase.from("message_stats").insert({
+                character_id: config.id,
+                wallet_address: walletAddress,
+                message_count: 1,
+                last_used: new Date().toISOString(),
+              });
             }
           } catch (err) {
             console.error("Direct DB update error:", err);
           }
         }
 
-        // Also call the local hook method
         await incrementMessageCount(config.id);
       }
     } catch (error) {
@@ -155,7 +149,6 @@ export const useMessages = () => {
     messagesEndRef,
     handleSend,
     audioRef,
-    // Expose the video-related data
     videoBlob,
     clearVideoBlob,
   };

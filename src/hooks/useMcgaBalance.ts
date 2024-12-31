@@ -3,14 +3,13 @@ import { useEffect, useState } from "react";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { PublicKey } from "@solana/web3.js";
 
-// Example: Import your MCGA_TOKEN_MINT from a config
-import { MCGA_TOKEN_MINT } from "../constants/tokens";
+import { MCGA_MINT_SMART_WALLET } from "../constants/tokens";
 
 async function fetchMcgaBalance(publicKey: PublicKey, connection: any) {
   try {
     const tokenAccounts = await connection.getParsedTokenAccountsByOwner(
       publicKey,
-      { mint: MCGA_TOKEN_MINT }
+      { mint: MCGA_MINT_SMART_WALLET }
     );
 
     const mcgaAccount = tokenAccounts.value[0];
