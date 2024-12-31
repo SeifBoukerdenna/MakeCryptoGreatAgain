@@ -131,7 +131,7 @@ const Layout: React.FC<LayoutProps> = ({ toggleTheme, theme }) => {
                         rel="noopener noreferrer"
                         className="flex items-center text-gray-600 hover:text-purple-500 dark:text-gray-300 dark:hover:text-purple-400 transition-colors duration-200"
                     >
-                        <FontAwesomeIcon icon={faXTwitter} size="lg" />
+                        <FontAwesomeIcon icon={faXTwitter} size="lg" color='rgba(147, 51, 234, 0.5)' />
                     </a>
                 </div>
 
