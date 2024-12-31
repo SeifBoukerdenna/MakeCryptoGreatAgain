@@ -710,3 +710,15 @@
         max-width: 300px;
     }
 }
+
+.challenge-card input.solved-input {
+    color: #10B981;
+    font-weight: 600;
+    background: rgba(16, 185, 129, 0.1);
+    border-color: rgba(16, 185, 129, 0.3);
+}
+
+.challenge-card input.solved-input::placeholder {
+    color: #10B981;
+    opacity: 1;
+}

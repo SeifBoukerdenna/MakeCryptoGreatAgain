@@ -200,7 +200,7 @@ const ChallengePage = () => {
                                                 : !hasPool
                                                     ? 'Pool not initialized'
                                                     : isSolved
-                                                        ? 'Solved'
+                                                        ? `${characterStatus.secret_phrase}`
                                                         : currentlyCoolingDown
                                                             ? 'Waiting for cooldown...'
                                                             : 'Enter the secret phrase...'
@@ -211,6 +211,7 @@ const ChallengePage = () => {
                                             [character.id]: e.target.value,
                                         })}
                                         disabled={!hasPool || currentlyCoolingDown || !connected || isSolved}
+                                        className={isSolved ? 'solved-input' : ''}
                                     />
 
                                     {/* Status Section */}

@@ -1,7 +1,5 @@
 import { useState, useEffect } from 'react';
 import { useConnection } from '@solana/wallet-adapter-react';
-import { PublicKey } from '@solana/web3.js';
-import { MCGA_TOKEN_MINT } from '../constants/tokens';
 import { supabase } from '../lib/supabase';
 import { Copy, Check } from 'lucide-react';
 import { formatToK } from '../utils/numberFormat';
@@ -30,32 +28,6 @@ const EngagementLeaderboard = () => {
             }, 2000);
         } catch (err) {
             console.error('Failed to copy address:', err);
-        }
-    };
-    const fetchInterval = 60000 * 5; // 5 minutes
-    const fetchMcgaBalance = async (address: string, retries = 3, delay = fetchInterval): Promise<number> => {
-        try {
-            const pubKey = new PublicKey(address);
-            const tokenAccounts = await connection.getParsedTokenAccountsByOwner(
-                pubKey,
-                { mint: MCGA_TOKEN_MINT }
-            );
-
-            const mcgaAccount = tokenAccounts.value[0];
-            if (mcgaAccount) {
-                const tokenAmount = mcgaAccount.account.data.parsed.info.tokenAmount;
-                return parseInt(tokenAmount.amount) / Math.pow(10, tokenAmount.decimals);
-            }
-            return 0;
-        } catch (err: any) {
-            if (err.response?.status === 429 && retries > 0) {
-                console.warn(`Rate limited. Retrying in ${delay}ms...`);
-                await new Promise(res => setTimeout(res, delay));
-                return fetchMcgaBalance(address, retries - 1, delay * 2);
-            } else {
-                console.error('Error fetching MCGA balance:', err);
-                return 0;
-            }
         }
     };
 
@@ -89,20 +61,6 @@ const EngagementLeaderboard = () => {
                     }
                     return acc;
                 }, {});
-
-                const userAddresses = Object.keys(aggregatedData);
-
-                // Limit concurrent requests to avoid rate limiting
-                const BATCH_SIZE = 5; // Adjust based on API limits
-                for (let i = 0; i < userAddresses.length; i += BATCH_SIZE) {
-                    const batch = userAddresses.slice(i, i + BATCH_SIZE);
-                    const balances = await Promise.all(
-                        batch.map(address => fetchMcgaBalance(address))
-                    );
-                    batch.forEach((address, index) => {
-                        aggregatedData[address].mcga_balance = balances[index];
-                    });
-                }
 
                 // Convert aggregated data to array and sort
                 const usersWithBalances = Object.values(aggregatedData).sort(

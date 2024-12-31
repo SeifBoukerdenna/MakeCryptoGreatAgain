@@ -1,5 +1,6 @@
+// src/App.tsx
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import './styles/global.css';
 import Home from './pages/Home';
 import About from './pages/About';
@@ -16,27 +17,28 @@ import AdminCharacters from './pages/Admin';
 import ChallengePage from './pages/Challenge';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { Buffer as BufferPolyfill } from 'buffer'
-declare var Buffer: typeof BufferPolyfill;
-globalThis.Buffer = BufferPolyfill
+import { Buffer as BufferPolyfill } from 'buffer';
 
+declare var Buffer: typeof BufferPolyfill;
+globalThis.Buffer = BufferPolyfill;
 
 const endpoint = 'https://api.devnet.solana.com';
 const wallets = [new PhantomWalletAdapter()];
 
 const App = () => {
   injectSpeedInsights();
-  const [theme, setTheme] = useState<'light' | 'dark'>('dark');
 
-  useEffect(() => {
+  // Initialize theme synchronously
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
     const storedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null;
     if (storedTheme) {
-      setTheme(storedTheme);
       document.documentElement.classList.toggle('dark', storedTheme === 'dark');
+      return storedTheme;
     } else {
       document.documentElement.classList.add('dark');
+      return 'dark';
     }
-  }, []);
+  });
 
   const toggleTheme = () => {
     const newTheme = theme === 'dark' ? 'light' : 'dark';
