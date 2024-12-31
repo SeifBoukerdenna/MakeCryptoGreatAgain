@@ -71,7 +71,7 @@ const Home: React.FC = () => {
     if (!selectedCharacter) {
       return (
         <div className="flex flex-col items-center justify-center h-full text-center my-8">
-          <p className="text-xl text-gray-400 dark:text-gray-500">
+          <p className="text-xl text-gray-400 dark:text-gray-500 font-bold">
             Select a character to start chatting
           </p>
         </div>
