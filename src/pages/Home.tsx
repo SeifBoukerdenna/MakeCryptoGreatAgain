@@ -16,7 +16,7 @@ import { TEST_MODE, FREE_CHARACTER_ID } from '../configs/test.config';
 import { charactersConfig } from '../configs/characters.config';
 import { thinkingMessages } from '../configs/thinkingMessages.ts';
 import useConversationStore from '../stores/useConversationStore';
-import GuidedTour from '../components/GuidedTour.tsx';
+import GuidedTour from '../components/tours/GuidedTour.tsx';
 
 const Home: React.FC = () => {
   const { connected } = useWallet();

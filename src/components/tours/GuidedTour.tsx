@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import Joyride, { Step, CallBackProps, STATUS } from 'react-joyride';
 import { useWallet } from '@solana/wallet-adapter-react';
-import useCharacterStore from '../stores/useCharacterStore';
+import useCharacterStore from '../../stores/useCharacterStore';
 
 const GuidedTour = () => {
     const [switchTourRun, setSwitchTourRun] = useState(false);
