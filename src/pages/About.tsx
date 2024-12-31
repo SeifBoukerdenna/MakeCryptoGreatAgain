@@ -330,8 +330,8 @@ pub struct Pool {
                         your favorite personalities.
                     </motion.p>
                 </div>
-                <div className="mt-8 flex justify-center">
-                    <div className="max-w-4xl w-full">
+                <div className="contract-viewer-section">
+                    <div className="contract-viewer-wrapper">
                         <SmartContractViewer code={contractCode} language="rust" theme={theme} />
                     </div>
                 </div>

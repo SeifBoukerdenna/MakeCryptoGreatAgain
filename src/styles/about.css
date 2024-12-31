@@ -457,3 +457,34 @@
         font-size: 1rem;
     }
 }
+
+
+.contract-viewer-section {
+    padding: 1rem;
+    width: 100%;
+    overflow-x: hidden;
+}
+
+.contract-viewer-wrapper {
+    width: 100%;
+    max-width: 4xl;
+    margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+    .contract-viewer-section {
+        padding: 0.5rem;
+    }
+
+    .contract-viewer-wrapper {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* Ensure code is visible on mobile */
+    .contract-viewer-wrapper pre {
+        min-width: min-content;
+        font-size: 0.8rem !important;
+    }
+}

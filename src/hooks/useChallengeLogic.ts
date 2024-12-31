@@ -1,4 +1,3 @@
-// src/hooks/useChallengeLogic.ts
 import { useState, useEffect } from "react";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { useDynamicCooldown } from "./useDynamicCooldown";
@@ -144,14 +143,35 @@ export function useChallengeLogic(onTransaction?: (txHash: string) => void) {
         const now = new Date();
         const nextAttemptTime = new Date(now.getTime() + dynamicCooldownMs);
 
-        // Apply cooldown regardless of error type
-        await supabase.from("challenge_attempts").upsert({
-          character_id: characterId,
-          wallet_address: publicKey.toString(),
-          last_attempt: now.toISOString(),
-          next_attempt_allowed: nextAttemptTime.toISOString(),
-          attempts: (attempts[characterId]?.attempts || 0) + 1,
-        });
+        // First, try to get the current record
+        const { data: existingAttempt } = await supabase
+          .from("challenge_attempts")
+          .select("*")
+          .eq("character_id", characterId)
+          .eq("wallet_address", publicKey.toString())
+          .single();
+
+        if (existingAttempt) {
+          // Update existing record
+          await supabase
+            .from("challenge_attempts")
+            .update({
+              last_attempt: now.toISOString(),
+              next_attempt_allowed: nextAttemptTime.toISOString(),
+              attempts: existingAttempt.attempts + 1,
+            })
+            .eq("character_id", characterId)
+            .eq("wallet_address", publicKey.toString());
+        } else {
+          // Insert new record
+          await supabase.from("challenge_attempts").insert({
+            character_id: characterId,
+            wallet_address: publicKey.toString(),
+            last_attempt: now.toISOString(),
+            next_attempt_allowed: nextAttemptTime.toISOString(),
+            attempts: 1,
+          });
+        }
 
         // Update local attempts state immediately
         setAttempts((prev) => ({
@@ -161,7 +181,7 @@ export function useChallengeLogic(onTransaction?: (txHash: string) => void) {
             wallet_address: publicKey.toString(),
             last_attempt: now.toISOString(),
             next_attempt_allowed: nextAttemptTime.toISOString(),
-            attempts: (prev[characterId]?.attempts || 0) + 1,
+            attempts: (existingAttempt?.attempts || 0) + 1,
           },
         }));
 
@@ -208,7 +228,7 @@ export function useChallengeLogic(onTransaction?: (txHash: string) => void) {
         if (onTransaction) onTransaction(sig);
       });
 
-      // If second transaction was cancelled or failed, throw specific error
+      // If second transaction was cancelled, throw specific error
       if (!secondTxCompleted) {
         throw new Error(
           "Challenge attempt cancelled - Cooldown period applied"
@@ -227,7 +247,57 @@ export function useChallengeLogic(onTransaction?: (txHash: string) => void) {
       const isCorrect = userGuess === secretData.secret.trim().toLowerCase();
       const now = new Date();
 
-      if (isCorrect) {
+      if (!isCorrect) {
+        const nextAttemptTime = new Date(now.getTime() + dynamicCooldownMs);
+
+        // First, try to get the current record
+        const { data: existingAttempt } = await supabase
+          .from("challenge_attempts")
+          .select("*")
+          .eq("character_id", characterId)
+          .eq("wallet_address", publicKey.toString())
+          .single();
+
+        if (existingAttempt) {
+          // Update existing record
+          await supabase
+            .from("challenge_attempts")
+            .update({
+              last_attempt: now.toISOString(),
+              next_attempt_allowed: nextAttemptTime.toISOString(),
+              attempts: existingAttempt.attempts + 1,
+            })
+            .eq("character_id", characterId)
+            .eq("wallet_address", publicKey.toString());
+        } else {
+          // Insert new record
+          await supabase.from("challenge_attempts").insert({
+            character_id: characterId,
+            wallet_address: publicKey.toString(),
+            last_attempt: now.toISOString(),
+            next_attempt_allowed: nextAttemptTime.toISOString(),
+            attempts: 1,
+          });
+        }
+
+        // Update local attempts state
+        setAttempts((prev) => ({
+          ...prev,
+          [characterId]: {
+            character_id: characterId,
+            wallet_address: publicKey.toString(),
+            last_attempt: now.toISOString(),
+            next_attempt_allowed: nextAttemptTime.toISOString(),
+            attempts: (existingAttempt?.attempts || 0) + 1,
+          },
+        }));
+
+        // Clear input for wrong answer
+        setGuesses((prev) => ({
+          ...prev,
+          [characterId]: "",
+        }));
+      } else {
         const poolBalanceAfter = await connection.getTokenAccountBalance(
           new PublicKey(poolInfo.pool_token_account)
         );
@@ -259,24 +329,16 @@ export function useChallengeLogic(onTransaction?: (txHash: string) => void) {
             secret_phrase: guesses[characterId],
           },
         }));
-      } else {
-        // Handle wrong answer (cooldown already applied in handlePoolGuess)
-        setGuesses((prev) => ({
-          ...prev,
-          [characterId]: "",
-        }));
       }
 
       await Promise.all([fetchCharacterStatuses(), fetchUserAttempts()]);
     } catch (error: any) {
       console.error("Error submitting guess:", error);
-
       // Clear input on any error
       setGuesses((prev) => ({
         ...prev,
         [characterId]: "",
       }));
-
       throw error;
     } finally {
       setIsLoading(false);

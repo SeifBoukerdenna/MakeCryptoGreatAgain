@@ -48,7 +48,7 @@ const LoadingScreen = ({ onLoadingComplete }: LoadingScreenProps) => {
     const [currentMessage, setCurrentMessage] = useState(selectedMessages.early);
 
     useEffect(() => {
-        const loadingTime = Math.random() * (3000 - 1000) + 1000;
+        const loadingTime = Math.random() * (2000 - 500) + 500;
         const interval = 10;
         const steps = loadingTime / interval;
         let currentStep = 0;
