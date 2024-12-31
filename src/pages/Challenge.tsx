@@ -200,7 +200,7 @@ const ChallengePage = () => {
                                                 : !hasPool
                                                     ? 'Pool not initialized'
                                                     : isSolved
-                                                        ? `Answer: "${characterStatus.secret_phrase}"`
+                                                        ? `${characterStatus.secret_phrase}`
                                                         : currentlyCoolingDown
                                                             ? 'Waiting for cooldown...'
                                                             : 'Enter the secret phrase...'
