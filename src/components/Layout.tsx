@@ -7,7 +7,7 @@ import { MCGA_TOKEN_MINT } from '../constants/tokens';
 import { formatToK } from '../utils/numberFormat';
 import BalanceDisplay from './BalanceDisplay';
 import useBalanceStore from '../hooks/useBalanceStore';
-import { TEST_MODE } from '../configs/test.config';
+// import { TEST_MODE } from '../configs/test.config';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faXTwitter } from '@fortawesome/free-brands-svg-icons';
 interface LayoutProps {
