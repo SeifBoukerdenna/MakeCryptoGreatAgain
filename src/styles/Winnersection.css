@@ -1,0 +1,138 @@
+/* Winner Section Styles */
+.winner-section {
+    margin-top: 3rem;
+    padding: 1.5rem;
+    background: var(--card-bg);
+    border-radius: 1rem;
+    border: 1px solid var(--card-border);
+}
+
+.winner-section h2 {
+    text-align: center;
+    font-size: 1.75rem;
+    margin-bottom: 1.5rem;
+    color: var(--text-primary);
+}
+
+
+.winner-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 1rem;
+    border: 2px solid var(--card-border);
+}
+
+.winner-name {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+}
+
+.winner-info {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: center;
+}
+
+.winner-address {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    background: rgba(147, 51, 234, 0.1);
+    padding: 0.5rem 1rem;
+    border-radius: 9999px;
+    width: fit-content;
+}
+
+.winner-amount {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(147, 51, 234, 0.1);
+    padding: 0.5rem 1rem;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.no-winner-info {
+    display: flex;
+    /* flex-direction: column; */
+    gap: 2rem;
+    opacity: 0.7;
+}
+
+.no-winner-address,
+.no-winner-amount {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(147, 51, 234, 0.1);
+    padding: 0.5rem 1rem;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    width: fit-content;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .winner-grid {
+        grid-template-columns: repeat(2, 1fr);
+        justify-content: center;
+        gap: 1rem;
+    }
+
+    .winner-card-challenge {
+        padding: 1.25rem;
+        max-height: 22px;
+    }
+
+    .winner-avatar {
+        width: 60px;
+        height: 60px;
+    }
+
+    .winner-name {
+        font-size: 1.125rem;
+    }
+
+    .winner-address,
+    .winner-amount,
+    .no-winner-address,
+    .no-winner-amount {
+        font-size: 0.8125rem;
+        padding: 0.375rem 0.75rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .winner-section {
+        padding: 1rem;
+    }
+
+    .winner-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .winner-card-challenge {
+        min-height: 200px;
+    }
+}
+
+
+@media (max-width: 480px) {
+    .challenge-grid {
+        grid-template-columns: 1fr;
+        padding: 0.5rem;
+    }
+}

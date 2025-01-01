@@ -46,6 +46,21 @@ const RoadmapPage = () => {
     const [isVotingEnded, setIsVotingEnded] = useState(false);
     const [showWinnerOverlay, setShowWinnerOverlay] = useState(true);
 
+    useEffect(() => {
+        if (isVotingEnded && showWinnerOverlay) {
+            // Prevent scrolling
+            document.body.style.overflow = 'hidden';
+        } else {
+            // Re-enable scrolling
+            document.body.style.overflow = 'auto';
+        }
+
+        // Cleanup on unmount
+        return () => {
+            document.body.style.overflow = 'auto';
+        };
+    }, [isVotingEnded, showWinnerOverlay]);
+
 
     // Enhanced timer effect
     useEffect(() => {
