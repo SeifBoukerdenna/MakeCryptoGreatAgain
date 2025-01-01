@@ -150,19 +150,6 @@ const ChallengePage = () => {
 
             {/* Stats Section */}
             <div className="token-holder-card">
-                {/* <div className="holder-stats">
-                    <div className="stat-item">
-                        <div className="stat-label">Total Characters</div>
-                        <div className="stat-value">{charactersConfig.length}</div>
-                    </div>
-                    <div className="stat-item">
-                        <div className="stat-label">Solved Characters</div>
-                        <div className="stat-value">
-                            {Object.values(characterStatuses).filter(s => s.is_solved).length}
-                        </div>
-                    </div>
-                </div> */}
-
                 {/* Character Grid */}
                 <div className="challenge-grid">
                     {charactersConfig.map((character) => {
@@ -332,7 +319,7 @@ const ChallengePage = () => {
                     {charactersConfig.map((character) => {
                         const status = characterStatuses[character.id];
                         return (
-                            <div key={character.id} className="winner-card">
+                            <div key={character.id} className="winner-card-challenge">
                                 <img
                                     src={character.avatar}
                                     alt={character.name}

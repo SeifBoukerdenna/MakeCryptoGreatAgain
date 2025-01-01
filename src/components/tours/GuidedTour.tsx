@@ -9,6 +9,7 @@ const GuidedTour = () => {
     const { connected } = useWallet();
     const selectedCharacter = useCharacterStore((state) => state.selectedCharacter);
     const [switchTourCompleted, setSwitchTourCompleted] = useState(false);
+    const [hasCheckedLocalStorage, setHasCheckedLocalStorage] = useState(false);
 
     // Switch tour steps
     const switchSteps: Step[] = [
@@ -73,28 +74,26 @@ const GuidedTour = () => {
         }
     ];
 
-    // Check if switch tour has been completed on mount
+    // Check localStorage only once on component mount
     useEffect(() => {
         const hasSwitchTour = localStorage.getItem('hasSwitchTour');
         setSwitchTourCompleted(!!hasSwitchTour);
+        setHasCheckedLocalStorage(true);
     }, []);
 
     // Start switch tour on initial connection
     useEffect(() => {
-        if (connected && !switchTourCompleted) {
+        if (connected && !switchTourCompleted && hasCheckedLocalStorage && !localStorage.getItem('hasSwitchTour')) {
             setSwitchTourRun(true);
         }
-    }, [connected, switchTourCompleted]);
+    }, [connected, switchTourCompleted, hasCheckedLocalStorage]);
 
-    // Start chat tour only after switch tour is completed
+    // Start chat tour only after switch tour is completed and if it hasn't been shown before
     useEffect(() => {
-        if (selectedCharacter && switchTourCompleted) {
-            const hasChatTour = localStorage.getItem('hasChatTour');
-            if (!hasChatTour) {
-                setTimeout(() => setChatTourRun(true), 300);
-            }
+        if (selectedCharacter && switchTourCompleted && hasCheckedLocalStorage && !localStorage.getItem('hasChatTour')) {
+            setTimeout(() => setChatTourRun(true), 300);
         }
-    }, [selectedCharacter, switchTourCompleted]);
+    }, [selectedCharacter, switchTourCompleted, hasCheckedLocalStorage]);
 
     const handleSwitchTourCallback = (data: CallBackProps) => {
         const { status } = data;
@@ -158,6 +157,11 @@ const GuidedTour = () => {
             backgroundColor: 'transparent',
         }
     };
+
+    // Don't render anything if both tours have been completed
+    if (localStorage.getItem('hasSwitchTour') && localStorage.getItem('hasChatTour')) {
+        return null;
+    }
 
     return (
         <>
