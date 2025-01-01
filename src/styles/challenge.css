@@ -471,16 +471,18 @@
     }
 }
 
-.winner-card {
+.winner-card-challenge {
     background: var(--card-bg);
     padding: 1rem;
     border-radius: 0.75rem;
     border: 1px solid var(--card-border);
     text-align: center;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
+    margin-left: auto;
+    height: auto;
 }
 
-.winner-card:hover {
+.winner-card-challenge:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(147, 51, 234, 0.1);
 }

@@ -1,4 +1,5 @@
-import React, { useEffect } from 'react';
+// src/pages/Home.tsx
+import React from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination } from 'swiper/modules';
@@ -44,10 +45,6 @@ const Home: React.FC = () => {
   const handleClearChat = () => {
     setMessages([]);
   };
-
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
 
   const renderChatArea = () => {
     // In test mode, allow chat if Trump is selected
@@ -100,7 +97,7 @@ const Home: React.FC = () => {
           </div>
         )}
 
-        {/* Messages Container (scrollable when too many messages) */}
+        {/* Messages Container */}
         <div
           className="
           messages
@@ -115,7 +112,6 @@ const Home: React.FC = () => {
           max-h-80
         "
           style={{ maxHeight: '20rem' }}
-        /* Alternatively: className="max-h-[20rem] ..." in Tailwind */
         >
           {messages.map((m, i) => {
             let messageText = m.text;
@@ -147,7 +143,6 @@ const Home: React.FC = () => {
       </>
     );
   };
-
 
   return (
     <>
@@ -207,7 +202,6 @@ const Home: React.FC = () => {
         </div>
       </div>
     </>
-
   );
 };
 
