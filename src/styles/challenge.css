@@ -441,11 +441,6 @@
     color: var(--text-primary);
 }
 
-.winner-grid {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 1.5rem;
-}
 
 @media (max-width: 1200px) {
     .winner-grid {
@@ -453,11 +448,7 @@
     }
 }
 
-@media (max-width: 992px) {
-    .winner-grid {
-        grid-template-columns: repeat(3, 1fr);
-    }
-}
+@media (max-width: 992px) {}
 
 @media (max-width: 768px) {
     .winner-grid {
@@ -539,6 +530,8 @@
 
 .header-content {
     display: flex;
+    align-items: center;
+    justify-content: center;
     flex-direction: column;
     gap: 0.5rem;
 }
@@ -548,7 +541,7 @@
     align-items: center;
     gap: 0.5rem;
     background: rgba(147, 51, 234, 0.1);
-    padding: 0.25rem 0.75rem;
+    /* padding: 0.25rem 0.75rem; */
     border-radius: 9999px;
     font-size: 0.875rem;
 }

@@ -10,7 +10,6 @@ import {
     Check,
     Timer,
     Wallet,
-    Copy,
     Coins,
     ExternalLink,
 } from 'lucide-react';
@@ -23,6 +22,7 @@ import TruncatedAddressLink from '../components/TruncatedAddressLink';
 import { toast } from 'react-toastify';
 import ChallengeTour from '../components/tours/ChallengeTour';
 import CooldownExplainer from '../components/CooldownExplainer';
+import WinnersSection from '../components/WinnersSection';
 
 const ChallengePage = () => {
     const { connected } = useWallet();
@@ -47,7 +47,7 @@ const ChallengePage = () => {
     useEffect(() => {
         if (Object.keys(poolInfos).length > 0) {
             fetchPoolBalances();
-            const interval = setInterval(fetchPoolBalances, 5000);
+            const interval = setInterval(fetchPoolBalances, 60000); // Refresh every minute
             return () => clearInterval(interval);
         }
     }, [poolInfos, connection]);
@@ -242,7 +242,7 @@ const ChallengePage = () => {
                                         <button
                                             onClick={() => handleGuess(character.id)}
                                             disabled={!hasPool || currentlyCoolingDown || !connected || isLoading || isSolved}
-                                            className={`challenge-button ${currentlyCoolingDown || isSolved ? 'cooldown' : 'ready'}`}
+                                            className={`challenge-button ${currentlyCoolingDown || isSolved ? 'cooldown' : 'ready -- refresh the page'}`}
                                         >
                                             {!connected ? (
                                                 <>
@@ -313,50 +313,12 @@ const ChallengePage = () => {
             </div>
 
             {/* Winners Section */}
-            <div className="winner-section">
-                <h2 className="text-2xl font-bold mb-4 text-center">Winners</h2>
-                <div className="winner-grid">
-                    {charactersConfig.map((character) => {
-                        const status = characterStatuses[character.id];
-                        return (
-                            <div key={character.id} className="winner-card-challenge">
-                                <img
-                                    src={character.avatar}
-                                    alt={character.name}
-                                    className="winner-avatar"
-                                />
-                                <h3 className="winner-name">{character.name}</h3>
-                                {status?.is_solved ? (
-                                    <div className="winner-info">
-                                        <div className="winner-address">
-                                            <button
-                                                onClick={() => handleCopy(status.solved_by || '')}
-                                                className="copy-address-button"
-                                                title="Click to copy wallet address"
-                                            >
-                                                <span>{truncateAddress(status.solved_by || '')}</span>
-                                                {copiedStates[status.solved_by || ''] ? (
-                                                    <Check className="copy-icon" size={16} />
-                                                ) : (
-                                                    <Copy className="copy-icon" size={16} />
-                                                )}
-                                            </button>
-                                        </div>
-                                        {status.tokens_won > 0 && (
-                                            <div className="winner-amount">
-                                                <Coins className="h-4 w-4" />
-                                                {status.tokens_won.toLocaleString()} MCGA
-                                            </div>
-                                        )}
-                                    </div>
-                                ) : (
-                                    <div className="no-winner">No winner yet</div>
-                                )}
-                            </div>
-                        );
-                    })}
-                </div>
-            </div>
+            <WinnersSection
+                charactersConfig={charactersConfig}
+                characterStatuses={characterStatuses}
+                copiedStates={copiedStates}
+                handleCopy={handleCopy}
+            />
         </div>
     );
 };

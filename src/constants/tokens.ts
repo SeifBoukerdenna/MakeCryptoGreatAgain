@@ -3,7 +3,7 @@
 import { PublicKey } from "@solana/web3.js";
 
 export const MCGA_TOKEN_MINT = new PublicKey(
-  "JDpSTtGrgY6Gv1BVPzA8wSoR1EBgjBg8v7aeBt9xzXLi"
+  "5g1hscK8kkX9ee1Snmm4HvBM4fH1b2u1tfee3GyTewAq"
 );
 export const MCGA_MINT_SMART_WALLET = new PublicKey(
   "5g1hscK8kkX9ee1Snmm4HvBM4fH1b2u1tfee3GyTewAq"
