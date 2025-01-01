@@ -410,6 +410,7 @@
 }
 
 /* Add to your roadmap.css file */
+/* Add to your roadmap.css file */
 
 .voting-ended-overlay {
     position: absolute;
@@ -443,16 +444,47 @@
     z-index: -1;
 }
 
-.winner-card {
-    pointer-events: auto;
+.close-button {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.close-button:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: rotate(90deg);
+}
+
+.close-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+/* Dark mode adjustments */
+.dark .close-button {
+    background: rgba(0, 0, 0, 0.2);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.dark .close-button:hover {
+    background: rgba(0, 0, 0, 0.3);
 }
 
 .winner-card {
     pointer-events: auto;
-    /* Add some extra depth with a stronger backdrop blur */
     backdrop-filter: blur(16px);
     position: relative;
-    /* Move the card down a bit to avoid the navbar area */
     margin-top: 80px;
 }
 

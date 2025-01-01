@@ -1,8 +1,9 @@
 import React from 'react';
-import { Trophy, Star } from 'lucide-react';
+import { Trophy, Star, X } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface VotingEndedOverlayProps {
+    onClose: () => void;
     winningCharacter: {
         name: string;
         votes: number;
@@ -11,7 +12,11 @@ interface VotingEndedOverlayProps {
     totalVotes: number;
 }
 
-const VotingEndedOverlay: React.FC<VotingEndedOverlayProps> = ({ winningCharacter, totalVotes }) => {
+const VotingEndedOverlay: React.FC<VotingEndedOverlayProps> = ({
+    winningCharacter,
+    totalVotes,
+    onClose
+}) => {
     return (
         <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
@@ -22,8 +27,13 @@ const VotingEndedOverlay: React.FC<VotingEndedOverlayProps> = ({ winningCharacte
                 initial={{ y: 50, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.2 }}
-                className="winner-card"
-            >
+                className="winner-card">
+                <button
+                    onClick={onClose}
+                    className="close-button"
+                >
+                    <X className="close-icon" />
+                </button>
                 <motion.div
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}

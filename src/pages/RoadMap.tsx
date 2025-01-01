@@ -44,6 +44,8 @@ const RoadmapPage = () => {
     const [mcgaBalance, setMcgaBalance] = useState<number>(0);
     const [totalVotes, setTotalVotes] = useState(0);
     const [isVotingEnded, setIsVotingEnded] = useState(false);
+    const [showWinnerOverlay, setShowWinnerOverlay] = useState(true);
+
 
     // Enhanced timer effect
     useEffect(() => {
@@ -321,10 +323,11 @@ const RoadmapPage = () => {
     return (
         <div className="roadmap-container">
             <RoadmapTour />
-            {isVotingEnded && winningCharacter && (
+            {isVotingEnded && winningCharacter && showWinnerOverlay && (
                 <VotingEndedOverlay
                     winningCharacter={winningCharacter}
                     totalVotes={totalVotes}
+                    onClose={() => setShowWinnerOverlay(false)}
                 />
             )}
             <div className="max-w-7xl mx-auto">
