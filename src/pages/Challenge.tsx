@@ -22,6 +22,7 @@ import '../styles/challenge.css';
 import TruncatedAddressLink from '../components/TruncatedAddressLink';
 import { toast } from 'react-toastify';
 import ChallengeTour from '../components/tours/ChallengeTour';
+import CooldownExplainer from '../components/CooldownExplainer';
 
 const ChallengePage = () => {
     const { connected } = useWallet();
@@ -136,15 +137,20 @@ const ChallengePage = () => {
     }
 
     return (
-        <div className="container mx-auto px-4 py-8">
+        <div className="container mx-auto px-4 py-8 space-y-8">
             <ChallengeTour />
-            <h1 className="text-3xl font-bold mb-8 text-center bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                Character Challenges
-            </h1>
+            <div className="cooldown-explainer">
+                <CooldownExplainer />
+            </div>
+            <div className='challenge-header'>
+                <h1 className="text-3xl font-bold mb-8 text-center bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                    Character Challenges
+                </h1>
+            </div>
 
             {/* Stats Section */}
             <div className="token-holder-card">
-                <div className="holder-stats">
+                {/* <div className="holder-stats">
                     <div className="stat-item">
                         <div className="stat-label">Total Characters</div>
                         <div className="stat-value">{charactersConfig.length}</div>
@@ -155,7 +161,7 @@ const ChallengePage = () => {
                             {Object.values(characterStatuses).filter(s => s.is_solved).length}
                         </div>
                     </div>
-                </div>
+                </div> */}
 
                 {/* Character Grid */}
                 <div className="challenge-grid">
