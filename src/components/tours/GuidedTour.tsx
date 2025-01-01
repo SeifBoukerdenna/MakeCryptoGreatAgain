@@ -77,7 +77,6 @@ const GuidedTour = () => {
     // Check localStorage only once on component mount
     useEffect(() => {
         const hasSwitchTour = localStorage.getItem('hasSwitchTour');
-        const hasChatTour = localStorage.getItem('hasChatTour');
         setSwitchTourCompleted(!!hasSwitchTour);
         setHasCheckedLocalStorage(true);
     }, []);

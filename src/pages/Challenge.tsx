@@ -319,7 +319,7 @@ const ChallengePage = () => {
                     {charactersConfig.map((character) => {
                         const status = characterStatuses[character.id];
                         return (
-                            <div key={character.id} className="winner-card">
+                            <div key={character.id} className="winner-card-challenge">
                                 <img
                                     src={character.avatar}
                                     alt={character.name}
