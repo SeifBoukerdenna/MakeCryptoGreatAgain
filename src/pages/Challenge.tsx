@@ -10,7 +10,6 @@ import {
     Check,
     Timer,
     Wallet,
-    Copy,
     Coins,
     ExternalLink,
 } from 'lucide-react';
@@ -158,6 +157,7 @@ const ChallengePage = () => {
                         const cooldownMs = getCooldownRemaining(character.id);
                         const isSolved = characterStatus?.is_solved;
                         const currentlyCoolingDown = isCoolingDown(character.id);
+                        const poolBalance = poolBalances[character.id] || 0;
                         const hasPool = !!poolInfos[character.id];
 
                         return (
@@ -172,6 +172,10 @@ const ChallengePage = () => {
                                         <h3>{character.name}</h3>
                                         {hasPool && (
                                             <div className="pool-info">
+                                                <Coins className="h-4 w-4" />
+                                                <span className="pool-balance">
+                                                    {poolBalance.toLocaleString()} MCGA
+                                                </span>
                                                 <TruncatedAddressLink
                                                     address={poolInfos[character.id].pool_address}
                                                     className="mt-2"
@@ -238,7 +242,7 @@ const ChallengePage = () => {
                                         <button
                                             onClick={() => handleGuess(character.id)}
                                             disabled={!hasPool || currentlyCoolingDown || !connected || isLoading || isSolved}
-                                            className={`challenge-button ${currentlyCoolingDown || isSolved ? 'cooldown' : 'ready'}`}
+                                            className={`challenge-button ${currentlyCoolingDown || isSolved ? 'cooldown' : 'ready -- refresh the page'}`}
                                         >
                                             {!connected ? (
                                                 <>
