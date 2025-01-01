@@ -408,3 +408,206 @@
     animation: sparkle 2s infinite;
     color: #D946EF;
 }
+
+/* Add to your roadmap.css file */
+
+.voting-ended-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    pointer-events: none;
+    background: linear-gradient(to bottom,
+            transparent 0%,
+            transparent 80px,
+            rgba(0, 0, 0, 0.5) 120px,
+            rgba(0, 0, 0, 0.5) 100%);
+}
+
+.voting-ended-overlay::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    backdrop-filter: blur(0px);
+    mask-image: linear-gradient(to bottom,
+            transparent 0%,
+            transparent 80px,
+            rgba(0, 0, 0, 0.2) 120px,
+            rgba(0, 0, 0, 0.4) 160px,
+            rgba(0, 0, 0, 0.6) 200px,
+            rgba(0, 0, 0, 0.8) 240px,
+            rgba(0, 0, 0, 1) 280px);
+    backdrop-filter: blur(4px);
+    z-index: -1;
+}
+
+.winner-card {
+    pointer-events: auto;
+}
+
+.winner-card {
+    pointer-events: auto;
+    /* Add some extra depth with a stronger backdrop blur */
+    backdrop-filter: blur(16px);
+    position: relative;
+    /* Move the card down a bit to avoid the navbar area */
+    margin-top: 80px;
+}
+
+.winner-card {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(217, 70, 239, 0.1));
+    border: 1px solid rgba(139, 92, 246, 0.2);
+    border-radius: 1rem;
+    padding: 2rem;
+    max-width: 32rem;
+    width: calc(100% - 2rem);
+    margin: 0 1rem;
+    text-align: center;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    backdrop-filter: blur(16px);
+}
+
+.trophy-container {
+    width: 4rem;
+    height: 4rem;
+    margin: 0 auto 1rem;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #8B5CF6, #D946EF);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.trophy-icon {
+    width: 2rem;
+    height: 2rem;
+    color: white;
+}
+
+.winner-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(to right, #A78BFA, #F472B6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.winner-subtitle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.winner-subtitle span {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: white;
+}
+
+.star-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+    color: #FBBF24;
+}
+
+.winner-info {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.winner-name {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: white;
+    margin-bottom: 0.5rem;
+}
+
+.winner-votes {
+    color: #A78BFA;
+    margin-bottom: 1rem;
+}
+
+.stats-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+}
+
+.stat-box {
+    text-align: center;
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #F472B6;
+}
+
+.stat-label {
+    font-size: 0.875rem;
+    color: #A78BFA;
+}
+
+.stat-divider {
+    height: 2rem;
+    width: 1px;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.thank-you-message {
+    color: #A78BFA;
+    font-size: 0.875rem;
+}
+
+/* Dark mode adjustments */
+.dark .winner-card {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.05), rgba(217, 70, 239, 0.05));
+    border-color: rgba(139, 92, 246, 0.1);
+}
+
+.dark .winner-info {
+    background: rgba(0, 0, 0, 0.2);
+}
+
+/* Animation keyframes */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+    .winner-card {
+        padding: 1.5rem;
+    }
+
+    .winner-title {
+        font-size: 1.25rem;
+    }
+
+    .stats-container {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .stat-divider {
+        height: 1px;
+        width: 50%;
+    }
+}

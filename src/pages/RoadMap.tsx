@@ -7,6 +7,7 @@ import { MCGA_TOKEN_MINT } from '../constants/tokens';
 import { PublicKey } from '@solana/web3.js';
 import '../styles/roadmap.css';
 import RoadmapTour from '../components/tours/RoadmapTour';
+import VotingEndedOverlay from '../components/VotingEndedOverlay';
 
 interface Character {
     id: string;
@@ -314,9 +315,18 @@ const RoadmapPage = () => {
         percent: char.percentage || 0
     }));
 
+    const winningCharacter = isVotingEnded && characters.length > 0 ? characters[0] : null;
+
+
     return (
         <div className="roadmap-container">
             <RoadmapTour />
+            {isVotingEnded && winningCharacter && (
+                <VotingEndedOverlay
+                    winningCharacter={winningCharacter}
+                    totalVotes={totalVotes}
+                />
+            )}
             <div className="max-w-7xl mx-auto">
                 <div className="roadmap-header">
                     <h1 className="roadmap-title">Character Roadmap</h1>
