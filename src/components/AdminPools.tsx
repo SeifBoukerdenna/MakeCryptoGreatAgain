@@ -9,8 +9,8 @@ import { charactersConfig } from '../configs/characters.config';
 import IDL from '../smart-contract/idl.json';
 import type { McgaPool } from '../smart-contract/idl_type';
 import { TOKEN_PROGRAM_ID } from '@solana/spl-token';
+import { MCGA_TOKEN_MINT } from '../constants/tokens';
 
-const MCGA_MINT = new PublicKey("5g1hscK8kkX9ee1Snmm4HvBM4fH1b2u1tfee3GyTewAq");
 
 interface PoolInfo {
     pool_address: string;
@@ -81,7 +81,7 @@ const AdminPools: React.FC = () => {
                     // @ts-ignore: Suppress the error for poolPda
                     pool: poolPda,
                     poolTokenAccount: poolTokenAccount.publicKey,
-                    mcgaMint: MCGA_MINT,
+                    mcgaMint: MCGA_TOKEN_MINT,
                     authority: publicKey,
                     systemProgram: SystemProgram.programId,
                     tokenProgram: TOKEN_PROGRAM_ID,
