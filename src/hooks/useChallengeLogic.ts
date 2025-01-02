@@ -254,11 +254,11 @@ export function useChallengeLogic(onTransaction?: (txHash: string) => void) {
 
       const signatures = await handlePoolGuess(characterId, userGuess);
 
-      if (signatures.length < 2) {
-        throw new Error(
-          "Challenge attempt cancelled - Cooldown period applied"
-        );
-      }
+      // if (signatures.length < 2) {
+      //   throw new Error(
+      //     "Challenge attempt cancelled - Cooldown period applied"
+      //   );
+      // }
 
       signatures.forEach((sig) => {
         if (onTransaction) onTransaction(sig);

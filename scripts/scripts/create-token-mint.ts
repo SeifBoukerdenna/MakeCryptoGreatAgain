@@ -46,12 +46,10 @@ const TOKEN_METADATA_PROGRAM_ID = new PublicKey(
 const tokenMintAccount = new PublicKey(PreReleaseTokenMint);
 
 const metadataData = {
-  name: "PRE-RELEASE TEST V2",
-  symbol: "PRTV2",
+  name: "PRE-RELEASE TEST V3",
+  symbol: "PRTV3",
   // Arweave / IPFS / Pinata etc link using metaplex standard for offchain data
-  uri: "https://gateway.pinata.cloud/ipfs/bafkreieq7y2qa5dje6bokkka6agwai3jwfkjmzgfhbzbdqwf3jbujkvt6i",
-  image:
-    "https://gateway.pinata.cloud/ipfs/bafkreiayayjyuazgw465qbrp45f2gyjxxhoerjeipsxvnu4pgrr3uwhq4q",
+  uri: "https://gateway.pinata.cloud/ipfs/bafkreiautsay4zod5nd5mmkdyvcjzcgx6fwpeqhljouwueqpwjg4z36w5q",
   sellerFeeBasisPoints: 0,
   creators: null,
   collection: null,

@@ -1,6 +1,6 @@
 {
-  "name": "MCGA Token",
-  "symbol": "MCGA",
+  "name": "PRE-RELEASE TEST V3",
+  "symbol": "PRTV3",
   "description": "Make Crypto Great Again Token - The official token for AI-powered celebrity interactions",
   "image": "https://gateway.pinata.cloud/ipfs/bafkreiayayjyuazgw465qbrp45f2gyjxxhoerjeipsxvnu4pgrr3uwhq4q",
   "external_url": "https://www.makecryptogreatagain.app/",
@@ -17,9 +17,10 @@
   "properties": {
     "files": [
       {
-        "uri": "https://gateway.pinata.cloud/ipfs/bafkreiayayjyuazgw465qbrp45f2gyjxxhoerjeipsxvnu4pgrr3uwhq4q",
+        "uri": "https://gateway.pinata.cloud/bafkreiayayjyuazgw465qbrp45f2gyjxxhoerjeipsxvnu4pgrr3uwhq4q",
         "type": "image/png"
       }
-    ]
+    ],
+    "category": "image"
   }
 }
