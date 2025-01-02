@@ -10,7 +10,7 @@ import IDL from '../smart-contract/idl.json';
 import type { McgaPool } from '../smart-contract/idl_type';
 import { TOKEN_PROGRAM_ID } from '@solana/spl-token';
 
-const MCGA_MINT = new PublicKey("5g1hscK8kkX9ee1Snmm4HvBM4fH1b2u1tfee3GyTewAq");
+const MCGA_MINT = new PublicKey("9RwPeqKD7WkXqj2L8u3GRJvs7XywH3Y3jxEkwToJoyeL");
 
 interface PoolInfo {
     pool_address: string;

@@ -3,7 +3,7 @@
 import { PublicKey } from "@solana/web3.js";
 
 export const MCGA_TOKEN_MINT = new PublicKey(
-  "5g1hscK8kkX9ee1Snmm4HvBM4fH1b2u1tfee3GyTewAq"
+  "9RwPeqKD7WkXqj2L8u3GRJvs7XywH3Y3jxEkwToJoyeL"
 );
 
 export const BASE_MULTIPLIER = 10;

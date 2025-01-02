@@ -1,0 +1,25 @@
+{
+  "name": "MCGA Token",
+  "symbol": "MCGA",
+  "description": "Make Crypto Great Again Token - The official token for AI-powered celebrity interactions",
+  "image": "https://gateway.pinata.cloud/ipfs/bafkreiayayjyuazgw465qbrp45f2gyjxxhoerjeipsxvnu4pgrr3uwhq4q",
+  "external_url": "https://www.makecryptogreatagain.app/",
+  "attributes": [
+    {
+      "trait_type": "Generation",
+      "value": "1"
+    }
+  ],
+  "collection": {
+    "name": "MCGA Collection",
+    "family": "AI Celebrity Tokens"
+  },
+  "properties": {
+    "files": [
+      {
+        "uri": "https://gateway.pinata.cloud/ipfs/bafkreiayayjyuazgw465qbrp45f2gyjxxhoerjeipsxvnu4pgrr3uwhq4q",
+        "type": "image/png"
+      }
+    ]
+  }
+}

@@ -9,6 +9,7 @@ import { getProvider } from "../smart-contract/anchor";
 import { Price } from "../constants/price";
 import { supabase } from "../lib/supabase";
 import { getAssociatedTokenAddress, TOKEN_PROGRAM_ID } from "@solana/spl-token";
+import { MCGA_TOKEN_MINT } from "../constants/tokens";
 
 export interface CharacterStatus {
   character_id: string;
@@ -39,10 +40,6 @@ export function useChallengeLogic(onTransaction?: (txHash: string) => void) {
   const { connected, publicKey } = useWallet();
   const { connection } = useConnection();
   const { dynamicCooldownMs } = useDynamicCooldown();
-
-  const MCGA_MINT = new PublicKey(
-    "5g1hscK8kkX9ee1Snmm4HvBM4fH1b2u1tfee3GyTewAq"
-  );
 
   const [guesses, setGuesses] = useState<Record<string, string>>({});
   const [attempts, setAttempts] = useState<Record<string, ChallengeAttempt>>(
@@ -182,7 +179,7 @@ export function useChallengeLogic(onTransaction?: (txHash: string) => void) {
       const program = new Program<McgaPool>(IDL as McgaPool, provider);
 
       const userTokenAccount = await getAssociatedTokenAddress(
-        MCGA_MINT,
+        MCGA_TOKEN_MINT,
         publicKey
       );
       const [poolPda] = PublicKey.findProgramAddressSync(
