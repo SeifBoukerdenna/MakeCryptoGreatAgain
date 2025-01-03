@@ -12,12 +12,14 @@ interface PromptInputProps {
     onSubmit: (prompt: string) => void;
     videoBlob: Blob | null;
     clearVideoBlob: () => void;
+    isProcessing: boolean;
 }
 
 const PromptInput: React.FC<PromptInputProps> = ({
     onSubmit,
     videoBlob,
-    clearVideoBlob
+    clearVideoBlob,
+    isProcessing,
 }) => {
     const [value, setValue] = useState('');
     const [isListening, setIsListening] = useState(false);
@@ -155,7 +157,7 @@ const PromptInput: React.FC<PromptInputProps> = ({
                     <button
                         type="button"
                         onClick={handleSubmit}
-                        disabled={!value.trim()}
+                        disabled={!value.trim() || isProcessing}
                         className="send-button"
                     >
                         Send

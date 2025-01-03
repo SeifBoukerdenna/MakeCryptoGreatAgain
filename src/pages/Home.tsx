@@ -29,7 +29,10 @@ const Home: React.FC = () => {
     handleSend,
     videoBlob,
     clearVideoBlob,
+    loadingResponse
   } = useMessages();
+
+  const isProcessing = loadingResponse || isPlaying
 
   const {
     selectedCharacter,
@@ -45,6 +48,8 @@ const Home: React.FC = () => {
   const handleClearChat = () => {
     setMessages([]);
   };
+
+
 
   const renderChatArea = () => {
     // In test mode, allow chat if Trump is selected
@@ -138,7 +143,7 @@ const Home: React.FC = () => {
         </div>
 
         {/* Prompt Input */}
-        <PromptInput onSubmit={handleSend} videoBlob={videoBlob} clearVideoBlob={clearVideoBlob} />
+        <PromptInput onSubmit={handleSend} videoBlob={videoBlob} clearVideoBlob={clearVideoBlob} isProcessing={isProcessing} />
         {ttsError && <p className="text-red-500 mt-2">{ttsError}</p>}
       </>
     );
@@ -179,11 +184,12 @@ const Home: React.FC = () => {
                   <SwiperSlide key={char.id}>
                     <CharacterCard
                       {...char}
+                      canSelect={!isProcessing}
                       onSelect={() => {
-                      if (isPlaying) return
-                      setSelectedCharacter(char.name)
-                      handleClearChat()
-                    }}
+                        if (isPlaying) return
+                        setSelectedCharacter(char.name)
+                        handleClearChat()
+                      }}
                       isSelected={selectedCharacter === char.name}
                     />
                   </SwiperSlide>
