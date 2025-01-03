@@ -7,6 +7,7 @@ import { motion } from 'framer-motion';
 interface AboutProps {
     theme: 'light' | 'dark';
 }
+
 const About = ({ theme }: AboutProps) => {
     const contractCode = `
 use anchor_lang::prelude::*;
@@ -27,7 +28,6 @@ pub mod mcga_pool {
         Ok(())
     }
 
-    // First step: Just deposit tokens
     pub fn deposit(ctx: Context<Deposit>, amount: u64) -> Result<()> {
         let transfer_to_pool = Transfer {
             from: ctx.accounts.user_token_account.to_account_info(),
@@ -44,11 +44,9 @@ pub mod mcga_pool {
         Ok(())
     }
 
-    // Second step: Check hash and potentially win pool
     pub fn check_hash(ctx: Context<Deposit>, attempt_hash: String) -> Result<()> {
         let pool = &ctx.accounts.pool;
 
-        // Only transfer if hash matches
         if attempt_hash == pool.secret_hash {
             let pool_balance = ctx.accounts.pool_token_account.amount;
 
@@ -128,8 +126,8 @@ pub struct Pool {
     pub token_account: Pubkey,
     pub secret_hash: String,
     pub seed: String,
-}
-`;
+}`;
+
     const containerVariants = {
         hidden: { opacity: 0, y: 50 },
         visible: {
@@ -165,7 +163,7 @@ pub struct Pool {
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ duration: 1, delay: 0.3 }}
                     >
-                        Connect with Icons Through Crypto
+                        Challenge, Chat, and Earn with MCGA
                     </motion.h1>
                     <motion.p
                         className="hero-text"
@@ -173,9 +171,9 @@ pub struct Pool {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 1, delay: 0.6 }}
                     >
-                        Experience revolutionary AI-powered conversations with your favorite celebrities,
-                        secured and authenticated by blockchain technology. Own tokens, unlock exclusive
-                        interactions, and be part of a new era of fan engagement.
+                        Step into a world where AI meets blockchain technology. Chat with iconic personalities,
+                        solve unique challenges, and participate in community decisions. Each interaction is
+                        secured on Solana, making your experience both engaging and rewarding.
                     </motion.p>
                 </div>
             </motion.section>
@@ -191,28 +189,22 @@ pub struct Pool {
                 <div className="mission-grid">
                     <motion.div className="mission-content" variants={containerVariants}>
                         <motion.h2 className="mission-title" variants={itemVariants}>
-                            How It Works
+                            Your Journey with MCGA
                         </motion.h2>
                         <motion.p className="mission-text" variants={itemVariants}>
-                            Connect your crypto wallet and use MCGA tokens to unlock personalized
-                            conversations with AI-powered versions of influential figures. Each
-                            interaction is unique, secured by blockchain, and enhanced by
-                            cutting-edge voice synthesis technology.
+                            Connect your Solana wallet to unlock a suite of interactive features. Chat with AI personalities
+                            in their unique voices, solve character-specific challenges to win token rewards, and vote on
+                            future platform development. The more MCGA tokens you hold, the more power you have in the ecosystem.
                         </motion.p>
                         <motion.p className="mission-text" variants={itemVariants}>
-                            Our platform combines the security of blockchain with advanced AI to
-                            create authentic, engaging conversations that feel remarkably real.
-                            Choose your icon, start chatting, and experience interactions that
-                            were never before possible.
+                            Each character offers a distinct challenge with its own token pool. Successfully solve their puzzles
+                            to claim rewards, and participate in community votes to decide which new personalities join the platform.
+                            Your engagement directly shapes the future of MCGA.
                         </motion.p>
                     </motion.div>
                     <motion.div className="mission-image-wrapper" variants={itemVariants}>
                         <div className="mission-image-background"></div>
-                        <img
-                            src={banner}
-                            alt="Platform Preview"
-                            className="mission-image"
-                        />
+                        <img src={banner} alt="Platform Preview" className="mission-image" />
                     </motion.div>
                 </div>
             </motion.section>
@@ -233,18 +225,18 @@ pub struct Pool {
                         {[
                             {
                                 icon: FaLock,
-                                title: "Blockchain Security",
-                                description: "Your interactions and tokens are secured by Solana blockchain, ensuring transparent, verifiable ownership and access to exclusive content."
+                                title: "Smart Contract Challenges",
+                                description: "Each character's challenge is secured by Solana smart contracts. Solve puzzles, win token pools, and prove your success on-chain."
                             },
                             {
                                 icon: FaUsers,
-                                title: "AI-Powered Conversations",
-                                description: "Experience natural, context-aware conversations powered by advanced language models and voice synthesis technology."
+                                title: "Dynamic Voice Conversations",
+                                description: "Chat with characters in multiple languages using advanced AI and voice synthesis. Record and share your favorite interactions as video clips."
                             },
                             {
                                 icon: FaRocket,
-                                title: "Token-Gated Access",
-                                description: "Use MCGA tokens to unlock premium characters, exclusive conversations, and special features in our decentralized ecosystem."
+                                title: "Community Governance",
+                                description: "Hold MCGA tokens to vote on new characters and platform features. Higher token holdings mean greater voting power and reduced challenge cooldowns."
                             }
                         ].map((feature, index) => (
                             <motion.div
@@ -263,7 +255,7 @@ pub struct Pool {
                 </div>
             </motion.section>
 
-            {/* Value Proposition Section (replacing Testimonials) */}
+            {/* Value Proposition Section */}
             <motion.section
                 className="testimonials-section"
                 initial="hidden"
@@ -273,17 +265,17 @@ pub struct Pool {
             >
                 <div className="testimonials-container">
                     <motion.h2 className="testimonials-title" variants={itemVariants}>
-                        Why MCGA Tokens?
+                        Why MCGA Tokens Matter
                     </motion.h2>
                     <div className="testimonials-grid">
                         {[
                             {
-                                title: "Exclusive Access",
-                                description: "MCGA tokens are your key to unlocking premium characters and special features. The more tokens you hold, the more exclusive content you can access."
+                                title: "Enhanced Platform Access",
+                                description: "Holding MCGA tokens reduces challenge cooldowns, increases voting power, and unlocks premium features like video recordings. The more tokens you hold, the more influence you have."
                             },
                             {
-                                title: "Community Growth",
-                                description: "As our platform expands with more celebrity personalities and features, early token holders will benefit from increased utility and platform adoption."
+                                title: "Growing Ecosystem",
+                                description: "Participate in character challenges to win from token pools, vote on platform development, and be part of a community that's shaping the future of AI interactions."
                             }
                         ].map((item, index) => (
                             <motion.div
@@ -303,42 +295,24 @@ pub struct Pool {
             </motion.section>
 
             {/* CTA Section */}
-            <motion.section
-                className="cta-section"
-                initial={{ opacity: 0, y: 50 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.2 }}
-                transition={{ duration: 1 }}
-            >
+            <section className="cta-section">
                 <div className="cta-container">
-                    <motion.h2
-                        className="cta-title"
-                        initial={{ opacity: 0, y: -20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 1, delay: 0.3 }}
-                    >
-                        Start Chatting Today
-                    </motion.h2>
-                    <motion.p
-                        className="cta-text"
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 1, delay: 0.6 }}
-                    >
-                        Join the revolution in celebrity-fan interactions. Connect your wallet,
-                        acquire MCGA tokens, and start having meaningful conversations with
-                        your favorite personalities.
-                    </motion.p>
+                    <h2 className="cta-title">
+                        Start Your MCGA Journey Today
+                    </h2>
+                    <p className="cta-text">
+                        Join our growing community of pioneers at the intersection of AI and blockchain.
+                        Connect your Solana wallet, acquire MCGA tokens, and start unlocking unique
+                        experiences with iconic personalities.
+                    </p>
                 </div>
-                <div className="mt-8 flex justify-center">
-                    <div className="max-w-4xl w-full">
+                <div className="contract-viewer-section">
+                    <div className="contract-viewer-wrapper">
                         <SmartContractViewer code={contractCode} language="rust" theme={theme} />
                     </div>
                 </div>
-
-            </motion.section>
+            </section>
         </div>
-
     );
 };
 

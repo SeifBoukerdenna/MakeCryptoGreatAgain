@@ -1,6 +1,7 @@
 /* src/styles/TruncatedAddressLink.css */
 .truncated-address-link {
-    display: inline-flex;
+    display: flex;
+    justify-content: center;
     align-items: center;
     gap: 0.25rem;
     color: var(--text-primary);

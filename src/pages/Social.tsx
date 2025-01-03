@@ -4,6 +4,7 @@ import '../styles/social.css';
 import CharacterStats from '../components/CharacterStats';
 import { useMessageStats } from '../hooks/useMessageStats';
 import EngagementLeaderboard from '../components/EngagementLeaderboard';
+import SocialTour from '../components/tours/SocialTour';
 
 const Social = () => {
     const { characterStats, isLoading, error } = useMessageStats();
@@ -12,7 +13,7 @@ const Social = () => {
     return (
         <div className="social-container">
             <h1 className="text-3xl font-bold mb-8 text-center">MCGA Community</h1>
-
+            <SocialTour />
             <EngagementLeaderboard />
 
             <CharacterStats

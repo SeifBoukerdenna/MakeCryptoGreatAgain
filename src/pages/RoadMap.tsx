@@ -6,6 +6,8 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recha
 import { MCGA_TOKEN_MINT } from '../constants/tokens';
 import { PublicKey } from '@solana/web3.js';
 import '../styles/roadmap.css';
+import RoadmapTour from '../components/tours/RoadmapTour';
+import VotingEndedOverlay from '../components/VotingEndedOverlay';
 
 interface Character {
     id: string;
@@ -42,6 +44,23 @@ const RoadmapPage = () => {
     const [mcgaBalance, setMcgaBalance] = useState<number>(0);
     const [totalVotes, setTotalVotes] = useState(0);
     const [isVotingEnded, setIsVotingEnded] = useState(false);
+    const [showWinnerOverlay, setShowWinnerOverlay] = useState(true);
+
+    useEffect(() => {
+        if (isVotingEnded && showWinnerOverlay) {
+            // Prevent scrolling
+            document.body.style.overflow = 'hidden';
+        } else {
+            // Re-enable scrolling
+            document.body.style.overflow = 'auto';
+        }
+
+        // Cleanup on unmount
+        return () => {
+            document.body.style.overflow = 'auto';
+        };
+    }, [isVotingEnded, showWinnerOverlay]);
+
 
     // Enhanced timer effect
     useEffect(() => {
@@ -313,8 +332,19 @@ const RoadmapPage = () => {
         percent: char.percentage || 0
     }));
 
+    const winningCharacter = isVotingEnded && characters.length > 0 ? characters[0] : null;
+
+
     return (
         <div className="roadmap-container">
+            <RoadmapTour />
+            {isVotingEnded && winningCharacter && showWinnerOverlay && (
+                <VotingEndedOverlay
+                    winningCharacter={winningCharacter}
+                    totalVotes={totalVotes}
+                    onClose={() => setShowWinnerOverlay(false)}
+                />
+            )}
             <div className="max-w-7xl mx-auto">
                 <div className="roadmap-header">
                     <h1 className="roadmap-title">Character Roadmap</h1>

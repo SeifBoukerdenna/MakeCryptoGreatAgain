@@ -1,5 +1,3 @@
-// src/App.tsx
-
 import { useState } from 'react';
 import './styles/global.css';
 import Home from './pages/Home';
@@ -18,6 +16,8 @@ import ChallengePage from './pages/Challenge';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Buffer as BufferPolyfill } from 'buffer';
+import { AnimatePresence } from 'framer-motion';
+import LoadingScreen from './components/LoadingScreen';
 
 declare var Buffer: typeof BufferPolyfill;
 globalThis.Buffer = BufferPolyfill;
@@ -27,6 +27,7 @@ const wallets = [new PhantomWalletAdapter()];
 
 const App = () => {
   injectSpeedInsights();
+  const [isLoading, setIsLoading] = useState(true);
 
   // Initialize theme synchronously
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
@@ -51,18 +52,25 @@ const App = () => {
     <ConnectionProvider endpoint={endpoint}>
       <WalletProvider wallets={wallets} autoConnect>
         <WalletModalProvider>
-          <Router>
-            <Routes>
-              <Route path="/" element={<Layout toggleTheme={toggleTheme} theme={theme} />}>
-                <Route index element={<Home />} />
-                <Route path="about" element={<About theme={theme} />} />
-                <Route path="social" element={<Social />} />
-                <Route path="/challenge" element={<ChallengePage />} />
-                <Route path="roadmap" element={<RoadmapPage />} />
-                {TEST_MODE && <Route path="/admin" element={<AdminCharacters />} />}
-              </Route>
-            </Routes>
-          </Router>
+          <AnimatePresence mode="wait">
+            {isLoading ? (
+              <LoadingScreen onLoadingComplete={() => setIsLoading(false)} />
+            ) : (
+              <Router>
+                <Routes>
+                  <Route path="/" element={<Layout toggleTheme={toggleTheme} theme={theme} />}>
+                    <Route index element={<Home />} />
+                    <Route path="about" element={<About theme={theme} />} />
+                    <Route path="social" element={<Social />} />
+                    <Route path="/challenge" element={<ChallengePage />} />
+                    <Route path="roadmap" element={<RoadmapPage />} />
+                    {TEST_MODE && <Route path="/admin" element={<AdminCharacters />} />}
+                  </Route>
+                </Routes>
+              </Router>
+            )}
+          </AnimatePresence>
+
           <ToastContainer
             position="top-right"
             autoClose={5000}

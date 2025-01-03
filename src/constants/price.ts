@@ -1,4 +1,4 @@
 export enum Price {
-  exportVideo = 5 * 10_000,
-  challengePrice = 250,
+  exportVideo = 5 * 10,
+  challengePrice = 1000,
 }

@@ -1,4 +1,5 @@
-import React, { useEffect } from 'react';
+// src/pages/Home.tsx
+import React from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination } from 'swiper/modules';
@@ -16,6 +17,7 @@ import { TEST_MODE, FREE_CHARACTER_ID } from '../configs/test.config';
 import { charactersConfig } from '../configs/characters.config';
 import { thinkingMessages } from '../configs/thinkingMessages.ts';
 import useConversationStore from '../stores/useConversationStore';
+import GuidedTour from '../components/tours/GuidedTour.tsx';
 
 const Home: React.FC = () => {
   const { connected } = useWallet();
@@ -44,10 +46,6 @@ const Home: React.FC = () => {
     setMessages([]);
   };
 
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
-
   const renderChatArea = () => {
     // In test mode, allow chat if Trump is selected
     const isTrumpSelectedInTestMode =
@@ -70,7 +68,7 @@ const Home: React.FC = () => {
     if (!selectedCharacter) {
       return (
         <div className="flex flex-col items-center justify-center h-full text-center my-8">
-          <p className="text-xl text-gray-400 dark:text-gray-500">
+          <p className="text-xl text-gray-400 dark:text-gray-500 font-bold">
             Select a character to start chatting
           </p>
         </div>
@@ -99,7 +97,7 @@ const Home: React.FC = () => {
           </div>
         )}
 
-        {/* Messages Container (scrollable when too many messages) */}
+        {/* Messages Container */}
         <div
           className="
           messages
@@ -114,7 +112,6 @@ const Home: React.FC = () => {
           max-h-80
         "
           style={{ maxHeight: '20rem' }}
-        /* Alternatively: className="max-h-[20rem] ..." in Tailwind */
         >
           {messages.map((m, i) => {
             let messageText = m.text;
@@ -147,66 +144,68 @@ const Home: React.FC = () => {
     );
   };
 
-
   return (
-    <div className="home-container min-h-screen flex flex-col">
-      <div className="container mx-auto flex-1 p-6 space-y-16">
-        {/* Character Selection */}
-        <section className="px-4 mb-8 mt-8">
-          <div className="flex justify-center items-center">
-            <Swiper
-              modules={[Navigation, Pagination]}
-              spaceBetween={20}
-              breakpoints={{
-                0: { slidesPerView: 2 },
-                640: { slidesPerView: 4 },
-              }}
-              centeredSlides={false}
-              navigation
-              pagination={{
-                clickable: true,
-                bulletClass: 'swiper-pagination-bullet',
-                bulletActiveClass: 'swiper-pagination-bullet-active',
-              }}
-              loop={true}
-              className="mySwiper"
-              onSwiper={(swiper) => {
-                swiperRef.current = swiper;
-                if (selectedIndex !== -1) {
-                  swiper.slideToLoop(selectedIndex, 0);
-                }
-              }}
-            >
-              {characters.map((char) => (
-                <SwiperSlide key={char.id}>
-                  <CharacterCard
-                    {...char}
-                    onSelect={() => {
+    <>
+      <GuidedTour />
+      <div className="home-container min-h-screen flex flex-col">
+        <div className="container mx-auto flex-1 p-6 space-y-16">
+          {/* Character Selection */}
+          <section className="px-4 mb-8 mt-8">
+            <div className="flex justify-center items-center">
+              <Swiper
+                modules={[Navigation, Pagination]}
+                spaceBetween={20}
+                breakpoints={{
+                  0: { slidesPerView: 2 },
+                  640: { slidesPerView: 4 },
+                }}
+                centeredSlides={false}
+                navigation
+                pagination={{
+                  clickable: true,
+                  bulletClass: 'swiper-pagination-bullet',
+                  bulletActiveClass: 'swiper-pagination-bullet-active',
+                }}
+                loop={true}
+                className="mySwiper"
+                onSwiper={(swiper) => {
+                  swiperRef.current = swiper;
+                  if (selectedIndex !== -1) {
+                    swiper.slideToLoop(selectedIndex, 0);
+                  }
+                }}
+              >
+                {characters.map((char) => (
+                  <SwiperSlide key={char.id}>
+                    <CharacterCard
+                      {...char}
+                      onSelect={() => {
                       if (isPlaying) return
                       setSelectedCharacter(char.name)
                       handleClearChat()
                     }}
-                    isSelected={selectedCharacter === char.name}
-                  />
-                </SwiperSlide>
-              ))}
-            </Swiper>
-          </div>
-        </section>
+                      isSelected={selectedCharacter === char.name}
+                    />
+                  </SwiperSlide>
+                ))}
+              </Swiper>
+            </div>
+          </section>
 
-        {/* Chat Area */}
-        <section className="chat-area p-6 rounded-lg shadow-lg flex flex-col h-96 pt-6 mt-4 mb-4 relative">
-          {/* Clear Chat Button */}
-          <button
-            onClick={handleClearChat}
-            className="clear-chat-button"
-          >
-            Clear Chat
-          </button>
-          {renderChatArea()}
-        </section>
+          {/* Chat Area */}
+          <section className="chat-area p-6 rounded-lg shadow-lg flex flex-col h-96 pt-6 mt-4 mb-4 relative">
+            {/* Clear Chat Button */}
+            <button
+              onClick={handleClearChat}
+              className="clear-chat-button"
+            >
+              Clear Chat
+            </button>
+            {renderChatArea()}
+          </section>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

@@ -77,7 +77,7 @@ const EngagementLeaderboard = () => {
         };
 
         fetchUserEngagement();
-        const interval = setInterval(fetchUserEngagement, 10000); // Fetch every 10 seconds
+        const interval = setInterval(fetchUserEngagement, 60000); // Fetch every minute
         return () => clearInterval(interval);
     }, [connection]);
 
@@ -115,7 +115,7 @@ const EngagementLeaderboard = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {users.map((user, index) => (
+                        {users.slice(0, 10).map((user, index) => (
                             <tr key={user.wallet_address}>
                                 <td className="rank-cell">
                                     {index === 0 ? (
