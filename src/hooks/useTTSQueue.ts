@@ -3,20 +3,12 @@ import { useState, useEffect } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { supabase } from "../lib/supabase";
 
-interface QueueEntry {
-  id: string;
-  wallet_address: string;
-  status: "waiting" | "processing" | "completed";
-  created_at: string;
-  updated_at: string;
-}
-
 export const useTTSQueue = () => {
   const { publicKey } = useWallet();
   const [queuePosition, setQueuePosition] = useState<number | null>(null);
   const [activeRequests, setActiveRequests] = useState<number>(0);
   const [isProcessing, setIsProcessing] = useState(false);
-  const MAX_REQUESTS_PER_MINUTE = 2;
+  const MAX_REQUESTS_PER_MINUTE = 5;
 
   useEffect(() => {
     if (!publicKey) return;

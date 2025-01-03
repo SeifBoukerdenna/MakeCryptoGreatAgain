@@ -1,9 +1,6 @@
 import axios from "axios";
 import routes from "../configs/routes.json";
 
-const PLAYHT_USER_ID = import.meta.env.VITE_Play_UserId;
-const PLAYHT_SECRET_KEY = import.meta.env.VITE_Play_Secret_Key;
-
 const authToken = "uzAqHZENYEWkspDZZayOrHAhe1a2"; // Ensure this is set
 const userId = "62f273499fb640c9b8d21143113c050e"; // Ensure this is set
 
