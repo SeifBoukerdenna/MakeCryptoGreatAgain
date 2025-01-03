@@ -17,6 +17,7 @@ interface CharacterCardProps extends Partial<CharacterConfig> {
     price: number;
     onSelect: () => void;
     isSelected: boolean;
+    canSelect: boolean;
 }
 
 interface SwitchColors {
@@ -35,6 +36,7 @@ const CharacterCard: React.FC<CharacterCardProps> = ({
     price,
     onSelect,
     isSelected,
+    canSelect = true,
 }) => {
     const { connected } = useWallet();
     const { mcgaBalance } = useBalanceStore();
@@ -182,8 +184,8 @@ const CharacterCard: React.FC<CharacterCardProps> = ({
           ${!isAvailable && !isSelected ? 'unavailable-button' : ''}
         `}
                 onClick={onSelect}
-                disabled={isSelected || !isAvailable}
-                aria-disabled={isSelected || !isAvailable}
+                disabled={isSelected || !isAvailable || !canSelect}
+                aria-disabled={isSelected || !isAvailable || !canSelect}
             >
                 {isSelected
                     ? 'Selected'

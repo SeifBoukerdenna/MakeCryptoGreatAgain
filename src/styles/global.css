@@ -163,7 +163,7 @@ html {
 
 .title {
     /* flex-wrap: nowrap; */
-    width: 80%;
+    width: 100%;
     box-shadow: 0 4px 4px 4px rgba(147, 51, 234, 0.5);
     border-radius: 8px;
 }
