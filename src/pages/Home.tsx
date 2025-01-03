@@ -33,6 +33,7 @@ const Home: React.FC = () => {
     queuePosition,
     activeRequests,
     isProcessing,
+    getTimeUntilNextSlot,
   } = useMessages();
 
   const {
@@ -207,6 +208,7 @@ const Home: React.FC = () => {
             queuePosition={queuePosition}
             activeRequests={activeRequests}
             isProcessing={isProcessing}
+            getTimeUntilNextSlot={getTimeUntilNextSlot}  // Add this line
           />
         </div>
       </div>

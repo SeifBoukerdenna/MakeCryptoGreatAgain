@@ -16,7 +16,7 @@ export const useTTSQueue = () => {
   const [queuePosition, setQueuePosition] = useState<number | null>(null);
   const [activeRequests, setActiveRequests] = useState<number>(0);
   const [isProcessing, setIsProcessing] = useState(false);
-  const MAX_CONCURRENT_REQUESTS = 1; // Changed to 1 as per your requirement
+  const MAX_REQUESTS_PER_MINUTE = 2;
 
   useEffect(() => {
     if (!publicKey) return;
@@ -47,28 +47,32 @@ export const useTTSQueue = () => {
     if (!publicKey) return;
 
     try {
-      // Get active requests count
-      const { data: processingData, error: processingError } = await supabase
+      // Get one-minute-old timestamp
+      const oneMinuteAgo = new Date();
+      oneMinuteAgo.setMinutes(oneMinuteAgo.getMinutes() - 1);
+
+      // Count requests in the last minute
+      const { data: recentData } = await supabase
         .from("tts_queue")
         .select("id")
-        .eq("status", "processing");
+        .gte("created_at", oneMinuteAgo.toISOString())
+        .order("created_at", { ascending: false });
 
-      if (processingError) throw processingError;
+      const recentCount = recentData?.length || 0;
+      setActiveRequests(recentCount);
 
-      const processingCount = processingData?.length || 0;
-      setActiveRequests(processingCount);
-
-      // Check if the current user is processing
+      // Check if current user is currently processing
       const { data: userProcessing } = await supabase
         .from("tts_queue")
         .select("id")
         .eq("wallet_address", publicKey.toString())
-        .eq("status", "processing");
+        .eq("status", "processing")
+        .single();
 
-      setIsProcessing(userProcessing && userProcessing.length > 0);
+      setIsProcessing(!!userProcessing);
 
-      // Get waiting queue if we're at max capacity
-      if (processingCount >= MAX_CONCURRENT_REQUESTS) {
+      // If we're at or over the limit, check queue position
+      if (recentCount >= MAX_REQUESTS_PER_MINUTE) {
         const { data: waitingData } = await supabase
           .from("tts_queue")
           .select("wallet_address")
@@ -107,19 +111,23 @@ export const useTTSQueue = () => {
         return false;
       }
 
-      // Get current processing count
-      const { data: processingData } = await supabase
+      // Get one-minute-old timestamp
+      const oneMinuteAgo = new Date();
+      oneMinuteAgo.setMinutes(oneMinuteAgo.getMinutes() - 1);
+
+      // Count requests in the last minute
+      const { data: recentData } = await supabase
         .from("tts_queue")
         .select("id")
-        .eq("status", "processing");
+        .gte("created_at", oneMinuteAgo.toISOString());
 
-      const processingCount = processingData?.length || 0;
+      const recentCount = recentData?.length || 0;
 
       // Add new request
       const { error: insertError } = await supabase.from("tts_queue").insert({
         wallet_address: publicKey.toString(),
         status:
-          processingCount < MAX_CONCURRENT_REQUESTS ? "processing" : "waiting",
+          recentCount < MAX_REQUESTS_PER_MINUTE ? "processing" : "waiting",
       });
 
       if (insertError) throw insertError;
@@ -136,22 +144,24 @@ export const useTTSQueue = () => {
     if (!publicKey) return;
 
     try {
-      // Get the current user's entry
-      const { data: currentEntry } = await supabase
-        .from("tts_queue")
-        .select("*")
-        .eq("wallet_address", publicKey.toString())
-        .eq("status", "processing")
-        .single();
-
-      // Remove the current user from queue
+      // Remove the current user's entry
       await supabase
         .from("tts_queue")
         .delete()
         .eq("wallet_address", publicKey.toString());
 
-      // If we were processing, promote the next in line
-      if (currentEntry) {
+      // Check if we can promote someone from the waiting list
+      const oneMinuteAgo = new Date();
+      oneMinuteAgo.setMinutes(oneMinuteAgo.getMinutes() - 1);
+
+      const { data: recentData } = await supabase
+        .from("tts_queue")
+        .select("id")
+        .gte("created_at", oneMinuteAgo.toISOString());
+
+      const recentCount = recentData?.length || 0;
+
+      if (recentCount < MAX_REQUESTS_PER_MINUTE) {
         const { data: nextInQueue } = await supabase
           .from("tts_queue")
           .select("*")
@@ -173,12 +183,29 @@ export const useTTSQueue = () => {
     }
   };
 
+  // Calculate time until next available slot
+  const getTimeUntilNextSlot = async (): Promise<number> => {
+    const { data } = await supabase
+      .from("tts_queue")
+      .select("created_at")
+      .order("created_at", { ascending: false })
+      .limit(MAX_REQUESTS_PER_MINUTE);
+
+    if (data && data.length >= MAX_REQUESTS_PER_MINUTE) {
+      const oldestTimestamp = new Date(data[data.length - 1].created_at);
+      const timeUntilExpiry = 60000 - (Date.now() - oldestTimestamp.getTime());
+      return Math.max(0, timeUntilExpiry);
+    }
+    return 0;
+  };
+
   return {
     queuePosition,
     activeRequests,
     isProcessing,
     addToQueue,
     removeFromQueue,
+    getTimeUntilNextSlot,
   };
 };
 

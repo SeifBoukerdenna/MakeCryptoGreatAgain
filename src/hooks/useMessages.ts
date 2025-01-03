@@ -21,6 +21,7 @@ export const useMessages = () => {
     isProcessing,
     addToQueue,
     removeFromQueue,
+    getTimeUntilNextSlot,
   } = useTTSQueue();
 
   const {
@@ -181,5 +182,6 @@ export const useMessages = () => {
     queuePosition,
     activeRequests,
     isProcessing,
+    getTimeUntilNextSlot,
   };
 };

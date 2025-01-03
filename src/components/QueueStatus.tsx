@@ -1,5 +1,5 @@
 // src/components/QueueStatus.tsx
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Clock, Users, Loader2 } from 'lucide-react';
 import '../styles/QueueStatus.css';
 
@@ -7,14 +7,37 @@ interface QueueStatusProps {
     queuePosition: number | null;
     activeRequests: number;
     isProcessing: boolean;
+    getTimeUntilNextSlot: () => Promise<number>;
 }
 
 const QueueStatus: React.FC<QueueStatusProps> = ({
     queuePosition,
     activeRequests,
     isProcessing,
+    getTimeUntilNextSlot
 }) => {
+    const [timeLeft, setTimeLeft] = useState<number | null>(null);
+
+    useEffect(() => {
+        const updateTimeLeft = async () => {
+            if (queuePosition !== null || isProcessing) {
+                const time = await getTimeUntilNextSlot();
+                setTimeLeft(time);
+            }
+        };
+
+        updateTimeLeft();
+        const interval = setInterval(updateTimeLeft, 1000);
+
+        return () => clearInterval(interval);
+    }, [queuePosition, isProcessing, getTimeUntilNextSlot]);
+
     if (!queuePosition && !isProcessing) return null;
+
+    const formatTime = (ms: number) => {
+        const seconds = Math.ceil(ms / 1000);
+        return `${Math.floor(seconds / 60)}:${(seconds % 60).toString().padStart(2, '0')}`;
+    };
 
     return (
         <div className="queue-status">
@@ -33,8 +56,13 @@ const QueueStatus: React.FC<QueueStatusProps> = ({
                             </span>
                             <span className="queue-details">
                                 <Users className="queue-details-icon" />
-                                {activeRequests}/3 active requests
+                                {activeRequests}/3 requests per minute
                             </span>
+                            {timeLeft !== null && timeLeft > 0 && (
+                                <span className="queue-time-left">
+                                    Next slot in: {formatTime(timeLeft)}
+                                </span>
+                            )}
                         </div>
                     </>
                 ) : null}
