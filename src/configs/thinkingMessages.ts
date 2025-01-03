@@ -15,24 +15,31 @@ export const thinkingMessages: { [key: string]: string[] } = {
       "Reviving the american dream...",
       "Rejecting the fake news...",
       "This is locker room talk...",
-
+      "Beating sleepy Joe...",
+      "We're going to win so much, you're going to be so sick and tired of winning...",
+      "My nuclear button is BIGGER than yours...",
+      "I'm a very stable genius...",
+      "I'm the least racist person you've ever met...",
+      "I'm the best thing that ever happened to Puerto Rico...",
+      "That happened under Obama...",
+      "I'm the president of the United States, I'm not the president of the globe...",
     ],
     
     "Elon Musk": [
-      "Innovating the future...",
       "Sending rockets to space...",
       "Trying to colonize Mars...",
-      "Thinking about the next big thing...",
       "AI and Mars are on my mind...",
+      "Giving away more HIB visas...",
       "Neuralink connections... ",
-      "Revolutionizing transportation...",
-      "Tesla is just getting started...",
-      "Building the future of sustainable energy...",
       "Thinking about interplanetary transportation...",
       "I hope you're not dumber than AI...",
-      "Thinking about the next Tesla model...",
-      "Disrupting industries, one idea at a time...",
       "making the internet free for everyone...",
+      "Getting money from emerald mines...",
+      "Son of multimillionaire but I'm self-made...",
+      "I'm the real Tony Stark...",
+      "Head of Dogecoin...",
+      "Having my 20th child...",
+
     ],
   
     "Andrew Tate": [
@@ -46,6 +53,17 @@ export const thinkingMessages: { [key: string]: string[] } = {
       "They try to silence me...",
       "The world is my chessboard...",
       "What color is your bugatti...",
+      "Join the Real World...",
+      "Depression isn't real...",
+      "Losers love to talk about feelings...",
+      "I don't sleep with vaccinated women...",
+      "I have a phd, a pimping hoes degree...",
+      "I will not administer cpr unless you're a hot female...",
+      "Women are like cars, I want a new one every year...",
+      "I don't date single mothers...",
+      "Unmatched perspicacity coupled with sheer indefatigability makes me a feared opponent in any realm of human endeavour...",
+      "I'm not always right, but I'm never wrong...",
+
     ],
   
     "Kanye West": [
@@ -68,6 +86,17 @@ export const thinkingMessages: { [key: string]: string[] } = {
       "Yandhi is coming...",
       "The culture needs me...",
       "Thinking in five dimensions...",
+      "I'm Ye Kelly bitch, I'm Bill Cosby bitch and I'm Puff Daddy rich...",
+      "Elon, where's my rocketship...",
+      "I'd rather be a dick then a swallower...",
+      "I ain't she a gold digga but she ain't mesing with no broke...",
+      "Poopy-di scoop Scoop-diddy-whoop Whoop-di-scoop-di-poop...",
+      "George Bush doesn't care about black people...",
+      "I don't know but , for me, 400 years of slavery...",
+      "I'm not gonna tell you what type of doctor he was...",
+      "One good girl is worth a thousand bitches...",
+      "I always had a phd, a pretty huge ..."
+
     ],
   
     "Ben Shapiro": [
@@ -86,20 +115,19 @@ export const thinkingMessages: { [key: string]: string[] } = {
     ],
   
     "Adolf Hitler": [
-      "History is being written...",
-      "Rewriting the past...",
-      "Strategizing... Always strategic...",
-      "Analyzing history...",
-      "Thinking about the Reich...",
-      "Building a new world order...",
-      "I need to secure the future of the nation...",
-      "Victory is within reach...",
-      "Outsmarting the enemy...",
-      "The world will bow before us...",
-      "My vision must be realized...",
-      "We are destined for greatness...",
-      "The time for action is now...",
-      "The ultimate plan is in motion..."
+      "Purifying the society...",
+      "Preparing mustard gaz...",
+      "Giving orders to the SS...",
+      "Applying to art school...",
+      "Getting married in my bunker...",
+      "Invading France...",
+      "Taking a selfie in front of the Eiffel Tower...",
+      "You can call me  Führer...",
+      "Hanging out in Argentina...",
+      "Heil Hitler...",
+      "Establishing the Third Reich...",
+      "Putting Germany back on the map...",
+      "Terror will be answered with terror..."
     ],
   
     "Connor Mcgregor": [
@@ -118,22 +146,23 @@ export const thinkingMessages: { [key: string]: string[] } = {
       "I'm the face of the fight game...",
       "I'm the king of the octagon...",
       "You'll do nothing...",
-      "I'm the money fight..."
+      "I'm the money fight...",
+      "Driving my lambo boat...",
       
     ],
   
     "Logan Paul": [
-      "Investing in thoughts...",
-      "Thinking about social media...",
       "How to become more famous...",
       "Scamming my audience...",
-      "The next big thing...",
-      "Content is king...",
-      "Going big or going home...",
+      "Content is my life...",
       "How to make more money...",
-      "I’ve got ideas brewing...",
-      "Making the best content possible...",
-      "The internet never sleeps...",
+      "getting people addicted to Prime...",
+      "making the #1 podcast...",
+      "Avoiding refunds...",
+      "Making my WWE debut...",
+      "Fighting Floyd Mayweather...",
+      "Selling my Pokemon cards...",
+
     ],
   
     "Alex Jones": [
