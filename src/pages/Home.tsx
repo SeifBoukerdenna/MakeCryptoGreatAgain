@@ -18,6 +18,7 @@ import { charactersConfig } from '../configs/characters.config';
 import { thinkingMessages } from '../configs/thinkingMessages.ts';
 import useConversationStore from '../stores/useConversationStore';
 import GuidedTour from '../components/tours/GuidedTour.tsx';
+import QueueStatus from '../components/QueueStatus.tsx';
 
 const Home: React.FC = () => {
   const { connected } = useWallet();
@@ -29,6 +30,9 @@ const Home: React.FC = () => {
     handleSend,
     videoBlob,
     clearVideoBlob,
+    queuePosition,
+    activeRequests,
+    isProcessing,
   } = useMessages();
 
   const {
@@ -199,6 +203,11 @@ const Home: React.FC = () => {
             </button>
             {renderChatArea()}
           </section>
+          <QueueStatus
+            queuePosition={queuePosition}
+            activeRequests={activeRequests}
+            isProcessing={isProcessing}
+          />
         </div>
       </div>
     </>
