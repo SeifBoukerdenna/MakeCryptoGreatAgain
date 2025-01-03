@@ -8,7 +8,7 @@ export const useTTSQueue = () => {
   const [queuePosition, setQueuePosition] = useState<number | null>(null);
   const [activeRequests, setActiveRequests] = useState<number>(0);
   const [isProcessing, setIsProcessing] = useState(false);
-  const MAX_REQUESTS_PER_MINUTE = 5;
+  const MAX_REQUESTS_PER_MINUTE = 2;
 
   useEffect(() => {
     if (!publicKey) return;
