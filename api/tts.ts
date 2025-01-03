@@ -4,6 +4,22 @@ import { VercelRequest, VercelResponse } from "@vercel/node";
 import { Readable } from "stream";
 import voices from "../src/configs/voices.json";
 
+function getRandomAuthTokenUser() {
+  const randomIndex = Math.floor(Math.random() * authTokenUserArray.length);
+  return authTokenUserArray[randomIndex];
+}
+
+const authTokenUserArray: { authToken: string; userId: string }[] = [
+  {
+    authToken: "62f273499fb640c9b8d21143113c050e",
+    userId: "uzAqHZENYEWkspDZZayOrHAhe1a2",
+  },
+  {
+    authToken: "198f8a8d41b641848ba289bee9418a2d",
+    userId: "PLBxqtHtEvhmn4gSNdzcUX35yZu1",
+  },
+];
+
 // Handle CORS preflight requests
 function handleOptions(
   req: VercelRequest,
@@ -52,10 +68,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(400).json({ error: "Missing or invalid text parameter" });
   }
 
-  // Retrieve Play.ht credentials from environment variables
+  const { authToken, userId } = getRandomAuthTokenUser();
 
-  const authToken = "198f8a8d41b641848ba289bee9418a2d"; // Ensure this is set
-  const userId = "PLBxqtHtEvhmn4gSNdzcUX35yZu1"; // Ensure this is set
+  console.log("authToken", authToken);
+  console.log("userId", userId);
 
   // Validate API credentials
   if (!authToken || !userId) {
