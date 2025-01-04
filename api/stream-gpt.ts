@@ -38,7 +38,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             ({
               role: msg.sender === "user" ? "user" : "assistant",
               content: msg.text,
-            } as ChatCompletionMessage)
+            }) as ChatCompletionMessage
         )
       );
     }
@@ -48,7 +48,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const stream = await openai.chat.completions.create({
       model: "gpt-3.5-turbo",
-      messages: messages as any, // Type assertion needed due to OpenAI types
+      messages: messages as any,
       stream: true,
       temperature: 0.7,
       max_tokens: 150,
@@ -56,27 +56,41 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       presence_penalty: 0,
     });
 
-    // Buffer to store partial words
     let buffer = "";
-    const wordRegex = /^[a-zA-Z]+$/;
+    let pendingWord = "";
+    let isInWord = false;
+    const isWordChar = (char: string) => /[a-zA-Z0-9'-]/.test(char);
+    const isBreakChar = (char: string) => /[\s.,!?;:)\]})"]/.test(char);
 
     for await (const part of stream) {
       const content = part.choices[0]?.delta?.content || "";
 
-      // If we have content to process
-      if (content) {
-        buffer += content;
+      for (const char of content) {
+        if (isWordChar(char)) {
+          pendingWord += char;
+          isInWord = true;
+        } else {
+          if (isInWord) {
+            // Complete word found, add it to buffer
+            buffer += pendingWord;
+            pendingWord = "";
+            isInWord = false;
+          }
+          buffer += char;
 
-        // If we have a complete word or non-letter character(s)
-        if (!wordRegex.test(content) || content.includes(" ")) {
-          // Send the buffered content
-          res.write(`data: ${buffer}\n\n`);
-          buffer = "";
+          // If we hit a break character, send the buffer
+          if (isBreakChar(char)) {
+            res.write(`data: ${buffer}\n\n`);
+            buffer = "";
+          }
         }
       }
     }
 
-    // Send any remaining buffered content
+    // Send any remaining content
+    if (pendingWord) {
+      buffer += pendingWord;
+    }
     if (buffer) {
       res.write(`data: ${buffer}\n\n`);
     }

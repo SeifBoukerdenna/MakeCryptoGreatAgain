@@ -72,7 +72,7 @@ const CharacterCard: React.FC<CharacterCardProps> = ({
     };
 
     const isAvailable =
-        (TEST_MODE && id === FREE_CHARACTER_ID) ||
+        (connected && TEST_MODE && id === FREE_CHARACTER_ID) ||
         (connected && mcgaBalance !== null && mcgaBalance >= price);
 
     const showPrice = connected && (!TEST_MODE || id !== FREE_CHARACTER_ID);
