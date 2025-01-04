@@ -69,7 +69,7 @@ const Home: React.FC = () => {
             Connect your wallet to start chatting
           </p>
           {TEST_MODE && (
-            <p className="text-purple-500">Test Mode: Trump is available without connecting</p>
+            <p className="text-purple-500">Test Mode: Trump is available but you still need to connect</p>
           )}
         </div>
       );
