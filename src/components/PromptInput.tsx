@@ -114,7 +114,6 @@ const PromptInput: React.FC<PromptInputProps> = ({
                     placeholder="Ask your question..."
                     value={value}
                     onChange={(e) => setValue(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
                     className="text-input placeholder-gray-400 flex-1 p-3 pr-20 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors duration-300"
                 />
 
