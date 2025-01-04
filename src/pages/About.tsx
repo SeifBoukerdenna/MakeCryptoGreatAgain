@@ -3,6 +3,7 @@ import '../styles/about.css';
 import banner from "../assets/banner.png";
 import SmartContractViewer from '../components/SmartContractViewer';
 import { motion } from 'framer-motion';
+import DisclaimerSection from '../components/DisclaimerSection';
 
 interface AboutProps {
     theme: 'light' | 'dark';
@@ -178,6 +179,7 @@ pub struct Pool {
                 </div>
             </motion.section>
 
+
             {/* Mission Section */}
             <motion.section
                 className="mission-section"
@@ -312,6 +314,11 @@ pub struct Pool {
                     </div>
                 </div>
             </section>
+
+
+            {/* Disclaimer Section */}
+            <DisclaimerSection />
+
         </div>
     );
 };

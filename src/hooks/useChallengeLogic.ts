@@ -168,11 +168,19 @@ export function useChallengeLogic(onTransaction?: (txHash: string) => void) {
   const handlePoolGuess = async (
     characterId: string,
     userGuess: string
-  ): Promise<string[]> => {
-    if (!connected || !publicKey) return [];
+  ): Promise<{
+    txResults: string[];
+    isCorrect: boolean;
+    depositSucceeded: boolean;
+  }> => {
+    if (!connected || !publicKey) {
+      return { txResults: [], isCorrect: false, depositSucceeded: false };
+    }
 
     const poolInfo = poolInfos[characterId];
-    if (!poolInfo) return [];
+    if (!poolInfo) {
+      return { txResults: [], isCorrect: false, depositSucceeded: false };
+    }
 
     try {
       const provider = getProvider();
@@ -188,23 +196,12 @@ export function useChallengeLogic(onTransaction?: (txHash: string) => void) {
       );
 
       // First transaction: DEPOSIT
-      const depositAmount = new BN(Price.challengePrice * 1e9);
-      const depositSignature = await program.methods
-        .deposit(depositAmount)
-        .accounts({
-          // @ts-ignore
-          pool: poolPda,
-          poolTokenAccount: new PublicKey(poolInfo.pool_token_account),
-          userTokenAccount,
-          user: publicKey,
-          tokenProgram: TOKEN_PROGRAM_ID,
-        })
-        .rpc();
-
+      let depositSucceeded = false;
+      let depositSignature = "";
       try {
-        // Second transaction: CHECK HASH
-        const checkHashSignature = await program.methods
-          .checkHash(userGuess)
+        const depositAmount = new BN(Price.challengePrice * 1e9);
+        depositSignature = await program.methods
+          .deposit(depositAmount)
           .accounts({
             // @ts-ignore
             pool: poolPda,
@@ -215,14 +212,67 @@ export function useChallengeLogic(onTransaction?: (txHash: string) => void) {
           })
           .rpc();
 
-        return [depositSignature, checkHashSignature];
-      } catch (checkHashError) {
-        await applyCooldown(characterId);
-        return [depositSignature];
+        // Wait for confirmation of deposit
+        await connection.confirmTransaction(depositSignature);
+        depositSucceeded = true;
+      } catch (depositError) {
+        console.log(
+          "Deposit transaction failed or was rejected:",
+          depositError
+        );
+        return {
+          txResults: [],
+          isCorrect: false,
+          depositSucceeded: false,
+        };
       }
-    } catch (err) {
-      console.error("Smart contract error:", err);
-      return [];
+
+      // Only proceed with check_hash if deposit succeeded
+      if (depositSucceeded) {
+        try {
+          // Second transaction: CHECK HASH
+          const checkHashSignature = await program.methods
+            .checkHash(userGuess)
+            .accounts({
+              // @ts-ignore
+              pool: poolPda,
+              poolTokenAccount: new PublicKey(poolInfo.pool_token_account),
+              userTokenAccount,
+              user: publicKey,
+              tokenProgram: TOKEN_PROGRAM_ID,
+            })
+            .rpc();
+
+          // If we got here, both transactions succeeded
+          return {
+            txResults: [depositSignature, checkHashSignature],
+            isCorrect: true, // The check_hash instruction only completes if hash matches
+            depositSucceeded: true,
+          };
+        } catch (checkHashError: any) {
+          // If we get here, deposit succeeded but hash check failed
+          // This could be due to wrong hash or user rejection
+
+          return {
+            txResults: [depositSignature],
+            isCorrect: false,
+            depositSucceeded: true,
+          };
+        }
+      }
+
+      return {
+        txResults: [],
+        isCorrect: false,
+        depositSucceeded: false,
+      };
+    } catch (error) {
+      console.error("Smart contract error:", error);
+      return {
+        txResults: [],
+        isCorrect: false,
+        depositSucceeded: false,
+      };
     }
   };
 
@@ -246,78 +296,84 @@ export function useChallengeLogic(onTransaction?: (txHash: string) => void) {
         throw new Error("Pool not initialized for this character.");
       }
 
-      console.log("Getting pool balance before attempt...");
+      // Get initial pool balance
       const poolBalanceBefore = await connection.getTokenAccountBalance(
         new PublicKey(poolInfo.pool_token_account)
       );
-      console.log("Balance before:", poolBalanceBefore.value);
 
-      const signatures = await handlePoolGuess(characterId, userGuess);
+      // Attempt the transactions
+      const { txResults, isCorrect, depositSucceeded } = await handlePoolGuess(
+        characterId,
+        userGuess
+      );
 
-      // if (signatures.length < 2) {
-      //   throw new Error(
-      //     "Challenge attempt cancelled - Cooldown period applied"
-      //   );
-      // }
-
-      signatures.forEach((sig) => {
+      // Notify of transactions
+      txResults.forEach((sig) => {
         if (onTransaction) onTransaction(sig);
       });
 
-      console.log("Getting pool balance after attempt...");
-      const poolBalanceAfter = await connection.getTokenAccountBalance(
-        new PublicKey(poolInfo.pool_token_account)
-      );
-      console.log("Balance after:", poolBalanceAfter.value);
+      // Calculate tokens only if needed
+      let tokensWon = 0;
+      if (isCorrect) {
+        const poolBalanceAfter = await connection.getTokenAccountBalance(
+          new PublicKey(poolInfo.pool_token_account)
+        );
+        tokensWon = calculateTokensWon(
+          poolBalanceBefore.value.uiAmount,
+          poolBalanceAfter.value.uiAmount
+        );
+      }
 
-      const tokensWon = calculateTokensWon(
-        poolBalanceBefore.value.uiAmount,
-        poolBalanceAfter.value.uiAmount
-      );
-
-      console.log("Calculated tokens won:", tokensWon);
-
+      // Get the actual secret to verify
       const { data: secretData } = await supabase
         .from("character_secrets")
         .select("secret")
         .eq("character_id", characterId)
         .single();
+
       if (!secretData) throw new Error("Secret not found");
 
-      const isCorrect = userGuess === secretData.secret.trim().toLowerCase();
+      const hashMatches = userGuess === secretData.secret.trim().toLowerCase();
       const now = new Date();
 
-      if (!isCorrect) {
-        await applyCooldown(characterId);
+      // Handle different scenarios
+      if (!depositSucceeded) {
+        // If deposit failed/rejected, do nothing
         setGuesses((prev) => ({ ...prev, [characterId]: "" }));
       } else {
-        // Save winning status
-        console.log("Saving winning status with tokens:", tokensWon);
-        const status = {
-          character_id: characterId,
-          is_solved: true,
-          solved_by: publicKey.toString(),
-          solved_at: now.toISOString(),
-          tokens_won: tokensWon,
-          secret_phrase: guesses[characterId],
-        };
-        console.log("Status to save:", status);
-
-        const { error: statusError } = await supabase
-          .from("character_status")
-          .upsert(status)
-          .select();
-
-        if (statusError) throw statusError;
-
-        // Update local state with the correct value
-        setCharacterStatuses((prev) => ({
-          ...prev,
-          [characterId]: {
-            ...status,
+        // Deposit succeeded, handle based on hash check result
+        if (!hashMatches) {
+          // Wrong hash: apply cooldown regardless of second tx
+          await applyCooldown(characterId);
+          setGuesses((prev) => ({ ...prev, [characterId]: "" }));
+        } else if (isCorrect) {
+          // Correct hash and both transactions succeeded
+          const status = {
+            character_id: characterId,
+            is_solved: true,
+            solved_by: publicKey.toString(),
+            solved_at: now.toISOString(),
             tokens_won: tokensWon,
-          },
-        }));
+            secret_phrase: userGuess,
+          };
+
+          // Update status in database
+          const { error: statusError } = await supabase
+            .from("character_status")
+            .upsert(status)
+            .select();
+
+          if (statusError) throw statusError;
+
+          // Update local state
+          setCharacterStatuses((prev) => ({
+            ...prev,
+            [characterId]: {
+              ...status,
+              tokens_won: tokensWon,
+            },
+          }));
+        }
       }
 
       await Promise.all([fetchCharacterStatuses(), fetchUserAttempts()]);

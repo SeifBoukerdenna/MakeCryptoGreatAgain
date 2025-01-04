@@ -87,7 +87,7 @@ const ChallengePage = () => {
 
             if (timeLeft <= 0) {
                 clearInterval((window as any)[`timerInterval_${characterId}`]);
-                timerElement.textContent = 'Ready';
+                timerElement.textContent = 'Ready - Refresh the page';
                 return;
             }
 
