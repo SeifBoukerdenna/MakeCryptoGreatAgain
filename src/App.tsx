@@ -1,3 +1,6 @@
+// FIX right hash -> canceled first tx --> tokens locked for ever
+// FIX shoudl use wallet before talking to anyone
+
 import { useState } from 'react';
 import './styles/global.css';
 import Home from './pages/Home';

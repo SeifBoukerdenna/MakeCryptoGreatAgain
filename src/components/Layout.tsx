@@ -95,12 +95,13 @@ const Layout: React.FC<LayoutProps> = ({ toggleTheme, theme }) => {
                         About
                     </NavLink>
                     <NavLink
-                        to="/https://x.com/___MCGA___"
+                        to="https://x.com/___MCGA___"
                         target="_blank"
                         rel="noopener noreferrer"
                         className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
                     >
-
+                        <a href="https://x.com/___MCGA___" target="_blank"
+                            rel="noopener noreferrer"></a>
                         <FontAwesomeIcon icon={faXTwitter} size="lg" color='rgba(147, 51, 234, 0.5)' />
                     </NavLink>
 

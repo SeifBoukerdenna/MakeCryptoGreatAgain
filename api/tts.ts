@@ -4,6 +4,34 @@ import { VercelRequest, VercelResponse } from "@vercel/node";
 import { Readable } from "stream";
 import voices from "../src/configs/voices.json";
 
+function getRandomAuthTokenUser() {
+  const randomIndex = Math.floor(Math.random() * authTokenUserArray.length);
+  return authTokenUserArray[randomIndex];
+}
+
+const authTokenUserArray: { authToken: string; userId: string }[] = [
+  {
+    authToken: "62f273499fb640c9b8d21143113c050e",
+    userId: "uzAqHZENYEWkspDZZayOrHAhe1a2",
+  },
+  {
+    authToken: "198f8a8d41b641848ba289bee9418a2d",
+    userId: "PLBxqtHtEvhmn4gSNdzcUX35yZu1",
+  },
+  {
+    authToken: "9c1624056d284ee4b32e92a4895b71d4",
+    userId: "RzncyNlk5hYgmUYUPauL64oi5Pz1",
+  },
+  {
+    authToken: "539ef4bd114440c5930da2ed59bcad0a",
+    userId: "wiP17EkJNZVcY2dPlqSLCNkei8B2",
+  },
+  {
+    authToken: "a21edf131f004f7a967ffa1c055ff694",
+    userId: "8nwNpiCL9fhyrbQBuNjNF7r3dvJ2",
+  },
+];
+
 // Handle CORS preflight requests
 function handleOptions(
   req: VercelRequest,
@@ -52,10 +80,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(400).json({ error: "Missing or invalid text parameter" });
   }
 
-  // Retrieve Play.ht credentials from environment variables
+  const { authToken, userId } = getRandomAuthTokenUser();
 
-  const authToken = "198f8a8d41b641848ba289bee9418a2d"; // Ensure this is set
-  const userId = "PLBxqtHtEvhmn4gSNdzcUX35yZu1"; // Ensure this is set
+  console.log("authToken", authToken);
+  console.log("userId", userId);
+  console.log("---------------------------------");
 
   // Validate API credentials
   if (!authToken || !userId) {
@@ -79,7 +108,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       headers: {
         Accept: "audio/mpeg",
         "Content-Type": "application/json",
-        Authorization: authToken, // Correct casing
+        Authorization: authToken,
         "X-User-ID": userId,
       },
       body: JSON.stringify({
@@ -122,3 +151,25 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(500).json({ error: "Internal server error from tts" });
   }
 }
+
+/*
+
+authToken 198f8a8d41b641848ba289bee9418a2d
+userId PLBxqtHtEvhmn4gSNdzcUX35yZu1
+---------------------------------
+
+authToken a21edf131f004f7a967ffa1c055ff694
+userId 8nwNpiCL9fhyrbQBuNjNF7r3dvJ2
+---------------------------------
+
+
+authToken 62f273499fb640c9b8d21143113c050e
+userId uzAqHZENYEWkspDZZayOrHAhe1a2
+---------------------------------
+
+
+
+
+
+
+*/
