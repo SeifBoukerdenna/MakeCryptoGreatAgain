@@ -12,6 +12,7 @@ import {
     Wallet,
     Coins,
     ExternalLink,
+    InfoIcon,
 } from 'lucide-react';
 import { charactersConfig } from '../configs/characters.config';
 import { formatTimeRemaining } from '../utils/time';
@@ -23,6 +24,8 @@ import { toast } from 'react-toastify';
 import ChallengeTour from '../components/tours/ChallengeTour';
 import CooldownExplainer from '../components/CooldownExplainer';
 import WinnersSection from '../components/WinnersSection';
+import { Link } from 'react-router-dom';
+import Tooltip from '../components/Tooltip';
 
 const ChallengePage = () => {
     const { connected } = useWallet();
@@ -87,7 +90,7 @@ const ChallengePage = () => {
 
             if (timeLeft <= 0) {
                 clearInterval((window as any)[`timerInterval_${characterId}`]);
-                timerElement.textContent = 'Ready';
+                timerElement.textContent = 'Ready - Refresh the page';
                 return;
             }
 
@@ -143,9 +146,20 @@ const ChallengePage = () => {
                 <CooldownExplainer />
             </div>
             <div className='challenge-header'>
-                <h1 className="text-3xl font-bold mb-8 text-center bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                    Character Challenges
+                <h1 className="text-3xl font-bold mb-8 text-center flex items-center justify-center gap-2">
+                    <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                        Character Challenges
+                    </span>
                 </h1>
+                <Link
+                    to="/about"
+                    className="text-purple-600 hover:text-pink-600 transition-colors duration-300"
+                    title="Learn more about challenges in the About page"
+                >
+                    <Tooltip message='Learn more about challenges in the About page'>
+                        <InfoIcon size={24} />
+                    </Tooltip>
+                </Link>
             </div>
 
             {/* Stats Section */}

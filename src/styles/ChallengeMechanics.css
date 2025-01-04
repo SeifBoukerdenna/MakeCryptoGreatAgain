@@ -1,0 +1,182 @@
+/* src/styles/ChallengeMechanics.css */
+
+.challenge-mechanics {
+    padding: 4rem 1.5rem;
+    /* background: linear-gradient(180deg, rgba(147, 51, 234, 0.05) 0%, rgba(0, 0, 0, 0) 100%); */
+    transition: background 0.3s ease;
+}
+
+.challenge-mechanics-container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+.challenge-mechanics-container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+.challenge-mechanics-title {
+    font-size: 2rem;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 3rem;
+    background: linear-gradient(90deg, #6366F1 0%, #D946EF 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.steps-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+}
+
+.step-card {
+    background: var(--card-bg-color);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: 1px solid var(--card-border);
+}
+
+.step-card:hover {
+    transform: translateY(-0.5rem);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+}
+
+.step-card.selected {
+    border: 2px solid var(--swiper-pagination-active-color);
+}
+
+.step-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.step-icon {
+    flex-shrink: 0;
+}
+
+.step-icon svg {
+    width: 2rem;
+    height: 2rem;
+}
+
+.step-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.step-description {
+    color: var(--text-secondary);
+    margin-bottom: 1rem;
+    line-height: 1.5;
+}
+
+.step-alert {
+    background: rgba(234, 179, 8, 0.1);
+    border-left: 4px solid #EAB308;
+    padding: 1rem;
+    margin-top: 1rem;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+}
+
+.outcomes-container {
+    margin-top: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.outcome-card {
+    background: rgba(147, 51, 234, 0.05);
+    border-radius: 0.5rem;
+    padding: 1rem;
+}
+
+.outcome-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.outcome-icon svg {
+    width: 1.5rem;
+    height: 1.5rem;
+}
+
+.outcome-title {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.outcome-description {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+}
+
+/* Icon colors */
+.icon-lock {
+    color: #8B5CF6;
+}
+
+.icon-arrow {
+    color: #3B82F6;
+}
+
+.icon-alert {
+    color: #EAB308;
+}
+
+.icon-check {
+    color: #10B981;
+}
+
+.icon-x {
+    color: #EF4444;
+}
+
+/* Dark mode adjustments */
+.dark .step-card {
+    background: var(--card-bg-color);
+}
+
+.dark .outcome-card {
+    background: rgba(147, 51, 234, 0.1);
+}
+
+.dark .step-alert {
+    background: rgba(234, 179, 8, 0.1);
+}
+
+/* Responsive design */
+@media (max-width: 1024px) {
+    .steps-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .steps-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .challenge-mechanics {
+        padding: 2rem 1rem;
+    }
+
+    .challenge-mechanics-title {
+        font-size: 1.75rem;
+    }
+}

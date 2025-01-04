@@ -2,37 +2,56 @@ import { Timer } from 'lucide-react';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { useMcgaBalance } from '../hooks/useMcgaBalance';
 import "../styles/challenge.css"
+
 const CooldownExplainer = () => {
     const { connected } = useWallet();
     const mcgaBalance = useMcgaBalance();
 
-    const BASE_COOLDOWN_MS = 120000; // 2 minutes
-    const MIN_COOLDOWN_MS = 1000; // 1 second
-    const TOKEN_DENOMINATOR = 1000; // Every 1000 tokens
-    const REDUCTION_PER_TOKEN_GROUP = 10000; // 10 seconds per 1000 tokens
+    const BASE_COOLDOWN_MS = 21600000; // 6 hours
+    const MIN_COOLDOWN_MS = 1000;      // 1 second
+    const MAX_TOKEN_AMOUNT = 100000;    // 100k tokens for minimum cooldown
 
     const calculateCooldown = () => {
-        const tokenGroups = Math.floor(mcgaBalance / TOKEN_DENOMINATOR);
-        const reduction = tokenGroups * REDUCTION_PER_TOKEN_GROUP;
-        return Math.max(BASE_COOLDOWN_MS - reduction, MIN_COOLDOWN_MS);
+        // Cap the balance at MAX_TOKEN_AMOUNT
+        const effectiveBalance = Math.min(mcgaBalance, MAX_TOKEN_AMOUNT);
+
+        // Calculate percentage of max tokens held (0 to 1)
+        const percentageOfMaxTokens = effectiveBalance / MAX_TOKEN_AMOUNT;
+
+        // Linear interpolation between BASE_COOLDOWN_MS and MIN_COOLDOWN_MS
+        const cooldown = BASE_COOLDOWN_MS - (percentageOfMaxTokens * (BASE_COOLDOWN_MS - MIN_COOLDOWN_MS));
+
+        return Math.max(Math.floor(cooldown), MIN_COOLDOWN_MS);
     };
 
     // Calculate reduction percentage (0-100)
     const getReductionPercentage = () => {
-        const maxReduction = BASE_COOLDOWN_MS - MIN_COOLDOWN_MS;
-        const actualReduction = Math.min(
-            Math.floor(mcgaBalance / TOKEN_DENOMINATOR) * REDUCTION_PER_TOKEN_GROUP,
-            maxReduction
-        );
-        return (actualReduction / maxReduction) * 100;
+        const effectiveBalance = Math.min(mcgaBalance, MAX_TOKEN_AMOUNT);
+        return (effectiveBalance / MAX_TOKEN_AMOUNT) * 100;
     };
 
     const formatTime = (ms: number) => {
-        const seconds = Math.floor(ms / 1000);
-        if (seconds < 60) return `${seconds} seconds`;
-        const minutes = Math.floor(seconds / 60);
-        const remainingSeconds = seconds % 60;
-        return `${minutes}m ${remainingSeconds}s`;
+        const totalSeconds = Math.floor(ms / 1000);
+
+        if (totalSeconds < 60) {
+            return `${totalSeconds} seconds`;
+        }
+
+        if (totalSeconds < 3600) {
+            const minutes = Math.floor(totalSeconds / 60);
+            const seconds = totalSeconds % 60;
+            return `${minutes}m ${seconds}s`;
+        }
+
+        const hours = Math.floor(totalSeconds / 3600);
+        const minutes = Math.floor((totalSeconds % 3600) / 60);
+        const seconds = totalSeconds % 60;
+
+        if (minutes === 0 && seconds === 0) {
+            return `${hours}h`;
+        }
+
+        return `${hours}h ${minutes}m ${seconds}s`;
     };
 
     return (
@@ -55,7 +74,10 @@ const CooldownExplainer = () => {
                     />
                 </div>
                 <div className="power-tips">
-                    Hold MCGA tokens to reduce cooldown from 2m to 1s
+                    Hold MCGA tokens to reduce cooldown from 6h to 1s
+                </div>
+                <div className="power-tips">
+                    Hold 100k MCGA to reduce cooldown to 1s
                 </div>
             </div>
         </div>

@@ -3,6 +3,8 @@ import '../styles/about.css';
 import banner from "../assets/banner.png";
 import SmartContractViewer from '../components/SmartContractViewer';
 import { motion } from 'framer-motion';
+import DisclaimerSection from '../components/DisclaimerSection';
+import ChallengeMechanics from '../components/ChallengeMechanics';
 
 interface AboutProps {
     theme: 'light' | 'dark';
@@ -178,6 +180,7 @@ pub struct Pool {
                 </div>
             </motion.section>
 
+
             {/* Mission Section */}
             <motion.section
                 className="mission-section"
@@ -255,6 +258,19 @@ pub struct Pool {
                 </div>
             </motion.section>
 
+
+            <motion.section
+                className="challenge-mechanics-section"
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, amount: 0.2 }}
+                variants={containerVariants}
+            >
+                <ChallengeMechanics />
+            </motion.section>
+
+
+
             {/* Value Proposition Section */}
             <motion.section
                 className="testimonials-section"
@@ -312,6 +328,11 @@ pub struct Pool {
                     </div>
                 </div>
             </section>
+
+
+            {/* Disclaimer Section */}
+            <DisclaimerSection />
+
         </div>
     );
 };
