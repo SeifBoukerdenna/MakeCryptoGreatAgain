@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { ArrowRight, AlertCircle, Lock, CheckCircle2, XCircle } from 'lucide-react';
 import '../styles/ChallengeMechanics.css';
 
 const ChallengeMechanics = () => {
-    const [selectedStep, setSelectedStep] = useState<number | null>(null);
+    const [selectedStep, _] = useState<number | null>(null);
 
     const steps = [
         {
