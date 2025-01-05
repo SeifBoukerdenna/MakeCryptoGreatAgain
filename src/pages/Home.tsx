@@ -1,4 +1,3 @@
-// src/pages/Home.tsx
 import React from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -10,17 +9,15 @@ import 'swiper/css/pagination';
 import CharacterCard from '../components/CharacterCard';
 import PromptInput from '../components/PromptInput';
 import Waveform from '../components/WaveForm';
-
 import { useMessages } from '../hooks/useMessages';
 import { useCharacterSelection } from '../hooks/useCharacterSelection';
-import { TEST_MODE, FREE_CHARACTER_ID } from '../configs/test.config';
 import { charactersConfig } from '../configs/characters.config';
 import { thinkingMessages } from '../configs/thinkingMessages.ts';
 import useConversationStore from '../stores/useConversationStore';
 import GuidedTour from '../components/tours/GuidedTour.tsx';
 import QueueStatus from '../components/QueueStatus.tsx';
 
-const Home: React.FC = () => {
+const Home = () => {
   const { connected } = useWallet();
   const {
     messages,
@@ -37,7 +34,7 @@ const Home: React.FC = () => {
     getTimeUntilNextSlot,
   } = useMessages();
 
-  const isProcessing = loadingResponse || isPlaying
+  const isProcessing = loadingResponse || isPlaying;
 
   const {
     selectedCharacter,
@@ -49,32 +46,12 @@ const Home: React.FC = () => {
   } = useCharacterSelection();
 
   const setMessages = useConversationStore((state) => state.setMessages);
+  const handleClearChat = () => setMessages([]);
 
-  const handleClearChat = () => {
-    setMessages([]);
-  };
-
-
+  const isTrumpSelected = selectedCharacter === 'Donald Trump';
 
   const renderChatArea = () => {
-    // In test mode, allow chat if Trump is selected
-    const isTrumpSelectedInTestMode =
-      TEST_MODE &&
-      selectedCharacter === charactersConfig.find((char) => char.id === FREE_CHARACTER_ID)?.name;
-
-    if (!connected && !isTrumpSelectedInTestMode) {
-      return (
-        <div className="flex flex-col items-center justify-center h-full text-center">
-          <p className="text-xl text-gray-400 dark:text-gray-500 mb-4">
-            Connect your wallet to start chatting
-          </p>
-          {TEST_MODE && (
-            <p className="text-purple-500">Test Mode: Trump is available but you still need to connect</p>
-          )}
-        </div>
-      );
-    }
-
+    // Allow chat if Trump is selected, regardless of wallet connection
     if (!selectedCharacter) {
       return (
         <div className="flex flex-col items-center justify-center h-full text-center my-8">
@@ -85,9 +62,19 @@ const Home: React.FC = () => {
       );
     }
 
+    // Only require wallet connection for non-Trump characters
+    if (!connected && !isTrumpSelected) {
+      return (
+        <div className="flex flex-col items-center justify-center h-full text-center">
+          <p className="text-xl text-gray-400 dark:text-gray-500 mb-4">
+            Connect your wallet to chat with other characters
+          </p>
+        </div>
+      );
+    }
+
     return (
       <>
-        {/* Avatar + Waveform up top */}
         {getSelectedCharacter() && (
           <div className="selected-character-icon relative">
             <img
@@ -107,20 +94,8 @@ const Home: React.FC = () => {
           </div>
         )}
 
-        {/* Messages Container */}
         <div
-          className="
-          messages
-          flex-1
-          overflow-y-auto
-          mb-4
-          p-2
-          text-sm
-          max-w-[75%]
-          rounded-lg
-          bg-gray-200
-          max-h-80
-        "
+          className="messages flex-1 overflow-y-auto mb-4 p-2 text-sm max-w-[75%] rounded-lg bg-gray-200 max-h-80"
           style={{ maxHeight: '20rem' }}
         >
           {messages.map((m, i) => {
@@ -147,7 +122,6 @@ const Home: React.FC = () => {
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Prompt Input */}
         <PromptInput onSubmit={handleSend} videoBlob={videoBlob} clearVideoBlob={clearVideoBlob} isProcessing={isProcessing} />
         {ttsError && <p className="text-red-500 mt-2">{ttsError}</p>}
       </>
@@ -159,7 +133,6 @@ const Home: React.FC = () => {
       <GuidedTour />
       <div className="home-container min-h-screen flex flex-col">
         <div className="container mx-auto flex-1 p-6 space-y-16">
-          {/* Character Selection */}
           <section className="px-4 mb-8 mt-8">
             <div className="flex justify-center items-center">
               <Swiper
@@ -171,11 +144,7 @@ const Home: React.FC = () => {
                 }}
                 centeredSlides={false}
                 navigation
-                pagination={{
-                  clickable: true,
-                  bulletClass: 'swiper-pagination-bullet',
-                  bulletActiveClass: 'swiper-pagination-bullet-active',
-                }}
+                pagination={{ clickable: true }}
                 loop={true}
                 className="mySwiper"
                 onSwiper={(swiper) => {
@@ -191,11 +160,12 @@ const Home: React.FC = () => {
                       {...char}
                       canSelect={!isProcessing}
                       onSelect={() => {
-                        if (isPlaying) return
-                        setSelectedCharacter(char.name)
-                        handleClearChat()
+                        if (isPlaying) return;
+                        setSelectedCharacter(char.name);
+                        handleClearChat();
                       }}
                       isSelected={selectedCharacter === char.name}
+                      overrideWalletCheck={char.name === 'Donald Trump'} // Add this prop to allow Trump without wallet
                     />
                   </SwiperSlide>
                 ))}
@@ -203,13 +173,8 @@ const Home: React.FC = () => {
             </div>
           </section>
 
-          {/* Chat Area */}
           <section className="chat-area p-6 rounded-lg shadow-lg flex flex-col h-96 pt-6 mt-4 mb-4 relative">
-            {/* Clear Chat Button */}
-            <button
-              onClick={handleClearChat}
-              className="clear-chat-button"
-            >
+            <button onClick={handleClearChat} className="clear-chat-button">
               Clear Chat
             </button>
             {renderChatArea()}
@@ -218,7 +183,7 @@ const Home: React.FC = () => {
             queuePosition={queuePosition}
             activeRequests={activeRequests}
             isProcessing={isProcessingQueue}
-            getTimeUntilNextSlot={getTimeUntilNextSlot}  // Add this line
+            getTimeUntilNextSlot={getTimeUntilNextSlot}
           />
         </div>
       </div>

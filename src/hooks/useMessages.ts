@@ -1,5 +1,3 @@
-// src/hooks/useMessages.ts
-
 import { useState, useRef } from "react";
 import { streamGPTResponse } from "../utils/openai";
 import { useTTS } from "./useTTS";
@@ -37,7 +35,7 @@ export const useMessages = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const { incrementMessageCount } = useMessageStats();
-  const { publicKey } = useWallet();
+  const { publicKey, connected } = useWallet();
   const { messages, addMessage, updateLastMessage } = useConversationStore();
 
   const { languages } = useLanguageStore();
@@ -54,7 +52,6 @@ export const useMessages = () => {
     setLoadingResponse(true);
     fullResponseRef.current = "";
 
-    // Build a dynamic prompt specifying the desired language
     const languageRequirement = `\n(Please respond strictly in ${characterLanguage}.)`;
     const finalSystemPrompt = systemPrompt + languageRequirement;
 
@@ -93,65 +90,83 @@ export const useMessages = () => {
       if (fullResponseRef.current) {
         updateLastMessage("", "loading");
 
-        // Try to add to TTS queue
-        const canProceed = await addToQueue();
-
-        if (!canProceed) {
-          if (queuePosition !== null) {
-            toast.info(
-              `You are in position ${queuePosition} in the queue. Please wait...`
-            );
-          }
-          updateLastMessage(fullResponseRef.current, "complete");
-          return;
-        }
-
-        try {
-          await sendTTSRequest(
-            fullResponseRef.current,
-            { voiceId, engine: voiceEngine },
-            () => {
-              updateLastMessage(fullResponseRef.current, "playing");
-            }
-          );
-
-          // Update database records
-          if (publicKey) {
-            try {
-              const walletAddress = publicKey.toString();
-
-              const { data: existingRecord } = await supabase
-                .from("message_stats")
-                .select("*")
-                .eq("character_id", config.id)
-                .eq("wallet_address", walletAddress)
-                .single();
-
-              if (existingRecord) {
-                await supabase
-                  .from("message_stats")
-                  .update({
-                    message_count: existingRecord.message_count + 1,
-                    last_used: new Date().toISOString(),
-                  })
-                  .eq("id", existingRecord.id);
-              } else {
-                await supabase.from("message_stats").insert({
-                  character_id: config.id,
-                  wallet_address: walletAddress,
-                  message_count: 1,
-                  last_used: new Date().toISOString(),
-                });
+        // For Trump (or any free character), skip the queue check
+        if (config.id === "1") {
+          // Trump's ID
+          try {
+            await sendTTSRequest(
+              fullResponseRef.current,
+              { voiceId, engine: voiceEngine },
+              () => {
+                updateLastMessage(fullResponseRef.current, "playing");
               }
-            } catch (err) {
-              console.error("Direct DB update error:", err);
+            );
+
+            updateLastMessage(fullResponseRef.current, "complete");
+          } catch (err) {
+            console.error("TTS Error:", err);
+            updateLastMessage(fullResponseRef.current, "complete");
+          }
+        } else {
+          // For other characters, use the queue system
+          const canProceed = await addToQueue();
+
+          if (!canProceed) {
+            if (queuePosition !== null) {
+              toast.info(
+                `You are in position ${queuePosition} in the queue. Please wait...`
+              );
             }
+            updateLastMessage(fullResponseRef.current, "complete");
+            return;
           }
 
-          await incrementMessageCount(config.id);
-        } finally {
-          // Always remove from queue when done
-          await removeFromQueue();
+          try {
+            await sendTTSRequest(
+              fullResponseRef.current,
+              { voiceId, engine: voiceEngine },
+              () => {
+                updateLastMessage(fullResponseRef.current, "playing");
+              }
+            );
+
+            // Update database records only for connected users
+            if (publicKey && connected) {
+              try {
+                const walletAddress = publicKey.toString();
+
+                const { data: existingRecord } = await supabase
+                  .from("message_stats")
+                  .select("*")
+                  .eq("character_id", config.id)
+                  .eq("wallet_address", walletAddress)
+                  .single();
+
+                if (existingRecord) {
+                  await supabase
+                    .from("message_stats")
+                    .update({
+                      message_count: existingRecord.message_count + 1,
+                      last_used: new Date().toISOString(),
+                    })
+                    .eq("id", existingRecord.id);
+                } else {
+                  await supabase.from("message_stats").insert({
+                    character_id: config.id,
+                    wallet_address: walletAddress,
+                    message_count: 1,
+                    last_used: new Date().toISOString(),
+                  });
+                }
+              } catch (err) {
+                console.error("Direct DB update error:", err);
+              }
+            }
+
+            await incrementMessageCount(config.id);
+          } finally {
+            await removeFromQueue();
+          }
         }
       }
     } catch (error) {
@@ -162,7 +177,10 @@ export const useMessages = () => {
         status: "complete",
       };
       addMessage(errorMessage);
-      await removeFromQueue();
+      if (config.id !== "1") {
+        // Only remove from queue if not Trump
+        await removeFromQueue();
+      }
     } finally {
       setLoadingResponse(false);
       fullResponseRef.current = "";

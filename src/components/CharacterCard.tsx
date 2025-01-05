@@ -1,14 +1,9 @@
-// src/components/CharacterCard.tsx
-
-import React from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
-import { TEST_MODE, FREE_CHARACTER_ID } from '../configs/test.config';
 import useBalanceStore from '../hooks/useBalanceStore';
 import { formatToK } from '../utils/numberFormat';
 import Switch from 'react-switch';
 import { Eye, Lock } from 'lucide-react';
 import useModeStore from '../stores/useModeStore';
-
 import useLanguageStore, { Language } from '../stores/useLanguageStore';
 import { CharacterConfig } from '../configs/characters.config';
 
@@ -18,16 +13,10 @@ interface CharacterCardProps extends Partial<CharacterConfig> {
     onSelect: () => void;
     isSelected: boolean;
     canSelect: boolean;
+    overrideWalletCheck?: boolean; // New prop to override wallet check
 }
 
-interface SwitchColors {
-    offColor: string;
-    onColor: string;
-    offHandleColor: string;
-    onHandleColor: string;
-}
-
-const CharacterCard: React.FC<CharacterCardProps> = ({
+const CharacterCard = ({
     id,
     name,
     avatar,
@@ -37,26 +26,17 @@ const CharacterCard: React.FC<CharacterCardProps> = ({
     onSelect,
     isSelected,
     canSelect = true,
-}) => {
+    overrideWalletCheck = false, // Default to false
+}: CharacterCardProps) => {
     const { connected } = useWallet();
     const { mcgaBalance } = useBalanceStore();
-
-    // Grab the current mode & toggler from Zustand
     const mode = useModeStore((state) => state.modes[id] || 'normal');
     const toggleMode = useModeStore((state) => state.toggleMode);
-
-    // Grab language & allowedLanguages from Zustand
     const { languages, allowedLanguages, setLanguage } = useLanguageStore();
-
-    // Figure out which language this character is currently set to
     const characterLanguage = languages[id] || 'english';
-
-    // If we haven't explicitly listed the character in allowedLanguages,
-    // just default them to a single choice: ['english']
     const characterAllowedLanguages = allowedLanguages[id] || ['english'];
 
-    // Switch colors from CSS variables
-    const switchColors: SwitchColors = {
+    const switchColors = {
         offColor: getComputedStyle(document.documentElement)
             .getPropertyValue('--toggle-bg-light')
             .trim() || '#888888',
@@ -71,17 +51,12 @@ const CharacterCard: React.FC<CharacterCardProps> = ({
             .trim() || '#ffffff',
     };
 
-    const isAvailable =
-        (connected && TEST_MODE && id === FREE_CHARACTER_ID) ||
-        (connected && mcgaBalance !== null && mcgaBalance >= price);
-
-    const showPrice = connected && (!TEST_MODE || id !== FREE_CHARACTER_ID);
+    // Character is available if wallet is connected with sufficient balance OR if overrideWalletCheck is true
+    const isAvailable = overrideWalletCheck || (connected && mcgaBalance !== null && mcgaBalance >= price);
 
     return (
         <div
-            key={id}
-            className={`character-card ${isSelected ? 'selected-card' : ''
-                } ${!isAvailable && !isSelected ? 'unavailable' : ''}`}
+            className={`character-card ${isSelected ? 'selected-card' : ''} ${!isAvailable && !isSelected ? 'unavailable' : ''}`}
             aria-disabled={isSelected || !isAvailable}
         >
             <img
@@ -91,39 +66,31 @@ const CharacterCard: React.FC<CharacterCardProps> = ({
             />
             <div className="character-details">
                 <div className="character-name">{name}</div>
-
-                {/* Normal or secondary description based on mode */}
                 <div className="character-description">
                     {mode === 'normal' ? description : description_secondary}
                 </div>
 
-                {/* Language Dropdown */}
-                {characterAllowedLanguages.length > 1 && <div className="language-dropdown">
-                    <select
-                        id={`language-selector-${id}`}
-                        value={characterLanguage}
-                        onChange={(e) =>
-                            setLanguage(id, e.target.value as Language)
-                        }
-                        className="dropdown"
-                    >
-                        {characterAllowedLanguages.map((lang) => (
-                            <option key={lang} value={lang}>
-                                {lang.charAt(0).toUpperCase() + lang.slice(1)}
-                            </option>
-                        ))}
-                    </select>
-                </div>}
+                {characterAllowedLanguages.length > 1 && (
+                    <div className="language-dropdown">
+                        <select
+                            value={characterLanguage}
+                            onChange={(e) => setLanguage(id, e.target.value as Language)}
+                            className="dropdown"
+                        >
+                            {characterAllowedLanguages.map((lang) => (
+                                <option key={lang} value={lang}>
+                                    {lang.charAt(0).toUpperCase() + lang.slice(1)}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                )}
 
-                {/* Mode Toggle Switch */}
                 <div className="flex items-center" style={{ marginTop: '1rem' }}>
                     <Switch
                         onChange={() => toggleMode(id)}
                         checked={mode === 'secret'}
-                        offColor={switchColors.offColor}
-                        onColor={switchColors.onColor}
-                        offHandleColor={switchColors.offHandleColor}
-                        onHandleColor={switchColors.onHandleColor}
+                        {...switchColors}
                         uncheckedIcon={
                             <Eye
                                 size={12}
@@ -157,23 +124,12 @@ const CharacterCard: React.FC<CharacterCardProps> = ({
                         height={24}
                         width={48}
                         handleDiameter={20}
-                        aria-label={`Switch to ${mode === 'normal' ? 'secret' : 'normal'
-                            } mode`}
-                        className="react-switch"
                     />
                 </div>
 
-                {showPrice && (
-                    <div
-                        className={`character-price ${isAvailable ? 'text-green-500' : 'text-red-500'
-                            }`}
-                    >
+                {!overrideWalletCheck && connected && (
+                    <div className={`character-price ${isAvailable ? 'text-green-500' : 'text-red-500'}`}>
                         {formatToK(price)} MCGA
-                    </div>
-                )}
-                {TEST_MODE && id === FREE_CHARACTER_ID && (
-                    <div className="text-xs text-purple-500 mt-1">
-                        Free in Test Mode
                     </div>
                 )}
             </div>
@@ -184,14 +140,13 @@ const CharacterCard: React.FC<CharacterCardProps> = ({
           ${!isAvailable && !isSelected ? 'unavailable-button' : ''}
         `}
                 onClick={onSelect}
-                disabled={isSelected || !isAvailable || !canSelect}
-                aria-disabled={isSelected || !isAvailable || !canSelect}
+                disabled={isSelected || (!isAvailable && !overrideWalletCheck) || !canSelect}
             >
                 {isSelected
                     ? 'Selected'
-                    : !connected && !(TEST_MODE && id === FREE_CHARACTER_ID)
+                    : !connected && !overrideWalletCheck
                         ? 'Connect Wallet'
-                        : !isAvailable
+                        : !isAvailable && !overrideWalletCheck
                             ? 'Insufficient MCGA'
                             : 'Select'}
             </button>
