@@ -1,4 +1,4 @@
-import React from 'react';
+// import React from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination } from 'swiper/modules';
@@ -11,7 +11,7 @@ import PromptInput from '../components/PromptInput';
 import Waveform from '../components/WaveForm';
 import { useMessages } from '../hooks/useMessages';
 import { useCharacterSelection } from '../hooks/useCharacterSelection';
-import { charactersConfig } from '../configs/characters.config';
+// import { charactersConfig } from '../configs/characters.config';
 import { thinkingMessages } from '../configs/thinkingMessages.ts';
 import useConversationStore from '../stores/useConversationStore';
 import GuidedTour from '../components/tours/GuidedTour.tsx';
