@@ -3,10 +3,10 @@ import { Mic, MicOff, Video, VideoOff } from 'lucide-react';
 import VideoPreviewOverlay from './VideoPreviewOverlay';
 import useShouldRecordStore from '../stores/useShouldRecordStore';
 import Tooltip from './Tooltip';
-import useBalanceStore from '../hooks/useBalanceStore';
-import { Price } from '../constants/price';
+// import useBalanceStore from '../hooks/useBalanceStore';
+// import { Price } from '../constants/price';
 import useIsChromium from '../hooks/useIsChromium';
-import { formatToK } from '../utils/numberFormat';
+// import { formatToK } from '../utils/numberFormat';
 
 interface PromptInputProps {
     onSubmit: (prompt: string) => void;
@@ -29,11 +29,11 @@ const PromptInput: React.FC<PromptInputProps> = ({
     const isChromium = useIsChromium();
 
     // Access mcgaBalance from the balance store
-    const mcgaBalance = useBalanceStore((state) => state.mcgaBalance);
+    // const mcgaBalance = useBalanceStore((state) => state.mcgaBalance);
 
     // Determine if the user has at least 50,000 MCGA
-    const hasSufficientTokens =
-        mcgaBalance !== null && mcgaBalance >= Price.exportVideo;
+    // const hasSufficientTokens =
+    //     mcgaBalance !== null && mcgaBalance >= Price.exportVideo;
 
     useEffect(() => {
         // Initialize Speech Recognition
