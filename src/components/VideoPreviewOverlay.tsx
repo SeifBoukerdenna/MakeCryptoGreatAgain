@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useMemo, memo } from 'react';
+import React, { useEffect, useState, useMemo, memo } from 'react';
 import { Download, X } from 'lucide-react';
 import Switch from 'react-switch';
 import { SwitchColors } from './ThemeToggle';
