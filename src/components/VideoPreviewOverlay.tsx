@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Download, X } from 'lucide-react';
 import Switch from 'react-switch';
 import { SwitchColors } from './ThemeToggle';
+import { toast } from 'react-toastify';
 
 interface VideoPreviewOverlayProps {
     videoBlob: Blob;
@@ -28,53 +29,51 @@ const VideoPreviewOverlay: React.FC<VideoPreviewOverlayProps> = ({
     }, [videoURL]);
 
     const convertToMP4 = async (webmBlob: Blob): Promise<Blob> => {
-        const mediaRecorder = new MediaRecorder(new MediaStream());
-        const mimeType = mediaRecorder.mimeType?.[0] || 'video/mp4';
-
-        return new Promise((resolve, reject) => {
-            const video = document.createElement('video');
-            video.src = URL.createObjectURL(webmBlob);
-            video.onloadedmetadata = () => {
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
-                if (!ctx) {
-                    reject(new Error('Failed to get canvas context'));
-                    return;
-                }
-
-                canvas.width = video.videoWidth;
-                canvas.height = video.videoHeight;
-
-                const stream = canvas.captureStream();
-                const newMediaRecorder = new MediaRecorder(stream, {
-                    mimeType,
-                    videoBitsPerSecond: 2500000 // 2.5 Mbps
-                });
-
-                const chunks: Blob[] = [];
-                newMediaRecorder.ondataavailable = (e) => chunks.push(e.data);
-                newMediaRecorder.onstop = () => {
-                    const mp4Blob = new Blob(chunks, { type: mimeType });
-                    resolve(mp4Blob);
-                };
-
-                video.onplay = () => {
-                    const drawFrame = () => {
-                        if (video.paused || video.ended) {
-                            newMediaRecorder.stop();
-                            return;
-                        }
-                        ctx.drawImage(video, 0, 0);
-                        requestAnimationFrame(drawFrame);
-                    };
-                    newMediaRecorder.start();
-                    drawFrame();
-                };
-
-                video.play();
-            };
-            video.onerror = () => reject(new Error('Video loading failed'));
+        // Convert blob to base64
+        const reader = new FileReader();
+        const base64Promise = new Promise<string>((resolve) => {
+            reader.onloadend = () => resolve(reader.result as string);
         });
+        reader.readAsDataURL(webmBlob);
+        const base64Data = await base64Promise;
+
+        // Show toast notification
+        const toastId = toast.loading("Converting video to MP4...");
+
+        try {
+            const response = await fetch('/api/convert', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    videoData: base64Data,
+                }),
+            });
+
+            if (!response.ok) {
+                const error = await response.text();
+                throw new Error(error || 'Failed to convert video');
+            }
+
+            const mp4Blob = await response.blob();
+            toast.update(toastId, {
+                render: "Conversion successful!",
+                type: "success",
+                isLoading: false,
+                autoClose: 2000
+            });
+
+            return mp4Blob;
+        } catch (error) {
+            toast.update(toastId, {
+                render: "Failed to convert video. Try downloading as WebM instead.",
+                type: "error",
+                isLoading: false,
+                autoClose: 5000
+            });
+            throw error;
+        }
     };
 
     const handleDownload = async () => {
@@ -86,13 +85,17 @@ const VideoPreviewOverlay: React.FC<VideoPreviewOverlayProps> = ({
                 const a = document.createElement('a');
                 a.href = url;
                 a.download = `${videoTitle}.mp4`;
+                document.body.appendChild(a);
                 a.click();
+                document.body.removeChild(a);
                 URL.revokeObjectURL(url);
             } else {
                 const a = document.createElement('a');
                 a.href = videoURL;
                 a.download = `${videoTitle}.webm`;
+                document.body.appendChild(a);
                 a.click();
+                document.body.removeChild(a);
             }
         } catch (error) {
             console.error('Download failed:', error);
@@ -115,7 +118,6 @@ const VideoPreviewOverlay: React.FC<VideoPreviewOverlayProps> = ({
             .getPropertyValue('--toggle-handle-dark')
             .trim() || '#ffffff',
     };
-
 
     return (
         <div className="video-overlay">
