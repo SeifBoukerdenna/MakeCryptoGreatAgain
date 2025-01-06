@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useMemo, memo } from 'react';
 import { Download, X } from 'lucide-react';
 import Switch from 'react-switch';
 import { SwitchColors } from './ThemeToggle';
@@ -10,6 +10,30 @@ interface VideoPreviewOverlayProps {
     characterName?: string;
 }
 
+// Memoized title input component
+const TitleInput = memo(({ value, onChange }: {
+    value: string;
+    onChange: (value: string) => void;
+}) => {
+    return (
+        <input
+            id="video-title"
+            type="text"
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            className="title-input"
+            placeholder="Enter a title..."
+        />
+    );
+});
+
+// Memoized video component
+const VideoPlayer = memo(({ src }: { src: string }) => {
+    return (
+        <video src={src} controls className="popup-video" />
+    );
+});
+
 const VideoPreviewOverlay: React.FC<VideoPreviewOverlayProps> = ({
     videoBlob,
     onClose,
@@ -18,7 +42,9 @@ const VideoPreviewOverlay: React.FC<VideoPreviewOverlayProps> = ({
     const [videoTitle, setVideoTitle] = useState(`${characterName}_video`);
     const [isMP4, setIsMP4] = useState(false);
     const [isConverting, setIsConverting] = useState(false);
-    const videoURL = URL.createObjectURL(videoBlob);
+
+    // Memoize the videoURL so it doesn't change on re-renders
+    const videoURL = useMemo(() => URL.createObjectURL(videoBlob), [videoBlob]);
 
     useEffect(() => {
         document.body.style.overflow = 'hidden';
@@ -37,7 +63,6 @@ const VideoPreviewOverlay: React.FC<VideoPreviewOverlayProps> = ({
         reader.readAsDataURL(webmBlob);
         const base64Data = await base64Promise;
 
-        // Show toast notification
         const toastId = toast.loading("Converting video to MP4...");
 
         try {
@@ -119,6 +144,28 @@ const VideoPreviewOverlay: React.FC<VideoPreviewOverlayProps> = ({
             .trim() || '#ffffff',
     };
 
+    // Memoize the format switch labels to prevent re-renders
+    const FormatSwitch = useMemo(() => (
+        <div className="format-switch">
+            <span className={`format-label ${!isMP4 ? 'active-format' : ''}`}>WebM</span>
+            <Switch
+                onChange={setIsMP4}
+                checked={isMP4}
+                offColor={switchColors.offColor}
+                onColor={switchColors.onColor}
+                offHandleColor={switchColors.offHandleColor}
+                onHandleColor={switchColors.onHandleColor}
+                height={24}
+                width={48}
+                handleDiameter={20}
+                uncheckedIcon={false}
+                checkedIcon={false}
+                className="switch-component"
+            />
+            <span className={`format-label ${isMP4 ? 'active-format' : ''}`}>MP4</span>
+        </div>
+    ), [isMP4, switchColors]);
+
     return (
         <div className="video-overlay">
             <div className="video-popup">
@@ -129,39 +176,18 @@ const VideoPreviewOverlay: React.FC<VideoPreviewOverlayProps> = ({
                 <h2 className="popup-title">Video Preview</h2>
 
                 <div className="video-container">
-                    <video src={videoURL} controls className="popup-video" />
+                    <VideoPlayer src={videoURL} />
                 </div>
 
                 <div className="export-section">
                     <div className="title-input-wrapper">
-                        <input
-                            id="video-title"
-                            type="text"
+                        <TitleInput
                             value={videoTitle}
-                            onChange={(e) => setVideoTitle(e.target.value)}
-                            className="title-input"
-                            placeholder="Enter a title..."
+                            onChange={setVideoTitle}
                         />
                     </div>
 
-                    <div className="format-switch">
-                        <span className={`format-label ${!isMP4 ? 'active-format' : ''}`}>WebM</span>
-                        <Switch
-                            onChange={setIsMP4}
-                            checked={isMP4}
-                            offColor={switchColors.offColor}
-                            onColor={switchColors.onColor}
-                            offHandleColor={switchColors.offHandleColor}
-                            onHandleColor={switchColors.onHandleColor}
-                            height={24}
-                            width={48}
-                            handleDiameter={20}
-                            uncheckedIcon={false}
-                            checkedIcon={false}
-                            className="switch-component"
-                        />
-                        <span className={`format-label ${isMP4 ? 'active-format' : ''}`}>MP4</span>
-                    </div>
+                    {FormatSwitch}
 
                     <button
                         onClick={handleDownload}
