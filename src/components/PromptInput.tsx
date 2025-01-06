@@ -92,18 +92,20 @@ const PromptInput: React.FC<PromptInputProps> = ({
     };
 
     const getTooltipMessage = () => {
-        if (!hasSufficientTokens) {
-            return `You need at least ${formatToK(
-                Price.exportVideo
-            )} MCGA tokens to use this feature.`;
-        }
+        // if (!hasSufficientTokens) {
+        //     return `You need at least ${formatToK(
+        //         Price.exportVideo
+        //     )} MCGA tokens to use this feature.`;
+        // }
         if (!isChromium) {
             return 'This feature is only supported in Chrome.';
         }
         return 'Record a short format video of the answer';
     };
 
-    const cameraButtonDisabled = !hasSufficientTokens || !isChromium;
+    // const cameraButtonDisabled = !hasSufficientTokens || !isChromium;
+    const cameraButtonDisabled = !isChromium;
+
 
     return (
         <>
