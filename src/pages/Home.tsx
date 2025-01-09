@@ -173,6 +173,10 @@ const Home = () => {
             </div>
           </section>
 
+          <script type="text/javascript">
+  // Insert Twitter Event ID
+          </script>
+
           <section className="chat-area p-6 rounded-lg shadow-lg flex flex-col h-96 pt-6 mt-4 mb-4 relative">
             <button onClick={handleClearChat} className="clear-chat-button">
               Clear Chat
@@ -187,6 +191,12 @@ const Home = () => {
           />
         </div>
       </div>
+
+      <script type="text/javascript">
+        // Insert Twitter Event ID
+        twq('event', 'tw-oys58-oyxym', {
+        });
+      </script>
     </>
   );
 };
