@@ -1,4 +1,3 @@
-// import React from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination } from 'swiper/modules';
@@ -11,11 +10,11 @@ import PromptInput from '../components/PromptInput';
 import Waveform from '../components/WaveForm';
 import { useMessages } from '../hooks/useMessages';
 import { useCharacterSelection } from '../hooks/useCharacterSelection';
-// import { charactersConfig } from '../configs/characters.config';
 import { thinkingMessages } from '../configs/thinkingMessages.ts';
 import useConversationStore from '../stores/useConversationStore';
 import GuidedTour from '../components/tours/GuidedTour.tsx';
 import QueueStatus from '../components/QueueStatus.tsx';
+import LaunchCountdownOverlay from '../components/LaunchCountdownOverlay';
 
 const Home = () => {
   const { connected } = useWallet();
@@ -131,6 +130,7 @@ const Home = () => {
   return (
     <>
       <GuidedTour />
+      <LaunchCountdownOverlay />
       <div className="home-container min-h-screen flex flex-col">
         <div className="container mx-auto flex-1 p-6 space-y-16">
           <section className="px-4 mb-8 mt-8">
@@ -165,7 +165,7 @@ const Home = () => {
                         handleClearChat();
                       }}
                       isSelected={selectedCharacter === char.name}
-                      overrideWalletCheck={char.name === 'Donald Trump'} // Add this prop to allow Trump without wallet
+                      overrideWalletCheck={char.name === 'Donald Trump'}
                     />
                   </SwiperSlide>
                 ))}
@@ -174,7 +174,7 @@ const Home = () => {
           </section>
 
           <script type="text/javascript">
-  // Insert Twitter Event ID
+            {/* Insert Twitter Event ID */}
           </script>
 
           <section className="chat-area p-6 rounded-lg shadow-lg flex flex-col h-96 pt-6 mt-4 mb-4 relative">
@@ -193,9 +193,8 @@ const Home = () => {
       </div>
 
       <script type="text/javascript">
-        // Insert Twitter Event ID
-        twq('event', 'tw-oys58-oyxym', {
-        });
+        {/* Insert Twitter Event ID */}
+        twq('event', 'tw-oys58-oyxym', { });
       </script>
     </>
   );

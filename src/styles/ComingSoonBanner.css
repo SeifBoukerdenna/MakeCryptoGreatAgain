@@ -1,5 +1,32 @@
 /* src/styles/ComingSoonBanner.css */
 
+.banner-close-button {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: white;
+    cursor: pointer;
+    padding: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+    z-index: 60;
+}
+
+.banner-close-button:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: rotate(90deg);
+}
+
+.banner-close-button:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3);
+}
+
 .coming-soon-banner {
     position: fixed;
     right: 0;
@@ -26,6 +53,33 @@
     align-items: center;
     gap: 0.5rem;
     color: white;
+}
+
+.banner-close-button {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: white;
+    cursor: pointer;
+    padding: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    z-index: 60;
+}
+
+.banner-close-button:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: rotate(90deg);
+}
+
+.banner-close-button:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.5);
 }
 
 .banner-icon {
@@ -166,6 +220,14 @@
 
 .dark .social-link:hover {
     color: #F472B6;
+}
+
+.dark .banner-close-button {
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.dark .banner-close-button:hover {
+    background: rgba(0, 0, 0, 0.3);
 }
 
 /* Entry Animation */
