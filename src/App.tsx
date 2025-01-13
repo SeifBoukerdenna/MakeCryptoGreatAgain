@@ -7,6 +7,7 @@ import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react
 import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
 import { PhantomWalletAdapter } from '@solana/wallet-adapter-phantom';
 import { injectSpeedInsights } from '@vercel/speed-insights';
+import { inject } from "@vercel/analytics"
 import { TEST_MODE } from './configs/test.config';
 import Layout from './components/Layout';
 import Social from './pages/Social';
@@ -27,6 +28,7 @@ const wallets = [new PhantomWalletAdapter()];
 
 const App = () => {
   injectSpeedInsights();
+  inject();
   const [isLoading, setIsLoading] = useState(true);
 
   // Initialize theme synchronously
