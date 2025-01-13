@@ -1,33 +1,35 @@
 // src/hooks/useDynamicCooldown.ts
 import { useMcgaBalance } from "./useMcgaBalance";
 
-const BASE_COOLDOWN_MS = 120000; // 2 minutes (120,000 ms)
-const TOKEN_DENOMINATOR = 1000; // Every 1000 tokens
-const REDUCTION_PER_TOKEN_GROUP = 10000; // 10 seconds (10,000 ms) per 1000 tokens
-const MIN_COOLDOWN_MS = 1000; // Minimum 1 second cooldown
+const BASE_COOLDOWN_MS = 21600000; // 6 hours
+const MIN_COOLDOWN_MS = 1000; // 1 second
+const MAX_TOKEN_AMOUNT = 100000; // 100k tokens for minimum cooldown
 
 export function useDynamicCooldown() {
   const mcgaBalance = useMcgaBalance();
 
-  // Calculate how many "token groups" the user has (each group is TOKEN_DENOMINATOR tokens)
-  const tokenGroups = Math.floor(mcgaBalance / TOKEN_DENOMINATOR);
+  const calculateCooldown = () => {
+    // Cap the balance at MAX_TOKEN_AMOUNT
+    const effectiveBalance = Math.min(mcgaBalance, MAX_TOKEN_AMOUNT);
 
-  // Calculate reduction (10 seconds per 1000 tokens)
-  const reduction = tokenGroups * REDUCTION_PER_TOKEN_GROUP;
+    // Calculate percentage of max tokens held (0 to 1)
+    const percentageOfMaxTokens = effectiveBalance / MAX_TOKEN_AMOUNT;
 
-  // Calculate final cooldown with minimum limit
-  const dynamicCooldownMs = Math.max(
-    BASE_COOLDOWN_MS - reduction,
-    MIN_COOLDOWN_MS
-  );
+    // Linear interpolation between BASE_COOLDOWN_MS and MIN_COOLDOWN_MS
+    const cooldown =
+      BASE_COOLDOWN_MS -
+      percentageOfMaxTokens * (BASE_COOLDOWN_MS - MIN_COOLDOWN_MS);
+
+    return Math.max(Math.floor(cooldown), MIN_COOLDOWN_MS);
+  };
 
   // Log the calculation for debugging
   console.log("Cooldown calculation:", {
     mcgaBalance,
-    tokenGroups,
-    reduction,
-    finalCooldown: dynamicCooldownMs,
+    finalCooldown: calculateCooldown(),
   });
 
-  return { dynamicCooldownMs };
+  const cooldown = calculateCooldown();
+
+  return { dynamicCooldownMs: cooldown };
 }

@@ -94,10 +94,8 @@ const ChallengePage = () => {
                 return;
             }
 
-            // Format time remaining
-            const minutes = Math.floor(timeLeft / (60 * 1000));
-            const seconds = Math.floor((timeLeft % (60 * 1000)) / 1000);
-            timerElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            // Use the updated formatTimeRemaining function
+            timerElement.textContent = formatTimeRemaining(timeLeft);
         };
 
         // Start interval
@@ -256,7 +254,7 @@ const ChallengePage = () => {
                                         <button
                                             onClick={() => handleGuess(character.id)}
                                             disabled={!hasPool || currentlyCoolingDown || !connected || isLoading || isSolved}
-                                            className={`challenge-button ${currentlyCoolingDown || isSolved ? 'cooldown' : 'ready -- refresh the page'}`}
+                                            className={`challenge-button ${currentlyCoolingDown || isSolved ? 'cooldown' : 'ready'}`}
                                         >
                                             {!connected ? (
                                                 <>
