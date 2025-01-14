@@ -1471,3 +1471,7 @@ button,
         /* center the 3 buttons horizontally */
     }
 }
+
+.selected-character-name {
+    display: none;
+}

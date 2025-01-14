@@ -56,9 +56,6 @@ const Home = () => {
           <p className="text-lg text-gray-600 dark:text-gray-400 max-w-md">
             Have conversations with famous personalities, win tokens, and be part of history
           </p>
-          <h3>
-            **note: this is a demo, the token hasn't been deployed yet**
-          </h3>
         </div>
       );
     }
@@ -72,14 +69,14 @@ const Home = () => {
               alt={`${getSelectedCharacter()!.name} Avatar`}
               className={`selected-avatar ${isPlaying ? 'speaking' : ''} w-24 h-24 transition-transform hover:scale-105`}
             />
-            {/* <div className="mt-2 text-lg font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+            <div className="selected-character-name text-transparent hidden">
               {getSelectedCharacter()!.name}
-            </div> */}
-            {/* {isPlaying && (
+            </div>
+            {isPlaying && (
               <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2">
-                <Waveform />
+                {/* <Waveform /> */}
               </div>
-            )} */}
+            )}
           </div>
         )}
 
