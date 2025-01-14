@@ -130,7 +130,7 @@ const Home = () => {
   return (
     <>
       <GuidedTour />
-      <LaunchCountdownOverlay />
+      {/* <LaunchCountdownOverlay /> */}
       <div className="home-container min-h-screen flex flex-col">
         <div className="container mx-auto flex-1 p-6 space-y-16">
           <section className="px-4 mb-8 mt-8">
