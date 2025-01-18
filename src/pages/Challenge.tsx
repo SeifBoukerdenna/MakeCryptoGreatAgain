@@ -26,6 +26,8 @@ import CooldownExplainer from '../components/CooldownExplainer';
 import WinnersSection from '../components/WinnersSection';
 import { Link } from 'react-router-dom';
 import Tooltip from '../components/Tooltip';
+import { CHALLENGES_ENABLED } from '../configs/test.config';
+import ChallengeBanner from '../components/ChallengeBanner';
 
 const ChallengePage = () => {
     const { connected } = useWallet();
@@ -136,6 +138,11 @@ const ChallengePage = () => {
             }
         );
     }
+
+    if (!CHALLENGES_ENABLED) {
+        return <ChallengeBanner />;
+    }
+
 
     return (
         <div className="container mx-auto px-4 py-8 space-y-8">

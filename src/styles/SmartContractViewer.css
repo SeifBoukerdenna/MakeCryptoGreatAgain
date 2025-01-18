@@ -1,5 +1,27 @@
 /* src/styles/SmartContractViewer.css */
 
+.contract-address {
+    font-family: 'Roboto Mono', monospace;
+    font-size: 0.875rem;
+    margin-bottom: 1rem;
+    padding: 0.5rem;
+    background: var(--input-bg);
+    border-radius: 0.5rem;
+}
+
+.contract-address.coming-soon {
+    color: var(--text-secondary);
+    font-style: italic;
+    text-align: center;
+    background: rgba(147, 51, 234, 0.1);
+}
+
+.copy-button.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+
 .contract-viewer-container {
     display: flex;
     flex-direction: column;

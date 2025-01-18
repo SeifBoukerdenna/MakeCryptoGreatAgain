@@ -134,7 +134,7 @@ const RoadmapPage = () => {
 
     const calculateVoteWeight = (mcgaBalance: number) => {
         // Each 1000 MCGA gives 1 extra vote weight, max 100 weight at 100k MCGA
-        return Math.min(Math.floor(mcgaBalance / 1000) + 1, 100);
+        return Math.min(Math.floor(mcgaBalance / 10000) + 1, 100);
     };
 
     const fetchCharacters = async () => {

@@ -4,6 +4,7 @@ import { okaidia } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { materialLight } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { FaCopy, FaCheck, FaExternalLinkAlt, FaShieldAlt, FaLock, FaCode, FaCheckCircle } from 'react-icons/fa';
+import { SHOW_CONTRACT_HASH } from '../configs/test.config';
 import '../styles/SmartContractViewer.css';
 
 interface SmartContractViewerProps {
@@ -14,9 +15,12 @@ interface SmartContractViewerProps {
 
 const SmartContractViewer: React.FC<SmartContractViewerProps> = ({ code, language, theme }) => {
     const [copied, setCopied] = useState(false);
-    const contractAddress = "DNsprXHccVbxFTE2RNvchU3E3W1Hn3U4yosFSiVs8bQT";
+    const contractAddress = SHOW_CONTRACT_HASH
+        ? "DNsprXHccVbxFTE2RNvchU3E3W1Hn3U4yosFSiVs8bQT"
+        : "Coming Soon";
 
     const handleCopy = () => {
+        if (!SHOW_CONTRACT_HASH) return;
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
     };
@@ -68,17 +72,21 @@ const SmartContractViewer: React.FC<SmartContractViewerProps> = ({ code, languag
     return (
         <div className="contract-viewer-container">
             {/* Contract Info Card */}
-            <div
-                className="address-card"
-            >
+            <div className="address-card">
                 {/* Contract Address Section */}
                 <section className="contract-section">
                     <h3 className="address-card-header">Contract Address</h3>
                     <div className="address-content">
                         <div className="address-label">
                             <span>MCGA Pool</span>
-                            <CopyToClipboard text={contractAddress} onCopy={handleCopy}>
-                                <button className="copy-button">
+                            <CopyToClipboard
+                                text={SHOW_CONTRACT_HASH ? contractAddress : ''}
+                                onCopy={handleCopy}
+                            >
+                                <button
+                                    className={`copy-button ${!SHOW_CONTRACT_HASH ? 'disabled' : ''}`}
+                                    disabled={!SHOW_CONTRACT_HASH}
+                                >
                                     {copied ? (
                                         <FaCheck className="copy-success" />
                                     ) : (
@@ -87,18 +95,20 @@ const SmartContractViewer: React.FC<SmartContractViewerProps> = ({ code, languag
                                 </button>
                             </CopyToClipboard>
                         </div>
-                        <div className="contract-address">
+                        <div className={`contract-address ${!SHOW_CONTRACT_HASH ? 'coming-soon' : ''}`}>
                             {contractAddress}
                         </div>
-                        <a
-                            href={`https://solscan.io/account/${contractAddress}?cluster=devnet`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="solscan-link"
-                        >
-                            View on Solscan
-                            <FaExternalLinkAlt />
-                        </a>
+                        {SHOW_CONTRACT_HASH && (
+                            <a
+                                href={`https://solscan.io/account/${contractAddress}?cluster=devnet`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="solscan-link"
+                            >
+                                View on Solscan
+                                <FaExternalLinkAlt />
+                            </a>
+                        )}
                     </div>
                 </section>
 
@@ -146,13 +156,9 @@ const SmartContractViewer: React.FC<SmartContractViewerProps> = ({ code, languag
             </div>
 
             {/* Code Viewer */}
-            <div
-                className="code-viewer"
-            >
+            <div className="code-viewer">
                 <CopyToClipboard text={code} onCopy={handleCopy}>
-                    <button
-                        className="code-copy-button"
-                    >
+                    <button className="code-copy-button">
                         {copied ? (
                             <FaCheck className="copy-success" />
                         ) : (

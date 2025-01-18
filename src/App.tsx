@@ -7,7 +7,7 @@ import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react
 import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
 import { PhantomWalletAdapter } from '@solana/wallet-adapter-phantom';
 import { injectSpeedInsights } from '@vercel/speed-insights';
-import { inject } from "@vercel/analytics"
+import { inject } from '@vercel/analytics';
 import { TEST_MODE } from './configs/test.config';
 import Layout from './components/Layout';
 import Social from './pages/Social';
@@ -24,6 +24,7 @@ declare var Buffer: typeof BufferPolyfill;
 globalThis.Buffer = BufferPolyfill;
 
 const endpoint = 'https://api.devnet.solana.com';
+// const endpoint = "https://go.getblock.io/362df45e292143fead2e2288ab34ec29"
 const wallets = [new PhantomWalletAdapter()];
 
 const App = () => {
@@ -49,6 +50,18 @@ const App = () => {
     document.documentElement.classList.toggle('dark', newTheme === 'dark');
     localStorage.setItem('theme', newTheme);
   };
+
+  // useEffect(() => {
+  //   const disableRightClick = (e: MouseEvent) => {
+  //     e.preventDefault();
+  //   };
+
+  //   document.addEventListener('contextmenu', disableRightClick);
+
+  //   return () => {
+  //     document.removeEventListener('contextmenu', disableRightClick);
+  //   };
+  // }, []);
 
   return (
     <ConnectionProvider endpoint={endpoint}>

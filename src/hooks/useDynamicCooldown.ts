@@ -1,10 +1,9 @@
 // src/hooks/useDynamicCooldown.ts
 import { useMcgaBalance } from "./useMcgaBalance";
 
-const BASE_COOLDOWN_MS = 21600000; // 6 hours
-const MIN_COOLDOWN_MS = 1000; // 1 second
-const MAX_TOKEN_AMOUNT = 100000; // 100k tokens for minimum cooldown
-
+const BASE_COOLDOWN_MS = 21600000; // 6 hours (21,600,000 ms)
+const MAX_TOKEN_AMOUNT = 1000000; // 1M tokens for minimum cooldown
+const MIN_COOLDOWN_MS = 1000; // Minimum 1 second cooldown
 export function useDynamicCooldown() {
   const mcgaBalance = useMcgaBalance();
 
