@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import './styles/global.css';
 import Home from './pages/Home';
 import About from './pages/About';
@@ -51,17 +51,17 @@ const App = () => {
     localStorage.setItem('theme', newTheme);
   };
 
-  // useEffect(() => {
-  //   const disableRightClick = (e: MouseEvent) => {
-  //     e.preventDefault();
-  //   };
+  useEffect(() => {
+    const disableRightClick = (e: MouseEvent) => {
+      e.preventDefault();
+    };
 
-  //   document.addEventListener('contextmenu', disableRightClick);
+    document.addEventListener('contextmenu', disableRightClick);
 
-  //   return () => {
-  //     document.removeEventListener('contextmenu', disableRightClick);
-  //   };
-  // }, []);
+    return () => {
+      document.removeEventListener('contextmenu', disableRightClick);
+    };
+  }, []);
 
   return (
     <ConnectionProvider endpoint={endpoint}>
