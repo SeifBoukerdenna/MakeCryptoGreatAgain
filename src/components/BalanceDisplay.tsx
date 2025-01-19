@@ -2,6 +2,7 @@ import React from 'react';
 import { CircleDollarSign, Coins, ExternalLink } from 'lucide-react';
 import Tooltip from './Tooltip';
 import { MCGA_TOKEN_MINT } from '../constants/tokens';
+import { NETWORK } from '../configs/test.config';
 
 interface BalanceDisplayProps {
     solBalance: number | null;
@@ -15,7 +16,7 @@ const BalanceDisplay: React.FC<BalanceDisplayProps> = ({
     formatToK,
 }) => {
     const handleMcgaClick = () => {
-        window.open(`https://solscan.io/token/${MCGA_TOKEN_MINT.toString()}?cluster=devnet`, '_blank');
+        window.open(`https://solscan.io/token/${MCGA_TOKEN_MINT.toString()}?cluster=${NETWORK}`, '_blank');
     };
 
     return (

@@ -8,7 +8,7 @@ import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
 import { PhantomWalletAdapter } from '@solana/wallet-adapter-phantom';
 import { injectSpeedInsights } from '@vercel/speed-insights';
 import { inject } from '@vercel/analytics';
-import { TEST_MODE } from './configs/test.config';
+import { endpoint, TEST_MODE } from './configs/test.config';
 import Layout from './components/Layout';
 import Social from './pages/Social';
 import RoadmapPage from './pages/RoadMap';
@@ -23,8 +23,6 @@ import LoadingScreen from './components/LoadingScreen';
 declare var Buffer: typeof BufferPolyfill;
 globalThis.Buffer = BufferPolyfill;
 
-const endpoint = 'https://api.devnet.solana.com';
-// const endpoint = "https://go.getblock.io/362df45e292143fead2e2288ab34ec29"
 const wallets = [new PhantomWalletAdapter()];
 
 const App = () => {

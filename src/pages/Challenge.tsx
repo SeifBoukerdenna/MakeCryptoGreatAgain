@@ -26,7 +26,7 @@ import CooldownExplainer from '../components/CooldownExplainer';
 import WinnersSection from '../components/WinnersSection';
 import { Link } from 'react-router-dom';
 import Tooltip from '../components/Tooltip';
-import { CHALLENGES_ENABLED } from '../configs/test.config';
+import { CHALLENGES_ENABLED, NETWORK } from '../configs/test.config';
 import ChallengeBanner from '../components/ChallengeBanner';
 
 const ChallengePage = () => {
@@ -112,7 +112,7 @@ const ChallengePage = () => {
 
     // Handle transaction notifications
     function handleTransaction(txHash: string) {
-        const solscanUrl = `https://solscan.io/tx/${txHash}?cluster=devnet`;
+        const solscanUrl = `https://solscan.io/tx/${txHash}?cluster=${NETWORK}`;
 
         toast.info(
             <div className="flex flex-col">

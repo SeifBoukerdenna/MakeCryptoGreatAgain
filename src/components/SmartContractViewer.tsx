@@ -4,7 +4,7 @@ import { okaidia } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { materialLight } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { FaCopy, FaCheck, FaExternalLinkAlt, FaShieldAlt, FaLock, FaCode, FaCheckCircle } from 'react-icons/fa';
-import { SHOW_CONTRACT_HASH } from '../configs/test.config';
+import { NETWORK, SHOW_CONTRACT_HASH } from '../configs/test.config';
 import '../styles/SmartContractViewer.css';
 
 interface SmartContractViewerProps {
@@ -100,7 +100,7 @@ const SmartContractViewer: React.FC<SmartContractViewerProps> = ({ code, languag
                         </div>
                         {SHOW_CONTRACT_HASH && (
                             <a
-                                href={`https://solscan.io/account/${contractAddress}?cluster=devnet`}
+                                href={`https://solscan.io/account/${contractAddress}?cluster=${NETWORK}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="solscan-link"
