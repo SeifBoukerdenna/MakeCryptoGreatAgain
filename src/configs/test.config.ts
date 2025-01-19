@@ -8,7 +8,7 @@ export const CHALLENGES_ENABLED = false;
 
 export const SHOW_CONTRACT_HASH = false;
 
-const devMode = true;
+const devMode = false;
 export const NETWORK = devMode ? "devnet" : "mainnet";
 
 export const endpoint = devMode

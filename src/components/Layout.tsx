@@ -10,7 +10,7 @@ import useBalanceStore from '../hooks/useBalanceStore';
 // import { TEST_MODE } from '../configs/test.config';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faXTwitter } from '@fortawesome/free-brands-svg-icons';
-import ComingSoonBanner from './ComingSoonBanner';
+// import ComingSoonBanner from './ComingSoonBanner';
 interface LayoutProps {
     toggleTheme: () => void;
     theme: 'light' | 'dark';
@@ -139,7 +139,7 @@ const Layout: React.FC<LayoutProps> = ({ toggleTheme, theme }) => {
                 </div>
 
             </nav>
-            <ComingSoonBanner />
+            {/* <ComingSoonBanner /> */}
 
             <main className="flex-1 px-4 py-6 md:px-8 bg-gray-50 dark:bg-gray-900">
                 <Outlet />
