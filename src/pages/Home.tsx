@@ -14,13 +14,14 @@ import { thinkingMessages } from '../configs/thinkingMessages.ts';
 import useConversationStore from '../stores/useConversationStore';
 import GuidedTour from '../components/tours/GuidedTour.tsx';
 import QueueStatus from '../components/QueueStatus.tsx';
+import Waveform from '../components/WaveForm.tsx';
 
 const Home = () => {
   // const { connected } = useWallet();
   const {
     messages,
     isPlaying,
-    ttsError,
+    // ttsError,
     messagesEndRef,
     handleSend,
     videoBlob,
@@ -49,43 +50,41 @@ const Home = () => {
   const renderChatArea = () => {
     if (!selectedCharacter) {
       return (
-        <div className="flex flex-col items-center justify-center h-full space-y-4 text-center my-8">
-          <div className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-            Welcome! Pick a character to start chatting
-          </div>
-          <p className="text-lg text-gray-600 dark:text-gray-400 max-w-md">
-            Have conversations with famous personalities, win tokens, and be part of history
+        <div className="flex flex-col items-center justify-center h-full text-center my-8">
+          <p className="text-xl text-gray-400 dark:text-gray-500 font-bold">
+            Select a character to start chatting
           </p>
         </div>
       );
     }
 
     return (
-      <div className="space-y-4">
+      <div className="space-y-4 relative"> {/* Added relative positioning */}
+        {messages.length > 0 && (
+          <button onClick={handleClearChat} className="clear-chat-button">
+            Clear Chat
+          </button>
+        )}
+
         {getSelectedCharacter() && (
-          <div className="selected-character-icon relative flex flex-col items-center">
+          <div className="selected-character-icon relative">
             <img
               src={getSelectedCharacter()!.avatar}
               alt={`${getSelectedCharacter()!.name} Avatar`}
-              className={`selected-avatar ${isPlaying ? 'speaking' : ''} w-24 h-24 transition-transform hover:scale-105`}
+              className={`selected-avatar ${isPlaying ? 'speaking' : ''} w-24 h-24`}
             />
-            <div className="selected-character-name text-transparent hidden">
+            <div className="selected-character-name">
               {getSelectedCharacter()!.name}
             </div>
             {isPlaying && (
-              <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2">
-                {/* <Waveform /> */}
+              <div className="waveform-under-avatar absolute inset-0 flex items-center justify-center">
+                <Waveform />
               </div>
             )}
           </div>
         )}
 
         <div className="messages flex-1 overflow-y-auto mb-4 p-4 text-base rounded-lg bg-opacity-50 backdrop-blur-sm max-h-96 space-y-3">
-          {messages.length === 0 && (
-            <div className="text-center text-gray-500 dark:text-gray-400 py-4">
-              Start the conversation by typing a message below
-            </div>
-          )}
           {messages.map((m, i) => {
             let messageText = m.text;
             if (m.sender !== 'user' && m.status === 'loading') {
@@ -114,9 +113,6 @@ const Home = () => {
           clearVideoBlob={clearVideoBlob}
           isProcessing={isProcessing}
         />
-        {ttsError && (
-          <p className="text-red-500 text-sm text-center">{ttsError}</p>
-        )}
       </div>
     );
   };

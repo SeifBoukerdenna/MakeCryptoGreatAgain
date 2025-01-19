@@ -1475,3 +1475,41 @@ button,
 .selected-character-name {
     display: none;
 }
+
+
+.clear-chat-button {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    font-size: 1rem;
+    background: transparent;
+    color: rgb(99, 102, 241);
+    z-index: 100;
+    padding: 0.5rem 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    border-radius: 30px;
+    border: 2px solid rgb(99, 102, 241);
+    transition: all 0.3s ease;
+}
+
+.clear-chat-button:hover {
+    background: rgba(99, 102, 241, 0.1);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 10px rgba(99, 102, 241, 0.2);
+}
+
+.clear-chat-button:active {
+    transform: translateY(0px);
+}
+
+/* Dark mode */
+.dark .clear-chat-button {
+    color: rgb(139, 92, 246);
+    border-color: rgb(139, 92, 246);
+}
+
+.dark .clear-chat-button:hover {
+    background: rgba(139, 92, 246, 0.1);
+    box-shadow: 0 2px 10px rgba(139, 92, 246, 0.2);
+}

@@ -30,8 +30,12 @@ import { CHALLENGES_ENABLED } from '../configs/test.config';
 import ChallengeBanner from '../components/ChallengeBanner';
 
 const ChallengePage = () => {
-    const { connected } = useWallet();
+
+    if (!CHALLENGES_ENABLED) {
+        return <ChallengeBanner />;
+    }
     const { connection } = useConnection();
+    const { connected } = useWallet();
 
     const {
         guesses,
@@ -137,10 +141,6 @@ const ChallengePage = () => {
                 progress: undefined,
             }
         );
-    }
-
-    if (!CHALLENGES_ENABLED) {
-        return <ChallengeBanner />;
     }
 
 
