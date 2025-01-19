@@ -32,7 +32,7 @@ const AdminSecrets = () => {
             });
             setSecrets(secretsMap);
         } catch (err) {
-            console.error('Error fetching secrets:', err);
+            // console.error('Error fetching secrets:', err);
             setError('Failed to load secrets');
         } finally {
             setIsLoading(false);
@@ -54,7 +54,7 @@ const AdminSecrets = () => {
             if (error) throw error;
             await fetchSecrets();
         } catch (err) {
-            console.error('Error updating secret:', err);
+            // console.error('Error updating secret:', err);
             setError('Failed to update secret');
         } finally {
             setIsLoading(false);
@@ -73,7 +73,7 @@ const AdminSecrets = () => {
             if (error) throw error;
             await fetchSecrets();
         } catch (err) {
-            console.error('Error deleting secret:', err);
+            // console.error('Error deleting secret:', err);
             setError('Failed to delete secret');
         } finally {
             setIsLoading(false);

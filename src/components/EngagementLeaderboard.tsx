@@ -27,7 +27,7 @@ const EngagementLeaderboard = () => {
                 setCopiedStates(prev => ({ ...prev, [address]: false }));
             }, 2000);
         } catch (err) {
-            console.error('Failed to copy address:', err);
+            // console.error('Failed to copy address:', err);
         }
     };
 
@@ -69,7 +69,7 @@ const EngagementLeaderboard = () => {
 
                 setUsers(usersWithBalances);
             } catch (err) {
-                console.error('Error fetching user engagement:', err);
+                // console.error('Error fetching user engagement:', err);
                 setError('Failed to fetch user engagement data');
             } finally {
                 setIsLoading(false);

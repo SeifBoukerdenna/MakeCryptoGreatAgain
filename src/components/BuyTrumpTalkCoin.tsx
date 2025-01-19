@@ -51,7 +51,7 @@ const BuyTrumpTalkCoin: React.FC = () => {
 
                     setTokens(fetchedTokens);
                 } catch (error) {
-                    console.error("Error fetching tokens or balance:", error);
+                    // console.error("Error fetching tokens or balance:", error);
                 }
             }
         };

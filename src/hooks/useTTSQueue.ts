@@ -2,13 +2,13 @@
 import { useState, useEffect } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { supabase } from "../lib/supabase";
+import { MAX_REQUESTS_PER_MINUTE } from "../configs/test.config";
 
 export const useTTSQueue = () => {
   const { publicKey } = useWallet();
   const [queuePosition, setQueuePosition] = useState<number | null>(null);
   const [activeRequests, setActiveRequests] = useState<number>(0);
   const [isProcessing, setIsProcessing] = useState(false);
-  const MAX_REQUESTS_PER_MINUTE = 2;
 
   useEffect(() => {
     if (!publicKey) return;

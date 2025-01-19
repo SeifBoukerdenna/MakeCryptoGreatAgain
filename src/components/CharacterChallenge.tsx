@@ -89,7 +89,7 @@ const CharacterChallenge = () => {
                 }
             }
         } catch (error) {
-            console.error('Error submitting guess:', error);
+            // console.error('Error submitting guess:', error);
         } finally {
             setIsLoading(false);
             setSubmittingId(null);

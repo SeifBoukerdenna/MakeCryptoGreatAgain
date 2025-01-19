@@ -46,7 +46,7 @@ const AdminPools: React.FC = () => {
             });
             setPoolInfo(poolMap);
         } catch (err) {
-            console.error('Error fetching pool info:', err);
+            // console.error('Error fetching pool info:', err);
             setError('Failed to load pool information');
         }
     };
@@ -75,7 +75,7 @@ const AdminPools: React.FC = () => {
 
             const poolTokenAccount = Keypair.generate();
 
-            const tx = await program.methods
+            await program.methods
                 .initializePool(uniqueSeed, secretHash)
                 .accounts({
                     // @ts-ignore: Suppress the error for poolPda
@@ -90,7 +90,7 @@ const AdminPools: React.FC = () => {
                 .signers([poolTokenAccount])
                 .rpc();
 
-            console.log("Pool initialized:", tx);
+            // console.log("Pool initialized:", tx);
 
             const newPoolInfo = {
                 pool_address: poolPda.toString(),
@@ -108,7 +108,7 @@ const AdminPools: React.FC = () => {
             await fetchPoolInfo();
 
         } catch (err) {
-            console.error("Error initializing pool:", err);
+            // console.error("Error initializing pool:", err);
             setError('Failed to initialize pool');
         } finally {
             setIsLoading(false);
