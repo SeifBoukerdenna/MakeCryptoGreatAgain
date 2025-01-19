@@ -153,7 +153,7 @@ export function useChallengeLogic(onTransaction?: (txHash: string) => void) {
     const difference = beforeAmount - afterAmount;
 
     // Round to 9 decimal places to handle SPL token decimals
-    const tokens = Math.round(difference * 1e9) / 1e9;
+    const tokens = Math.round(difference * 1e6) / 1e6;
 
     console.log("Tokens calculation:", {
       beforeAmount,
@@ -199,7 +199,7 @@ export function useChallengeLogic(onTransaction?: (txHash: string) => void) {
       let depositSucceeded = false;
       let depositSignature = "";
       try {
-        const depositAmount = new BN(Price.challengePrice * 1e9);
+        const depositAmount = new BN(Price.challengePrice * 1e6);
         depositSignature = await program.methods
           .deposit(depositAmount)
           .accounts({
