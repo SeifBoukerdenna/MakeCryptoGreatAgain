@@ -84,6 +84,7 @@ const ChallengeBanner = () => {
                             <p className="banner-description">
                                 Prepare for an epic adventure where you'll solve unique challenges,
                                 compete with players worldwide, and earn exclusive MCGA token rewards.
+                                You'll need to interact with the second discussion mode of the avatars to get hints about secrets
                             </p>
                         </motion.div>
 

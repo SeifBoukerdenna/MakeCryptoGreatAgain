@@ -1513,3 +1513,55 @@ button,
     background: rgba(139, 92, 246, 0.1);
     box-shadow: 0 2px 10px rgba(139, 92, 246, 0.2);
 }
+
+
+/* Add these styles to your social.css or characterStats.css */
+
+.free-character {
+    opacity: 0.7;
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.dark .free-character {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.free-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.25rem 0.75rem;
+    background: linear-gradient(135deg, #6366F1, #D946EF);
+    color: white;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+}
+
+.free-character-note {
+    color: #6B7280;
+    font-style: italic;
+    font-size: 0.875rem;
+}
+
+.dark .free-character-note {
+    color: #9CA3AF;
+}
+
+/* Make the free character row stand out less */
+.free-character td {
+    border-color: rgba(0, 0, 0, 0.05);
+}
+
+.dark .free-character td {
+    border-color: rgba(255, 255, 255, 0.05);
+}
+
+.free-character:hover {
+    background: rgba(0, 0, 0, 0.05) !important;
+}
+
+.dark .free-character:hover {
+    background: rgba(255, 255, 255, 0.05) !important;
+}

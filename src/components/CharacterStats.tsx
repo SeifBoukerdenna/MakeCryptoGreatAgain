@@ -45,7 +45,6 @@ const CharacterStats: React.FC<CharacterStatsProps> = ({
         }
     };
 
-
     const getRankBadge = (index: number) => {
         switch (index) {
             case 0:
@@ -59,8 +58,9 @@ const CharacterStats: React.FC<CharacterStatsProps> = ({
         }
     };
 
+    // Filter out Trump from total message count
     const totalMessages = characterStats.reduce(
-        (sum, char) => sum + char.total_message_count,
+        (sum, char) => char.character_id !== "1" ? sum + char.total_message_count : sum,
         0
     );
 
@@ -76,8 +76,8 @@ const CharacterStats: React.FC<CharacterStatsProps> = ({
                     <div className="stat-value">{totalMessages}</div>
                 </div>
                 <div className="stat-item">
-                    <div className="stat-label">Active Characters</div>
-                    <div className="stat-value">{characterStats.length}</div>
+                    <div className="stat-label">Active Paid Characters</div>
+                    <div className="stat-value">{characterStats.filter(char => char.character_id !== "1").length}</div>
                 </div>
             </div>
 
@@ -90,7 +90,6 @@ const CharacterStats: React.FC<CharacterStatsProps> = ({
                     <div className="error-message">Error loading character stats: {error}</div>
                 </div>
             ) : (
-                /* Scrollable table container */
                 <div className="table-responsive">
                     <table className="character-stats-table">
                         <thead>
@@ -104,9 +103,16 @@ const CharacterStats: React.FC<CharacterStatsProps> = ({
                         </thead>
                         <tbody>
                             {characterStats.map((character, index) => (
-                                <tr key={character.character_id} className="character-row">
+                                <tr
+                                    key={character.character_id}
+                                    className={`character-row ${character.character_id === "1" ? "free-character" : ""}`}
+                                >
                                     <td className="rank-cell">
-                                        {getRankBadge(index)}
+                                        {character.character_id === "1" ? (
+                                            <span className="free-badge">FREE</span>
+                                        ) : (
+                                            getRankBadge(index)
+                                        )}
                                     </td>
                                     <td className="character-cell">
                                         <div className="character-content">
@@ -120,28 +126,38 @@ const CharacterStats: React.FC<CharacterStatsProps> = ({
                                             <span className="character-name">{character.name}</span>
                                         </div>
                                     </td>
-                                    <td className="stats-center mcga-balance">
-                                        {formatToK(character.total_message_count)}
+                                    <td className="stats-center mcga-balance" colSpan={character.character_id === "1" ? 3 : 1}>
+                                        {character.character_id === "1" ? (
+                                            <span className="free-character-note">
+                                                Free character - statistics not tracked
+                                            </span>
+                                        ) : (
+                                            formatToK(character.total_message_count)
+                                        )}
                                     </td>
-                                    <td className="character-time">
-                                        {formatDistanceToNow(new Date(character.last_used), {
-                                            addSuffix: true
-                                        })}
-                                    </td>
-                                    <td className="wallet-address-cell">
-                                        <button
-                                            onClick={() => handleCopy(character.last_wallet_address)}
-                                            className="copy-address-button"
-                                            title="Click to copy wallet address"
-                                        >
-                                            <span>{truncateAddress(character.last_wallet_address)}</span>
-                                            {copiedStates[character.last_wallet_address] ? (
-                                                <Check className="copy-icon" size={16} />
-                                            ) : (
-                                                <Copy className="copy-icon" size={16} />
-                                            )}
-                                        </button>
-                                    </td>
+                                    {character.character_id !== "1" && (
+                                        <>
+                                            <td className="character-time">
+                                                {formatDistanceToNow(new Date(character.last_used), {
+                                                    addSuffix: true
+                                                })}
+                                            </td>
+                                            <td className="wallet-address-cell">
+                                                <button
+                                                    onClick={() => handleCopy(character.last_wallet_address)}
+                                                    className="copy-address-button"
+                                                    title="Click to copy wallet address"
+                                                >
+                                                    <span>{truncateAddress(character.last_wallet_address)}</span>
+                                                    {copiedStates[character.last_wallet_address] ? (
+                                                        <Check className="copy-icon" size={16} />
+                                                    ) : (
+                                                        <Copy className="copy-icon" size={16} />
+                                                    )}
+                                                </button>
+                                            </td>
+                                        </>
+                                    )}
                                 </tr>
                             ))}
                             {characterStats.length === 0 && (
@@ -158,5 +174,6 @@ const CharacterStats: React.FC<CharacterStatsProps> = ({
         </div>
     );
 };
+
 
 export default CharacterStats;
